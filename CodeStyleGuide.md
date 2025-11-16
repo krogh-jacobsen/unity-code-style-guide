@@ -1,4 +1,5 @@
 # GitHub Copilot Instructions: Unity C# Style Guide & Naming
+
 This document serves two purposes:
 1. To provide human-readable explanations of the coding conventions.
 2. To guide GitHub Copilot in generating code that aligns with these conventions.
@@ -18,9 +19,9 @@ Feel free to use it for inspiration, tweak it to your own preferences, or use it
     - [Table of Contents](#table-of-contents)
     - [Purpose of this Style Guide](#purpose-of-this-style-guide)
     - [Key Principles for this Style Guide](#key-principles-for-this-style-guide)
-    - [Unity Version-Specific Instructions](#unity-version-specific-instructions-for-this-project)
-2. The Unity C# Fundamentals
-    - [Balancing Succinctness vs. Verbosity](#balancing-being-too-succinct-vs-too-verbose)
+    - [Unity Version-Specific Instructions](#unity-version-specific-instructions)
+2. [The Unity C# Fundamentals](#the-unity-c-fundamentals)
+    - [Balancing Succinctness vs. Verbosity](#balancing-succinctness-vs-verbosity)
     - [General Naming](#general-naming)
     - [Formatting](#formatting)
         - [Spacing](#spacing)
@@ -42,17 +43,17 @@ Feel free to use it for inspiration, tweak it to your own preferences, or use it
 3. [General Tips to Cleaner Code](#general-tips-to-cleaner-code)
     - [Avoid Nesting If Statements](#avoid-nesting-if-statements)
     - [Collection Type Selection](#collection-type-selection)
-    - [Async & Awaitable Usage](#async--awaitable-usage)
+    - [Async & Awaitable Usage](#async-awaitable-usage)
     - [Scriptable Objects](#scriptable-objects)
     - [Animation Parameters, Layers, Tags, Sorting Layers, and Input Action Names](#animation-parameters-layers-tags-sorting-layers-and-input-action-names)
 4. [Debugging](#debugging)
-    - [Using Try-Catch & Debugger Breaks](#using-try-catch--debugger-breaks)
+    - [Using Try-Catch & Debugger Breaks](#using-try-catch-debugger-breaks)
 5. [Design Patterns for Unity](#design-patterns-for-unity)
     - [Use Enums for Managing States](#use-enums-for-managing-states)
     - [Implementing the State Pattern](#implementing-the-state-pattern)
     - [Object Pooling](#object-pooling)
 6. [UI Toolkit](#ui-toolkit)
-    - [UI Toolkit File Naming & Organization](#ui-toolkit-file-naming--organization)
+    - [UI Toolkit File Naming & Organization](#ui-toolkit-file-naming-organization)
     - [UXML](#uxml)
     - [USS](#uss)
     - [UI Toolkit Event Handling](#ui-toolkit-event-handling)
@@ -61,15 +62,14 @@ Feel free to use it for inspiration, tweak it to your own preferences, or use it
 ## Instructions for GitHub Copilot
 The following sections provide specific coding conventions and examples for GitHub Copilot to follow.
 
-### Purpose of this Style Guide
 - ℹ️ To provide GitHub Copilot with clear instructions on how to generate code that aligns with my coding style and conventions for Unity C# projects.
 - ℹ️ To ensure consistency, readability, and maintainability across the codebase by adhering to established coding standards.
 - ℹ️ To help Copilot understand the specific Unity version and features being used in this project.
 - ℹ️ To improve the quality of code suggestions and completions provided by Copilot, making them more relevant and useful for this particular project.
 
-### Key Principles for this Style Guide
+## Key Principles for this Style Guide
 
-- ℹ️ The standards specified here stand on the shoulders of the [Microsoft Framework Design Guidelines](https://docs.microsoft.com/en-us/dotnet/standard/design-guidelines/) and common industry best practices.
+- ℹ️ The standards specified here stand on the shoulders of the [Microsoft Framework Design Guidelines](https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/) and common industry best practices.
 - ℹ️ The variations are generally intended to be more LLM-friendly, pragmatic, and beginner-friendly as well as Unity-specific.
 - ℹ️ When something isn’t explicitly covered here, default to Microsoft’s general recommendations for C#.
 - ℹ️ The goal is to make the code more readable, maintainable, and consistent. Being consistent creates patterns and enables Copilot to make more accurate predictions.
@@ -78,7 +78,7 @@ The following sections provide specific coding conventions and examples for GitH
 - ℹ️ Doing things like naming the right way from the beginning will save time and effort later, particularly when debugging and extending functionality.
 - ℹ️ As much as possible, stick to industry standards and conventions but be pragmatic. Not all rules will apply in every situation, so use judgment and adapt as needed.
 
-### Unity version-specific instructions for this project
+## Unity Version-Specific Instructions
 
 - ℹ️ This project uses Unity 6. Make sure to use the latest sources and documentation that apply to Unity 6 or later versions.
 - ℹ️ This project uses the newer Input System and not the older Input Manager.
@@ -145,7 +145,7 @@ public void ProcessItems ( List<Item>items,int startIndex ) { for(int i=startInd
 #### Spacing
 
 - ✅ Use a single space after a comma between function arguments, e.g., `CollectItem(myObject, 0, 1);`.
-- ❌ Don't add a space after the parenthesis and function arguments, e.g., `CollectItem(myObject, 0, 1);`.
+- ❌ Don't add spaces just inside the parentheses before the first or after the last argument, e.g., `CollectItem( myObject, 0, 1 );`.
 - ❌ Don't use spaces between a function name and parenthesis, e.g., `DropPowerUp(myPrefab, 0, 1);`.
 - ✅ Use vertical spacing (extra blank line) for visual separation.
 - ✅ Use one variable declaration per line in most cases. It's less compact but enhances readability.
@@ -169,9 +169,8 @@ public void ProcessItems ( List<Item>items,int startIndex ) { for(int i=startInd
 ```
 
 ## Comments
-
+- ✅ Add clarifying comments to most lines. However, they should provide valuable context or clarify intent that isn’t obvious from good naming.
 - ⚠️ If a comment is needed to explain complex logic, consider refactoring the code to improve clarity first.
-- ✅ Add comments only when they provide valuable context or clarify intent that isn’t obvious from good naming.
 - ✅ Favor simple, succinct comments that explain “why” rather than “what” the code does.
 - ✅ Prefer renaming variables or methods to make intent clear before relying on comments.
 - ⚠️ When in doubt, err on the side of providing more context, but avoid commenting code that is already self-explanatory.
@@ -247,7 +246,7 @@ private const float k_maxSpeed = 10f;
 ## Organize your class by the Unity Script Execution Order
 
 - ✅ Organize your class in the Unity script execution order: Fields, Properties, Events, MonoBehaviour methods (`Awake`, `OnEnable`, `Start`, `OnDisable`, `OnDestroy`, etc.), public methods, private methods, other classes.
-- ✅ Use `#region` sparingly. It's sometimes helpful but generally discouraged because it can hide complexity and often signals a class is too large and should be refactored.
+- ✅ Keep related methods together for better readability.
 - ✅ Keep MonoBehaviours focused on a single responsibility. If a class is getting too large or complex, consider breaking it into smaller components or using ScriptableObjects for data/configuration.
 - ✅ Use `[RequireComponent(typeof(OtherComponent))]` when dependencies exist. It ensures the required component is always present so we don't need to check for null references later.
 - ✅ Cache expensive operations outside of Update loops to prevent repeated allocations.
@@ -334,6 +333,28 @@ namespace MyGame.Examples
 }
 ```
 
+### Use of regions
+- ℹ️ Use `#region` sparingly. It's sometimes helpful but generally discouraged because it can hide complexity and often signals a class is too large and should be refactored instead.
+- ✅ A good use case for `#region` however is to group Animation Event Handlers or Input Event Handlers, called from the animation system etc. so they are clearly separated from the rest of the code.
+
+```csharp
+        #region Animation Event Methods
+        // This method is called from animation events to signal landing
+        public void OnLand()
+        {
+            Debug.Log("OnLand called from animation event");
+        }
+
+        // This method is called from animation events
+        public void OnFootstep()
+        {
+            // This method can be used to play footstep sounds
+            Debug.Log("Footstep event triggered");
+        }
+        #endregion
+```
+
+
 ### Using statements
 
 - ✅ Keep using statements at the top of your file.
@@ -410,7 +431,7 @@ private const int k_maxCount = 100;      // Constant with k_ prefix
 - ✅ Place properties after fields and before MonoBehaviour methods as per your class organization.
 - ✅ Place properties after fields and before MonoBehaviour methods as per your class organization.
 - ✅ Use properties for simple state access or modification.
-- ℹ️ Use methods for actions or operations. Such as input handling and event-driven behavior. Name appropiately `ApplyDamage(int amount)` instead of `SetHealth(int amount)`.
+- ℹ️ Use methods for actions or operations. Such as input handling and event-driven behavior. Name appropiate `ApplyDamage(int amount)` instead of `SetHealth(int amount)`.
 
 ```csharp
 // Private backing field
@@ -533,7 +554,7 @@ public class EnemyManager : MonoBehaviour
 {
    // Modern initialization syntax (C# 9.0+)
    [SerializeField] private List<GameObject> m_activeEnemies = new();
-   [SerializeField] private Dictionary<string, int> m_enemyScores = new();
+   [SerializeField] private Dictionary<string, List<GameObject>> m_enemyScores = new();
    [SerializeField] private HashSet<string> m_uniqueIds = new();
 
    // Reusable collection to avoid allocations in Update
@@ -576,12 +597,17 @@ public class EnemyManager : MonoBehaviour
    }
 }
 
+```
 
+```csharp
 // Efficient string operations
 public class ScoreManager : MonoBehaviour
 {
    // Bad - creates garbage with string concatenation
-   string result = "Score: " + score + " Time: " + time;
+   private string BuildLabelWithConcatenation(int score, float time)
+   {
+       return "Score: " + score + " Time: " + time;
+   }
 
    // Good - use string interpolation
    private void UpdateScoreDisplay(int score, float time)
@@ -590,6 +616,7 @@ public class ScoreManager : MonoBehaviour
        // Display result...
    }
 }
+```
 
 ```csharp
 // Avoid - expensive operations in Update
@@ -1455,7 +1482,7 @@ Here is a quick explanation of some of the key settings:
 
 
 # Script examples (putting it all together)
-This example focuses on a Character Controller and an Animation Controller, demonstrating some of the concepts and conventions discussed in this style guide.
+This example focuses on a CharacterController and a AnimationController, demonstrating some of the concepts and conventions discussed in this style guide.
 
 ```csharp
 // This script ties everything together, managing movement, health, and audio.
@@ -1474,10 +1501,14 @@ namespace CoreSystems
         [SerializeField, Tooltip("Force applied when the character jumps.")]
         private float m_jumpForce = 7f;
 
+        [Header("Ground Detection")]
+        [SerializeField, Tooltip("Layer mask used to determine which surfaces count as ground.")]
+        private LayerMask m_groundLayer;
+
         private Rigidbody m_rigidbody;
 
         // Event to notify animation changes
-        public event System.Action<Vector3> OnMovementInput;
+        public event System.Action<Vector3> MovementInputReceived;
 
         private void Awake()
         {
@@ -1511,8 +1542,12 @@ namespace CoreSystems
             transform.Translate(movement * m_moveSpeed * Time.deltaTime, Space.World);
 
             // Notify listeners about movement input
-            OnMovementInput?.Invoke(movement);
+            OnMovementInputReceived(movement);
+        }
 
+        private void OnMovementInputReceived(Vector3 movement)
+        {
+            MovementInputReceived?.Invoke(movement);
         }
 
         private void HandleJump()
@@ -1564,12 +1599,12 @@ namespace CoreSystems
 
         private void OnEnable()
         {
-            m_characterController.OnMovementInput += HandleMovementInput;
+            m_characterController.MovementInputReceived += HandleMovementInput;
         }
 
         private void OnDisable()
         {
-            m_characterController.OnMovementInput -= HandleMovementInput;
+            m_characterController.MovementInputReceived -= HandleMovementInput;
         }
 
         private void HandleMovementInput(Vector3 movement)
@@ -1580,5 +1615,50 @@ namespace CoreSystems
         }
     }
 }
+
+```
+# Bonus tips
+
+## Beginner tips: Avoid (too much) shorthand code
+- ✅ It can be tempting to use shorthand syntax to make code more concise, but if you're new to programming or Unity, prioritizing clarity and readability is more important. As you gain experience, you can gradually use more advanced syntax.
+- ✅ Prioritize code clarity and readability over brevity. If a shorthand syntax makes the code harder to understand, prefer the more explicit form.
+- ✅ Use explicit types instead of var when the type is not immediately clear from the right-hand side of the assignment.
+- ✅ Prefer traditional method syntax over lambda expressions for multi-line methods or when the logic is not immediately clear.
+- ❌ Avoid using the ternary operator for complex conditions that reduce readability.
+
+```csharp
+
+    // Calculate the current movement speed based on input
+
+    // Less clear version ternary operator
+    m_currentMovementSpeed = m_forwardMovementInput.y * (m_isRunning ? m_runningSpeed : m_walkSpeed);
+
+    // Clearer version with if-else
+    if (m_isRunning)
+    {
+        m_currentMovementSpeed = m_forwardMovementInput.y * m_runningSpeed;
+    }
+    else
+    {
+        m_currentMovementSpeed = m_forwardMovementInput.y * m_walkSpeed;
+    }
+```
+
+
+## Naming files and folders
+- ✅ Use PascalCase for all file and folder names to maintain consistency with class and script naming conventions (e.g., `CharacterController.cs`, `AnimationController.cs`, `CoreSystems/`, `UI/`).
+- ✅ Organize scripts into folders based on functionality or feature areas (e.g., `CoreSystems/`, `UI/`).
+- ✅ Don't worry about long folder paths if they improve organization and clarity. That only helps future maintainers and copilot.
+- ❌ Avoid spaces and special characters in file and folder names to prevent issues with version control systems and cross-platform compatibility.
+- ℹ️ If you have a very long folder name with variations you can consider using _ instead of spaces to seperate words. Example: InputSystemActions_PlayerInputComponent_UnityEvents, InputSystemActions_PlayerInputComponent_CSharpEvents, etc.
+- ❌ Don't use the ´NotImplementedException´ when stubbing out new methods or event handlers. It adds unnecessary noise and makes it harder to read the code. Instead, leave the method body empty or add a comment indicating that the implementation is pending.
+
+```csharp
+
+    private void LookInputReceived(InputAction.CallbackContext context)
+    {
+        // Don't: when Copilot helps create new methods, leave out the the NotImplementedException
+        throw new NotImplementedException();
+    }
 
 ```
