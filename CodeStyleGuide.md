@@ -12,53 +12,6 @@ While this guide is aimed at Copilot, it also includes short explanations about 
 Any code style guide should evolve over time. That has also been the case for this doc, and the intent is to update it as needed. Note that these instructions are specific to Unity and include some opinionated, Unity-specific conventions based on personal experience.
 
 Feel free to use it for inspiration, tweak it to your own preferences, or use it for your own Unity projects. Happy coding!
-
-# Table of Contents
-
-1. [About this Style Guide](#about-this-style-guide)
-    - [Table of Contents](#table-of-contents)
-    - [Purpose of this Style Guide](#purpose-of-this-style-guide)
-    - [Key Principles for this Style Guide](#key-principles-for-this-style-guide)
-    - [Unity Version-Specific Instructions](#unity-version-specific-instructions)
-2. [The Unity C# Fundamentals](#the-unity-c-fundamentals)
-    - [Balancing Succinctness vs. Verbosity](#balancing-succinctness-vs-verbosity)
-    - [General Naming](#general-naming)
-    - [Formatting](#formatting)
-        - [Spacing](#spacing)
-    - [Comments](#comments)
-    - [Fields](#fields)
-    - [Custom Attributes](#custom-attributes)
-    - [Casing and Prefixes](#casing-and-prefixes)
-    - [Avoid Redundancy but Don't Leave Out Context](#avoid-redundancy-but-dont-leave-out-context)
-    - [Organize Your Class by the Unity Script Execution Order](#organize-your-class-by-the-unity-script-execution-order)
-    - [Using Statements](#using-statements)
-    - [Namespaces](#namespaces)
-    - [Properties](#properties)
-    - [Start vs. Awake](#start-vs-awake)
-    - [Update vs. FixedUpdate](#update-vs-fixedupdate)
-    - [Methods](#methods)
-    - [Events](#events)
-        - [Subscribing and Unsubscribing to Events](#subscribing-and-unsubscribing-to-events)
-    - [Interfaces](#interfaces)
-3. [General Tips to Cleaner Code](#general-tips-to-cleaner-code)
-    - [Avoid Nesting If Statements](#avoid-nesting-if-statements)
-    - [Collection Type Selection](#collection-type-selection)
-    - [Async & Awaitable Usage](#async-awaitable-usage)
-    - [Scriptable Objects](#scriptable-objects)
-    - [Animation Parameters, Layers, Tags, Sorting Layers, and Input Action Names](#animation-parameters-layers-tags-sorting-layers-and-input-action-names)
-4. [Debugging](#debugging)
-    - [Using Try-Catch & Debugger Breaks](#using-try-catch-debugger-breaks)
-5. [Design Patterns for Unity](#design-patterns-for-unity)
-    - [Use Enums for Managing States](#use-enums-for-managing-states)
-    - [Implementing the State Pattern](#implementing-the-state-pattern)
-    - [Object Pooling](#object-pooling)
-6. [UI Toolkit](#ui-toolkit)
-    - [UI Toolkit File Naming & Organization](#ui-toolkit-file-naming-organization)
-    - [UXML](#uxml)
-    - [USS](#uss)
-    - [UI Toolkit Event Handling](#ui-toolkit-event-handling)
-7. [Using .editorconfig to Enforce Formatting Rules](#using-editorconfig-to-enforce-formatting-rules)
-
 ## Instructions for GitHub Copilot
 The following sections provide specific coding conventions and examples for GitHub Copilot to follow.
 
@@ -1253,70 +1206,28 @@ public class BulletPool : MonoBehaviour
 
 # UI Toolkit
 
-## UI Toolkit File Naming & Organization
-- ✅ Use PascalCase for UXML filenames to align with Unity conventions and maintain consistency with class and script naming (e.g., `MainMenu.uxml`, `InventoryPanel.uxml`, `SettingsPanel.uxml`, `PlayerHUD.uxml`).
-- ✅ Organize UXML and USS files in a consistent folder structure (e.g., Assets/UI/UXML/ and Assets/UI/USS/).
-- ✅ Name USS files to match their corresponding UXML files for easy association (e.g., `MainMenu.uss` for `MainMenu.uxml`).
 
-## UXML
-- ✅ Use BEM (Block-Element-Modifier) for name and class values to improve maintainability, readability, and consistency between code and style and why it's widely considered a best practice standard
-- ✅ Prefer kebab-case for UXML name and class strings (e.g., navbar-menu, shop-button).
-- ✅ Use name for unique identifiers (e.g., elements you query in C#) and class for reusable styles or shared behavior.
-- ✅ Keep name unique within it's block to improve query performance when using .Q() or .Query() from C#.
-- ✅ Avoid overloading a single element with many unrelated classes; keep classes purposeful and focused.
-- ✅ Group related elements inside a top-level block container to make queries and styling predictable.
-- ✅ For nested blocks, use the parent block name as a prefix for child blocks (e.g., navbar-menu__dropdown).
-- ✅ Add accessibility attributes (e.g., aria-label) to UXML elements where applicable.
+## UXML & USS files
+- ✅ Use PascalCase for USS and UXML filenames as well as custom UXML elements (custom controls) to align with Unity conventions and maintain consistency with class and script naming (e.g., MainMenu.uxml, InventoryPanel.uxml, SettingsPanel.uxml, PlayerHUD.uxml)
 
-**BEM refresher:**
-- ℹ️ Pattern: `block-name__element-name--modifier-name`
-    - ℹ️ Block: standalone component that is meaningful on it's own (e.g., `navbar-menu`, `sidebar`, `login-form`)
-    - ℹ️ Element: part of a block that has no standalone meaning and is semantically tied to it's block (e.g., `__item`, `__button`, `__input-field`)
-    - ℹ️ Modifier: a flag on a block or element used to change appearance or behavior (e.g., `--active`, `--collapsed`, `--error`)
-- ℹ️ Parts joined by `__` (element) and `--` (modifier)
-- ℹ️ Examples: `menu__home-button`, `menu__shop-button`, `navbar-menu__shop-button--small`, `button--primary`
 
-**Examples**
-- These follow the BEM (Block-Element-Modifier) standard, ensuring clarity, structure, and maintainability.
+## Visual Elements in UXML
+- ✅ Use kebab-case for UXML elements names (e.g., navbar-menu, shop-button).
+- ✅ Keep name unique within its block to improve query performance when using .Q() or .Query() from C#.
+- ✅ Element name should stay short, semantic, and unique.
 
-    ***Block Names***: should clearly describe the purpose or role of the block within the UI and be suitable for grouping related elements
-    - ✅ `navbar-menu`(easy to identify navigation menu block)
-    - ✅ `sidebar`
-    - ✅ `login-form`
-    - ❌ `menu` (too generic, lacks context)
-    - ❌ `navBarMenu` (camelCase instead of kebab-case)
-    - ❌ `navbar_menu` (uses underscores instead of dashes)
-
-    ***Element Names***: should describe the specific part of the block they belong to, maintaining a clear relationship to the block
-    - ✅ `navbar-menu__item`
-    - ✅ `sidebar__toggle-button`
-    - ✅ `login-form__input-field`
-    - ❌ `navbar-item` (missing the block reference, should be `navbar-menu__item`)
-    - ❌ `sidebar-button` (missing the block reference, should be `sidebar__button`)
-    - ❌ `login-form-input` (missing the __ for the element, should be `login-form__input`)
-
-    ***Modifier Names***: should indicate variations or states of blocks or elements
-    - ✅ `navbar-menu__item--active`
-    - ✅ `sidebar__toggle-button--collapsed`
-    - ✅ `login-form__input-field--error`
-    - ❌ `navbar-menu__item-active` (missing `--` for the modifier, should be `navbar-menu__item--active`)
-    - ❌ `sidebar__toggleButton--collapsed` (camelCase instead of kebab-case)
-    - ❌ `login-form__input-field_error` (uses underscores instead of -- for the modifier)
 
 **Example (UXML)**
 ```xml
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
-  <!-- Block container -->
-  <ui:VisualElement name="navbar-menu" class="navbar-menu">
-    <!-- Element: a specific button inside the block -->
-    <ui:Button name="navbar-menu__shop-button" class="navbar-menu__shop-button button button--primary" aria-label="Shop">
-      <ui:Button.text>Shop</ui:Button.text>
-    </ui:Button>
-    <!-- Variant via modifier -->
-    <ui:Button name="navbar-menu__shop-button--small" class="navbar-menu__shop-button navbar-menu__shop-button--small button button--small" aria-label="Shop (Small)">
-      <ui:Button.text>Shop</ui:Button.text>
-    </ui:Button>
-  </ui:VisualElement>
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/Runtime/B03_MainMenu/MainMenuStyles.uss?fileID=7433441132597879392&amp;guid=a182ccb84c0dd044a8df49d76f575b05&amp;type=3#MainMenuStyles"/>
+    <Bagel.MainMenuPaneManager name="main-menu-pane-manager">
+        <ui:Label text="Bagel Game" name="title" class="b-title"/>
+        <ui:Button text="Play" name="play-button" class="b-primary"/>
+        <ui:Button text="Settings" name="settings-button"/>
+        <ui:Button text="Leaderboard" name="leaderboard-button"/>
+        <ui:Button text="Exit" name="exit-button"/>
+    </Bagel.MainMenuPaneManager>
 </ui:UXML>
 ```
 
@@ -1325,10 +1236,11 @@ public class BulletPool : MonoBehaviour
 // Centralize selectors as constants to avoid typos
 public static class UiSelectors
 {
-    public const string NavbarMenu = "navbar-menu"; // block
-    public const string ShopButton = "navbar-menu__shop-button"; // element
-    public const string ShopButtonSmall = "navbar-menu__shop-button--small"; // modifier
+   public const string NavbarMenu = "navbar-menu"; // block
+   public const string ShopButton = "shop-button"; // element
+modifier
 }
+
 
 // Usage in a MonoBehaviour or UI controller
 var root = GetComponent<UIDocument>().rootVisualElement;
@@ -1337,8 +1249,104 @@ var shopButton = root.Q<Button>(UiSelectors.ShopButton);
 shopButton.clicked += OnShopClicked;
 ```
 
+
 ## USS
 **Guidelines**
+- ✅ Use BEM (Block-Element-Modifier) for styling and thus for naming USS classes to improve maintainability,
+readability, and consistency between code and style and why it's widely considered a best practice standard
+- ✅ Use **kebab-case** for class names. prefer **BEM** to encode structure and variants.
+- ✅ Keep selectors **flat and specific**: prefer `.block__element` over deep descendant chains.
+- ✅ Use **modifiers** as additive classes (e.g., `.button--small`) instead of redefining the base element.
+- ✅ Keep **state** styles separate via state classes (e.g., `.is-selected`, `.is-disabled`) or use built-in pseudo-classes when available.
+- ✅ Define **design tokens** (colors, spacing, sizes) as USS variables at the root when possible.
+- ✅ Do keep class names short, descriptive, and BEM-aligned.
+- ✅ Do centralize string constants used in code to avoid typos.
+- ❌ Don’t rely on deep descendant selectors (e.g., `.a .b .c`) — they become brittle.
+- ❌ Don’t mix unrelated concerns in one class; compose via multiple small classes instead.
+- ✅ For nested blocks, use the parent block name as a prefix for child blocks (e.g., navbar-menu__dropdown).
+
+**BEM refresher:**
+- ℹ️ Pattern: `block-name__element-name--modifier-name`
+   - ℹ️ Block: standalone component that is meaningful on its own (e.g., `navbar-menu`, `sidebar`, `login-form`)
+   - ℹ️ Element: part of a block that has no standalone meaning and is semantically tied to its block (e.g., `__item`, `__button`, `__input-field`)
+   - ℹ️ Modifier: a flag on a block or element used to change appearance or behavior (e.g., `--active`, `--collapsed`, `--error`)
+- ℹ️ Parts joined by `__` (element) and `--` (modifier)
+- ℹ️ Examples: `menu__home-button`, `menu__shop-button`, `navbar-menu__shop-button--small`, `button--primary`
+
+**Examples**
+- These follow the BEM (Block-Element-Modifier) standard, ensuring clarity, structure, and maintainability.
+
+   ***Block Names***: should clearly describe the purpose or role of the block within the UI and be suitable for grouping related elements
+   - ✅ `navbar-menu`(easy to identify navigation menu block)
+   - ✅ `sidebar`
+   - ✅ `login-form`
+   - ❌ `menu` (too generic, lacks context)
+   - ❌ `navBarMenu` (camelCase instead of kebab-case)
+   - ❌ `navbar_menu` (uses underscores instead of dashes)
+
+   ***Element Names***: should describe the specific part of the block they belong to, maintaining a clear relationship to the block
+   - ✅ `navbar-menu__item`
+   - ✅ `sidebar__toggle-button`
+   - ✅ `login-form__input-field`
+   - ❌ `navbar-item` (missing the block reference, should be `navbar-menu__item`)
+   - ❌ `sidebar-button` (missing the block reference, should be `sidebar__button`)
+   - ❌ `login-form-input` (missing the __ for the element, should be `login-form__input`)
+
+
+   ***Modifier Names***: should indicate variations or states of blocks or elements
+   - ✅ `navbar-menu__item--active`
+   - ✅ `sidebar__toggle-button--collapsed`
+   - ✅ `login-form__input-field--error`
+   - ❌ `navbar-menu__item-active` (missing -- for the modifier, should be `navbar-menu__item--active`)
+   - ❌ `sidebar__toggleButton--collapsed` (camelCase instead of kebab-case)
+   - ❌ `login-form__input-field_error` (uses underscores instead of -- for the modifier)
+
+**Example (USS)**
+```css
+/* Block base */
+.navbar-menu { padding: 8px; gap: 8px; }
+
+
+/* Element base */
+.navbar-menu__shop-button { min-width: 120px; }
+
+
+/* Modifier */
+.navbar-menu__shop-button--small { min-width: 80px; }
+
+
+/* Generic button system using BEM-like modifiers */
+.button { height: 32px; padding-left: 12px; padding-right: 12px; }
+.button--primary { background-color: rgb(40, 120, 240); color: white; }
+.button--small { height: 24px; font-size: 11px; }
+
+
+/* State classes (add/remove from C#) */
+.is-selected { outline-color: rgb(255, 200, 0); outline-width: 2px; outline-style: solid; }
+.is-disabled { opacity: 0.5; }
+```
+
+
+**Toggling classes from C#**
+```csharp
+// Toggle modifiers and state via classList
+var btn = root.Q<Button>(UiSelectors.ShopButton);
+btn.classList.Add("button--primary");
+
+
+// Set a state
+btn.classList.Toggle("is-selected", true);
+
+
+// Switch to a different size variant
+btn.classList.Remove("navbar-menu__shop-button--small");
+btn.classList.Add("button--small");
+```
+
+
+## USS
+**Guidelines**
+- ✅ Make sure not confuse CSS with USS. USS is a subset of CSS with Unity-specific properties and limitations. Refer to the [Unity USS documentation](https://docs.unity3d.com/Manual/UIE-USS.html) for supported features.
 - ✅ Use **kebab-case** for class names. prefer **BEM** to encode structure and variants.
 - ✅ Keep selectors **flat and specific**: prefer `.block__element` over deep descendant chains.
 - ✅ Use **modifiers** as additive classes (e.g., `.button--small`) instead of redefining the base element.
