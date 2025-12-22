@@ -1,79 +1,77 @@
 # GitHub Copilot Instructions: Unity C# Style Guide & Naming
 
-This document serves two purposes:
-1. To provide human-readable explanations of the coding conventions.
-2. To guide GitHub Copilot in generating code that aligns with these conventions.
+Use this cheat sheet for LLM completions. See the readme.md for the general rationale behind these guidelines.
 
-## About this Style Guide (for the human reader)
-The instructions are designed to help GitHub Copilot better match my approach and style. The code style standards are a variation of the [Unity C# style guide ebook we released for Unity 6](https://github.com/thomasjacobsen-unity/Unity-Code-Style-Guide), which I co-authored and is intended to be more LLM-friendly, pragmatic, and beginner-friendly. That guide stands on the shoulders of the [Microsoft Framework Design Guidelines](https://docs.microsoft.com/en-us/dotnet/standard/design-guidelines/) and common industry best practices.
+Table of contents:
+- [Unity Version-Specific Instructions](#unity-version-specific-instructions)
+- [General Guidelines](#general-guidelines)
+  - [Formatting](#formatting)
+    - [Spacing](#spacing)
+    - [Use of regions](#use-of-regions)
+  - [Comments](#comments)
+- [Organize classes by the Unity Script Execution Order](#organize-classes-by-the-unity-script-execution-order)
+  - [Using statements](#using-statements)
+    - [Namespaces](#namespaces)
+  - [Fields](#fields)
+  - [Properties](#properties)
+  - [Events](#events)
+    - [Subscribing and unsubscribing to events](#subscribing-and-unsubscribing-to-events)
+  - [MonoBehaviour methods](#monobehaviour-methods)
+    - [Awake\(\)](#awake)
+    - [OnEnable\(\)](#onenable)
+    - [Start\(\)](#start)
+    - [OnDisable\(\)](#ondisable)
+    - [OnDestroy](#ondestroy)
+    - [FixedUpdate\(\)](#fixedupdate)
+    - [Update\(\)](#update)
+    - [LateUpdate\(\)](#lateupdate)
+    - [General notes](#general-notes)
+  - [Public methods](#public-methods)
+  - [Private methods](#private-methods)
+  - [Other classes](#other-classes)
+- [Methods](#methods)
+- [General tips to cleaner Unity code](#general-tips-to-cleaner-unity-code)
+  - [Interfaces](#interfaces)
+  - [Naming files and folders](#naming-files-and-folders)
+  - [Enums](#use-enums-for-managing-states)
+  - [Avoid nesting if statements](#avoid-nesting-if-statements)
+  - [Managing String Allocations](#managing-string-allocations)
+  - [Collection Type Selection](#collection-type-selection)
+  - [Async \& Awaitable Usage](#async--awaitable-usage)
+  - [Scriptable Objects](#scriptable-objects)
+  - [Animation Parameters, Layers, Tags, Sorting Layers, and Input Action Names](#animation-parameters-layers-tags-sorting-layers-and-input-action-names)
+  - [Debugging](#debugging)
+  - [Using Try-Catch \& Debugger Breaks](#using-try-catch--debugger-breaks)
+  - [Design Patterns for Unity](#design-patterns-for-unity)
+    - [Implementing the State Pattern](#implementing-the-state-pattern)
+    - [Object Pooling](#object-pooling)
+- [UI Toolkit](#ui-toolkit)
+  - [UI Toolkit File Naming \& Organization](#ui-toolkit-file-naming--organization)
+  - [UXML](#uxml)
+    - [BEM refresher](#bem-refresher)
+    - [Examples](#examples)
+    - [Querying from C\#](#querying-from-c)
+  - [USS](#uss)
+    - [Guidelines](#guidelines)
+    - [Toggling classes from C\#](#toggling-classes-from-c)
+  - [UI Toolkit Event Handling](#ui-toolkit-event-handling)
 
-While this guide is aimed at Copilot, it also includes short explanations about why certain choices are made, useful for anyone reading it. Some points are repeated or phrased in a few different ways to give Copilot more examples and context. It might feel a bit verbose, but it helps reinforce the intent behind each rule to help Copilot make more informed decisions.
+# Unity Version-Specific Instructions
 
-Any code style guide should evolve over time. That has also been the case for this doc, and the intent is to update it as needed. Note that these instructions are specific to Unity and include some opinionated, Unity-specific conventions based on personal experience.
-
-Feel free to use it for inspiration, tweak it to your own preferences, or use it for your own Unity projects. Happy coding!
-## Instructions for GitHub Copilot
-The following sections provide specific coding conventions and examples for GitHub Copilot to follow.
-
-- ℹ️ To provide GitHub Copilot with clear instructions on how to generate code that aligns with my coding style and conventions for Unity C# projects.
-- ℹ️ To ensure consistency, readability, and maintainability across the codebase by adhering to established coding standards.
-- ℹ️ To help Copilot understand the specific Unity version and features being used in this project.
-- ℹ️ To improve the quality of code suggestions and completions provided by Copilot, making them more relevant and useful for this particular project.
-
-## Key Principles for this Style Guide
-
-- ℹ️ The standards specified here stand on the shoulders of the [Microsoft Framework Design Guidelines](https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/) and common industry best practices.
-- ℹ️ The variations are generally intended to be more LLM-friendly, pragmatic, and beginner-friendly as well as Unity-specific.
-- ℹ️ When something isn’t explicitly covered here, default to Microsoft’s general recommendations for C#.
-- ℹ️ The goal is to make the code more readable, maintainable, and consistent. Being consistent creates patterns and enables Copilot to make more accurate predictions.
-- ℹ️ Simple is better than complicated.
-- ℹ️ The code should strive to comply with the SOLID principles, be clean, and DRY.
-- ℹ️ Doing things like naming the right way from the beginning will save time and effort later, particularly when debugging and extending functionality.
-- ℹ️ As much as possible, stick to industry standards and conventions but be pragmatic. Not all rules will apply in every situation, so use judgment and adapt as needed.
-
-## Unity Version-Specific Instructions
-
-- ℹ️ This project uses Unity 6. Make sure to use the latest sources and documentation that apply to Unity 6 or later versions.
-- ℹ️ This project uses the newer Input System and not the older Input Manager.
+- ℹ️ This project uses Unity 6.3. Make sure to use the latest sources and documentation that apply to Unity 6 or later versions.
+- ℹ️ This project uses the newer "Input System" and not the older "Input Manager".
 - ℹ️ This project uses the newer UI Toolkit and not the older UGUI for UI.
 - ℹ️ This project uses the Universal Render Pipeline and not the old Built‑in Render Pipeline.
-- ℹ️ When implementing systems like object pooling, make sure to use Unity's own API.
-- ℹ️ When implementing async operations, consider using Unity's built-in Awaitable API.
+- ℹ️ Prefer Unity 6 Awaitables over coroutines for sequencing: `await Awaitable.WaitForSecondsAsync(delay, token);` Guard continuations with `if (this == null || !isActiveAndEnabled) return;`.
+- ℹ️ When instantiating frequently, favor `UnityEngine.Pool.ObjectPool<T>` with `actionOnGet`/`actionOnRelease` to toggle active state.
 
+# General Guidelines
 
-## The Unity C# fundamentals
-
-### Balancing being too succinct vs. too verbose
-
-- ⚠️ Succinctness is often good, but not at the cost of clarity. A code style guide should provide enough context for Copilot to understand the intent behind naming and formatting choices beyond the patience of the reader.
-- ✅ Prioritize readability and clarity over cleverness or brevity. More context is better than less. Don't sacrifice context by making things too short, as the LLMs might miss the intent.
-- ❌ Don't use abbreviations. Use meaningful names and spell out words completely. Clarity and readability are more important than any time saved from omitting a few vowels.
-- ⚠️ Yet don't make it too long by adding unnecessary information. Ensure each point adds value and context.
-
-### General naming
-- ✅ Use meaningful, descriptive names that clearly convey the purpose and intent of the variable, method, class, etc. Names should be descriptive, clear, and unambiguous because they represent an action, thing or state.
-- ✅ Favor names that can be pronounced naturally and are readable (e.g., `HorizontalAlignment` instead of `AlignmentHorizontal`).
-- ❌ Don't use abbreviations unless it's math or commonly accepted. Your variable names should reveal their intent.
-- ✅ Pick meaningful names from the beginning to minimize refactoring later.
-- ✅ Use a noun when naming them except when the variable is of the type `bool`.
-- ✅ Prefix Booleans with a verb to make their meaning more apparent. e.g., `isDead`, `isWalking`, `hasDamageMultiplier`.
-- ✅ Make type names unambiguous across namespaces and problem domains by avoiding common terms or adding a prefix or a suffix (e.g., use `PhysicsSolver`, not `Solver`).
-
-```csharp
-// Examples of good naming
-bool m_isPlayerDead;
-bool m_hasWeapon;
-
-// Examples of bad naming
-bool m_dead;
-bool m_weapon;
-```
-
-### Formatting
+## Formatting
 
 - ⚠️ Readability is key. Try to keep lines short. Consider horizontal whitespace.
 - ✅ Use the Allman style (opening curly braces on a new line).
-- ✅ Define a standard max line width in your style guide (some prefer less than 120–140 characters).
+- ✅ Define a standard max line width of less than 120–140 characters.
 - ✅ Break a long line into smaller statements rather than letting it overflow.
 - ✅ Use a single space before flow control conditions, e.g., `while (x == y)`.
 - ❌ Avoid spaces inside brackets, e.g., `x = dataArray[index]`.
@@ -95,7 +93,7 @@ public void ProcessItems(List<Item> items, int startIndex)
 public void ProcessItems ( List<Item>items,int startIndex ) { for(int i=startIndex;i<items.Count;i++) { ProcessItem( items [ i ] ); } Debug.Log("Processing complete"); }
 ```
 
-#### Spacing
+### Spacing
 
 - ✅ Use a single space after a comma between function arguments, e.g., `CollectItem(myObject, 0, 1);`.
 - ❌ Don't add spaces just inside the parentheses before the first or after the last argument, e.g., `CollectItem( myObject, 0, 1 );`.
@@ -120,175 +118,9 @@ public void ProcessItems(List<Item> items, int startIndex)
 // Bad spacing example
 public void ProcessItems ( List<Item>items,int startIndex ) { for(int i=startIndex;i<items.Count;i++) { ProcessItem( items [ i ] ); } Debug.Log("Processing complete"); }
 ```
-
-## Comments
-- ✅ Add clarifying comments to most lines. However, they should provide valuable context or clarify intent that isn’t obvious from good naming.
-- ⚠️ If a comment is needed to explain complex logic, consider refactoring the code to improve clarity first.
-- ✅ Favor simple, succinct comments that explain “why” rather than “what” the code does.
-- ✅ Prefer renaming variables or methods to make intent clear before relying on comments.
-- ⚠️ When in doubt, err on the side of providing more context, but avoid commenting code that is already self-explanatory.
-- ✅ Use the comment to keep the explanation next to the logic.
-- ✅ Use a Tooltip instead of a comment for serialized fields if your fields in the Inspector need explanation. If you want to debug or tweak input actions during runtime, consider exposing them in the Inspector using [SerializeField].
-
-```csharp
-// Good - explains why, not just what
-// Skip processing if below threshold to avoid performance issues with small batches
-if (itemCount < processingThreshold)
-{
-    return;
-}
-
-[Tooltip("Maximum distance the player can travel in one frame")]
-[SerializeField] private float m_maxDeltaMovement = 10f;
-```
-
-## Fields
-- ⚠️ As a default always make your fields private so they are not exposed to other scripts and properly encapsulated adhering to basic OOP principles.
-- ✅ Instead leverage Unity's inspector window by making use of [SerializeField] when you need to expose a field in the Inspector.
-- ✅ Use properties when you need to access them from other classes.
-
-```csharp
-// Use [SerializeField] rather than exposing your field publicly; keep it private or make it a property
-[SerializeField] private int m_playerHealth;
-```
-
-### Custom attributes
-- ✅ Use Unity attributes to improve the Inspector experience.
-- ✅ Use `[Tooltip]`, `[Range]` for exposed fields where relevant.
-- ✅ Use `[Header]` and `[Space]` for grouping fields.
-- ✅ Consider `[ContextMenu]` or `[Button]` (with Odin or NaughtyAttributes) to create dev tools.
-
-```csharp
-[Header("Movement Settings")]
-[SerializeField, Range(0f, 20f)] private float m_moveSpeed = 5f;
-
-[ContextMenu("Reset Position")]
-private void ResetPosition()
-{
-    transform.position = Vector3.zero;
-}
-```
-
-### Casing and Prefixes
-
-- ⚠️ Specificity reduces guesswork and prefixes help reveal intent.
-- ✅ Use prefixes for private member variables (`m_`), constants (`k_`), and static variables (`s_`), so the name reveals more about the variable at a glance.
-- ✅ Use PascalCase (e.g., `ExamplePlayerController`, `MaxHealth`, etc.) unless noted otherwise.
-- ✅ Use camelCase (e.g., `examplePlayerController`, `maxHealth`, etc.) for local/private variables and parameters.
-- ✅ Avoid snake_case, kebab-case, Hungarian notation in your C# code (you can consider kebab-case for UXML and USS when using UI Toolkit).
-
-```csharp
-// Member variable should have an m_ prefix
-[SerializeField] private int m_playerHealth;
-
-// Static variable should have an s_ prefix
-private static int s_instanceCount;
-
-// Constant with k_ prefix
-private const float k_maxSpeed = 10f;
-```
-
-### Avoid redundancy but don't leave out context
-
-- ⚠️ Drop redundant initializers (i.e., no `= 0` on ints, `= null` on ref types, etc.) as they are initialized to 0 or null by default.
-- ⚠️ Don't omit private access level modifiers consistently even though they are redundant. Microsoft guidelines recommend explicitly specifying private to make the access level clear and to avoid any ambiguity.
-- ⚠️ Avoid redundant names: If your class is called `Player`, you don't need to create member variables called `PlayerScore` or `PlayerTarget`. Trim them down to `Score` or `Target`.
-- ⚠️ Consider using XML tags in front of public methods or functions for output documentation/IntelliSense.
-- ⚠️ Avoid attributions, e.g., `// Created by`, `// Modified by`, etc. Use version control to track changes.
-
-## Organize your class by the Unity Script Execution Order
-
-- ✅ Organize your class in the Unity script execution order: Fields, Properties, Events, MonoBehaviour methods (`Awake`, `OnEnable`, `Start`, `OnDisable`, `OnDestroy`, etc.), public methods, private methods, other classes.
-- ✅ Keep related methods together for better readability.
-- ✅ Keep MonoBehaviours focused on a single responsibility. If a class is getting too large or complex, consider breaking it into smaller components or using ScriptableObjects for data/configuration.
-- ✅ Use `[RequireComponent(typeof(OtherComponent))]` when dependencies exist. It ensures the required component is always present so we don't need to check for null references later.
-- ✅ Cache expensive operations outside of Update loops to prevent repeated allocations.
-- ❌ Avoid magic numbers and strings. Replace hardcoded values (e.g., `5f` in Speed) with constants or serialized fields for better flexibility and readability.
-
-```csharp
-using UnityEngine;
-
-// Require necessary components
-[RequireComponent(typeof(Rigidbody))]
-
-namespace MyGame.Examples
-{
-    public class ExampleMonoBehaviour : MonoBehaviour
-    {
-        // Fields before properties
-        [SerializeField] private float m_speed = 5f;
-        private Rigidbody m_rigidbody;
-
-        // Properties
-        public float Speed
-        {
-            get => m_speed;
-            set => m_speed = value;
-        }
-
-        // Events
-        public event Action OnSpeedChanged;
-
-        // Cache expensive operations in Awake
-        private void Awake()
-        {
-            // Cache component references here
-            m_rigidbody = GetComponent<Rigidbody>();
-        }
-
-        private void OnEnable()
-        {
-            // Subscribe to events here. Avoid using lambda
-        }
-
-        private void Start()
-        {
-            // Use cached references and perform operations that might depend on other components being initialized
-            m_animator.SetTrigger("Initialize");
-        }
-
-        private void OnDisable()
-        {
-            // Unsubscribe from events here to prevent memory leaks or unexpected behavior
-        }
-
-        // Good - descriptive method names and cached values
-        private void Update()
-        {
-            // Put all your regular frame logic update code in Update()
-
-            if (!m_isActive) return; // Early return pattern
-
-            // Move logic to well-named methods
-            HandleMovement();
-            UpdateAnimations();
-            CheckPlayerInput();
-        }
-
-        // Use FixedUpdate for physics
-        private void FixedUpdate()
-        {
-            HandlePhysicsMovement();
-        }
-
-        // Use LateUpdate for camera or post-processing updates
-        private void LateUpdate()
-        {
-
-        }
-
-        // MonoBehaviour methods follow after the lifecycle methods
-
-        // Public methods
-
-        // Private methods
-    }
-}
-```
-
 ### Use of regions
-- ℹ️ Use `#region` sparingly. It's sometimes helpful but generally discouraged because it can hide complexity and often signals a class is too large and should be refactored instead.
-- ✅ A good use case for `#region` however is to group Animation Event Handlers or Input Event Handlers, called from the animation system etc. so they are clearly separated from the rest of the code.
+- ℹ️ Use `#region` sparingly as it can hide code and reduce readability.
+- ✅ Use `#region` to group Animation Event Handlers or Input Event Handlers, called from the animation system etc. so they are separated from the rest of the code.
 
 ```csharp
         #region Animation Event Methods
@@ -307,17 +139,52 @@ namespace MyGame.Examples
         #endregion
 ```
 
+## Comments
+- ✅ Add clarifying comments to most lines for documentation.
+- ✅ Comment intent (“why”) rather than restating code (“what”).
+- ✅ Use `[Tooltip]`, `[Header]`, `[Space]`, etc. for serialized fields that need Inspector context.
 
-### Using statements
+```csharp
+// Good - explains why, not just what
+// Skip processing if below threshold to avoid performance issues with small batches
+if (itemCount < processingThreshold)
+{
+    return;
+}
+
+[Tooltip("Maximum distance the player can travel in one frame")]
+[SerializeField] private float m_maxDeltaMovement = 10f;
+```
+
+# Organize classes by the Unity Script Execution Order
+- ✅ Organize your class in the Unity script execution order: 
+  - [Using statements](#using-statements)
+    - [Namespace](#namespaces)
+  - [Fields](#fields) 
+  - [Properties](#properties) 
+  - [Events](#events) 
+  - [MonoBehaviour methods](#monobehaviour-methods)
+    - [Awake\(\)](#awake)
+    - [OnEnable\(\)](#onenable)
+    - [Start\(\)](#start)
+    - [OnDisable\(\)](#ondisable)
+    - [OnDestroy](#ondestroy)
+    - [FixedUpdate\(\)](#fixedupdate)
+    - [Update\(\)](#update)
+    - [LateUpdate\(\)](#lateupdate)
+  - Public methods 
+  - Private methods 
+  - Other classes
+
+## Using statements
 
 - ✅ Keep using statements at the top of your file.
-- ✅ Start with the generic ones at the top. Add the specific ones, such as your own last.
-- ✅ Regularly remove unused `using` statements to keep the file clean and avoid unnecessary dependencies.
+- ✅ Ordering `using` statements improves readability and ensures consistency across files. It also helps avoid conflicts when namespaces have overlapping class names.
 - ✅ Start with system namespaces (e.g., `System`, `System.Collections`) at the top.
 - ✅ Follow with Unity namespaces (e.g., `UnityEngine`).
 - ✅ Add project-specific namespaces (e.g., `MyGameProject.Utilities`) last.
-- ✅ Ordering `using` statements improves readability and ensures consistency across files. It also helps avoid conflicts when namespaces have overlapping class names.
-- ✅ Use IDE tools like "Organize Imports" in Visual Studio Code to automatically sort and remove unused `using` statements.
+- ✅ Remove unused `using` statements to keep the file clean and avoid unnecessary dependencies.
+
 
 ```csharp
 // System namespaces
@@ -337,7 +204,6 @@ using MyGameProject.Utilities;
 - ✅ Use namespaces to ensure that your classes, interfaces, enums, etc., won't conflict with existing ones from other namespaces or the global namespace.
 - ✅ Use PascalCase, without special symbols or underscores.
 - ✅ Create sub-namespaces with the dot (`.`) operator, e.g., `MyApplication.GameFlow`, `MyApplication.AI`, etc.
-- ℹ️ Some recommend namespaces that reflect the folder structure of the project so it's logically grouped, but it's not a hard requirement.
 
 ```csharp
 namespace MyGame.Characters
@@ -349,11 +215,9 @@ namespace MyGame.Characters
 }
 ```
 
-
-### Fields
+## Fields
 - ✅ Don't omit the private accessor field though technically its implicit. It provides context about the intent.
 - ✅ Use `m_` prefix for private variables, `k_` for constants
-- ✅ Prefix Booleans with a verb like "is" to make their meaning apparent
 - ✅ Use `m_` prefix for private fields to distinguish them from local variables.
 - ✅ Use `k_` prefix for constants to indicate immutability.
 - ✅ Use descriptive names that clearly indicate the field's purpose.
@@ -361,31 +225,42 @@ namespace MyGame.Characters
 - ✅ Include units in the name if applicable (e.g., `m_speedInMetersPerSecond`).
 - ✅ Prefix Boolean fields with verbs like `is`, `has`, or `can` for clarity (e.g., `m_isActive`, `m_hasPermission`).
 - ❌ Avoid redundancy by not repeating the class name in field names (e.g., use `m_health` instead of `m_playerHealth` in a `Player` class).
+- ✅ Expose fields in the Inspector with `[SerializeField]`.
+- ✅ Use properties when you need to access them from other classes.
 
 ```csharp
-// Examples
-[SerializeField] private int m_health;  // Good: Descriptive and uses prefix
-private const float k_gravity = 9.8f;   // Good: Constant with prefix
-private bool m_isVisible;               // Good: Boolean with verb prefix
-private int m_elapsedTimeInHours;       // Specify the unit used to eliminate guessing
-private int m_elapsedTimeInDays;        // Don't omit the private accessor
-private int m_elapsedTimeInSeconds;     // Don't abbreviate. Favor readability.
-[SerializeField] private bool m_isPlayerDead;   // Prefix Booleans with a verb like "is" to make their meaning apparent
-private static int s_sharedCount;          // Static variable with s_ prefix
-private const int k_maxCount = 100;      // Constant with k_ prefix
+// Use `m_` prefix for private variables
+private int m_health; 
+
+// Static variable with s_ prefix
+private static int s_sharedCount;          
+
+// Constant with k_ prefix
+private const int k_maxCount = 100;
+
+// Use [SerializeField] rather than exposing your field publicly; keep it private or make it a property
+[SerializeField] private int m_health;  
+
+// Specify the unit used to eliminate guessing. Favor readability over brevity
+private int m_elapsedTimeInHours;       
+private int m_elapsedTimeInDays;        
+private int m_elapsedTimeInSeconds;     
+
+// Prefix Booleans with a verb like "is" to make their meaning apparent
+[SerializeField] private bool m_isPlayerDead;   
 
 ```
 
 ### Properties
+- ✅ Place properties after fields and before MonoBehaviour methods as per your class organization.
 - ✅ Use PascalCase for properties and avoid prefixes/suffixes.
-- ✅ Prefer verb-like names for boolean properties (Is/Has/Can).
-- ✅ Use m_ prefix for backing fields and keep one field per line.
+- ✅ Prefer verb-like names for boolean properties (Is/Has/Can) (e.g., IsGrounded, HasHealtPack, CanJump).
 - ❌ Do not serialize properties. Instead use [SerializeField] private T m_field when you need to expose it in the inspector plus a public property that returns or validates it.
-- ✅ Place properties after fields and before MonoBehaviour methods as per your class organization.
-- ✅ Place properties after fields and before MonoBehaviour methods as per your class organization.
-- ✅ Use properties for simple state access or modification.
+- ✅ Use Properties for accessing or modifying the state of an object. Properties are ideal for lightweight operations with no or minimal side effects.
+  Example: Health, Speed, IsGrounded.
 - ℹ️ Use methods for actions or operations. Such as input handling and event-driven behavior. Name appropiate `ApplyDamage(int amount)` instead of `SetHealth(int amount)`.
-
+  ❌ Avoid Using Properties for Actions: Properties should not perform significant computations, trigger events, or have side effects.
+- 
 ```csharp
 // Private backing field
 private int m_maxHealth;
@@ -402,45 +277,6 @@ public int MaxHealth
 
 // Auto-implemented property
 public string DescriptionName { get; set; } = "Fireball";
-```
-
-### Start vs. Awake
-- ✅ Use Awake for initializing references between components and from different GameObjects.
-- ✅ Use Start for call initialization methods that require other components to exist and be ready.
-
-
-```csharp
-    public class Player : MonoBehaviour
-    {
-        private Animator m_animator;
-        [SerializeField] private AudioManagerOnOtherGameObject m_audioManager;
-
-        private void Awake()
-        {
-            // Cache component references here
-            m_animator = GetComponent<Animator>();
-            m_audioManager = FindObjectOfType<AudioManagerOnOtherGameObject>();
-        }
-
-        private void Start()
-        {
-            // Use cached references and perform operations that might depend on other components being initialized
-            m_animator.SetTrigger("Initialize");
-            m_audioManager.PlaySound("PlayerSpawn");
-        }
-    }
-
-```
-
-### Properties vs. Methods: When to Use Each
-- ✅  Use Properties for accessing or modifying the state of an object. Properties are ideal for lightweight operations with no or minimal side effects.
-Example: Health, Speed, IsGrounded.
-- ❌ Avoid Using Properties for Actions: Properties should not perform significant computations, trigger events, or have side effects.
-
-```csharp
-// Properties for simple state access
-public float Speed { get; private set; }
-public bool IsGrounded => m_isGrounded;
 
 // Avoid: Using a property for an action like SetMovementInput to handle input events.
 public Vector2 MovementInput
@@ -449,187 +285,6 @@ public Vector2 MovementInput
     {
         m_forwardMovementInput = value;
         Debug.Log("Movement input set.");
-    }
-}
-```
-- ✅ Use Methods for performing actions or operations that involve behavior, side effects, or require input parameters. Example: `Jump()`, `TakeDamage(int amount)`, `SetMovementInput(Vector2 input)`.
-- ✅ Use methods for event callbacks, as Unity allows methods (but not properties) to be assigned to events in the Inspector. Example: The PlayerInput component can call a method like `SetMovementInput(Vector2 input)` in response to input events.
-- ✅ Use descriptive verb-based names for methods to clearly indicate the action being performed.
-- ✅ Use `SetX` as prefix when naming a method which is primarily assigning or updating a value (e.g., SetMovementInput(Vector2 input)).
-- ✅ Use `ChangeX` when naming a method that implies a transformation or modification of the current state (e.g., ChangeHealth(int amount)).
-
-
-```csharp
-// Good: Use a method for actions or operations
-public void Jump()
-{
-    m_rigidbody.AddForce(Vector3.up * m_jumpForce, ForceMode.Impulse);
-}
-
-// Good: Clear intent for setting a value
-public void SetMovementInput(Vector2 input)
-{
-    m_forwardMovementInput = input;
-}
-
-// Good: Clear intent for modifying a value
-public void ChangeHealth(int amount)
-{
-    m_health += amount;
-}
-
-// Avoid: Ambiguous name that could be confused with a property
-public void MovementInput(Vector2 input)
-{
-    m_forwardMovementInput = input;
-}
-
-```
-
-- ✅ General Rule of Thumb:
-Use properties for state (e.g., IsGrounded, Health).
-Use methods for behavior (e.g., Jump(), TakeDamage()).
-- ℹ️ Unity-Specific Considerations: Unity's PlayerInput component often calls methods for input handling. For example, use a method like SetMovementInput(Vector2 input) instead of a property to align with Unity's event-driven design.
-
-
-### Update vs. FixedUpdate
-- ✅ Use Update for regular frame updates (e.g., input handling, non-physics calculations).
-- ✅ Use FixedUpdate for physics-related updates (e.g., applying forces, physics calculations).
-- ✅ Never create new collections in Update() but reuse existing ones.
-- ✅ Cache string operations and use StringBuilder for complex concatenation.
-- ✅ Use early returns to avoid unnecessary processing.
-- ✅ Instead of having logic directly in the Update loop, move it to methods with descriptive names to improve cleanliness and self-documentation
-
-
-```csharp
-// Enhanced collection management with modern C# and performance best practices
-public class EnemyManager : MonoBehaviour
-{
-   // Modern initialization syntax (C# 9.0+)
-   [SerializeField] private List<GameObject> m_activeEnemies = new();
-   [SerializeField] private Dictionary<string, List<GameObject>> m_enemyScores = new();
-   [SerializeField] private HashSet<string> m_uniqueIds = new();
-
-   // Reusable collection to avoid allocations in Update
-   private List<Enemy> m_tempNearbyEnemies = new();
-   private Vector3 m_cachedPosition;
-
-   public void RegisterEnemy(GameObject enemy)
-   {
-       if (!m_activeEnemies.Contains(enemy))
-       {
-           m_activeEnemies.Add(enemy);
-       }
-   }
-
-   public void ClearAllEnemies()
-   {
-       // Reuse the list to avoid GC pressure
-       m_activeEnemies.Clear();
-   }
-
-   // Good - avoid allocations in Update
-   private void Update()
-   {
-       if (!m_isActive) return; // Early return pattern
-
-       // Reuse collection instead of creating new one
-       GetNearbyEnemies(m_tempNearbyEnemies);
-       ProcessEnemies(m_tempNearbyEnemies);
-       m_tempNearbyEnemies.Clear(); // Clear for next frame
-
-       // Reuse Vector3 instead of creating new ones
-       m_cachedPosition.Set(newX, newY, newZ);
-   }
-
-   // Bad example - creates garbage every frame
-   private void Update()
-   {
-       var nearbyEnemies = GetEnemiesInRange(); // Returns new List<>
-       var position = new Vector3(x, y, z);     // Creates new Vector3
-   }
-}
-
-```
-
-```csharp
-// Efficient string operations
-public class ScoreManager : MonoBehaviour
-{
-   // Bad - creates garbage with string concatenation
-   private string BuildLabelWithConcatenation(int score, float time)
-   {
-       return "Score: " + score + " Time: " + time;
-   }
-
-   // Good - use string interpolation
-   private void UpdateScoreDisplay(int score, float time)
-   {
-       string result = $"Score: {score} Time: {time:F1}";
-       // Display result...
-   }
-}
-```
-
-```csharp
-// Avoid - expensive operations in Update
-private void Update()
-{
-   // Bad - expensive operation every frame
-   var nearbyEnemies = Physics.OverlapSphere(transform.position, m_detectionRadius);
-
-   // Better - cache and update less frequently
-   if (Time.time > m_nextUpdateTime)
-   {
-       UpdateNearbyEnemies();
-       m_nextUpdateTime = Time.time + m_updateInterval;
-   }
-}
-```
-
-### Methods
-
-- ✅ Use verb-based method names so the code clearly states the action being performed (e.g., ApplyDamage, PlaySound, RotateTurret).
-- ✅ Prefer names that describe what the method does (for example, SetPosition or CalculateDamage).
-- ❌ Avoid noun-style method names except for factory methods or event handlers.
-- Boolean methods should ask a question, starting with verbs like `Is`, `Has`, or `Can`.
-- ❌ Avoid confusion: Names like `Walking()` or `Rotating()` imply a continuous state or property rather than an action.
-- ✅ These are better suited for variables or properties (e.g., `isWalking`, `isRotating`).
-- ⚠️ Though people sometimes use method and function interchangeably in casual conversation, the term "method" is more accurate in C# as it refers to functions that are part of a class.
-
-```csharp
-// Good examples
-public void SetInitialPosition(float x, float y, float z);
-public void SaveGame();
-public bool IsPlayerAlive();
-public Player CreatePlayer();
-Walk(); // Indicates an action being performed
-
-// Avoid 'ing as that implies a continuous state or property rather than an action.
-Walking();
-
-// Use verb names that describe what the method does
-public void SetInitialPosition(float x, float y, float z)
-{
-    transform.position = new Vector3(x, y, z);
-}
-
-// Boolean methods asking questions
-public bool IsNewPosition(Vector3 newPosition)
-{
-    return (transform.position == newPosition);
-}
-
-// Using var keyword
-void ExampleMethod()
-{
-    var powerUps = new List<PlayerStats>();
-    var dict = new Dictionary<string, List<GameObject>>();
-
-    // Proper loop formatting
-    for (int i = 0; i < 100; i++)
-    {
-        DoSomething(i);
     }
 }
 ```
@@ -697,8 +352,193 @@ private void OnDisable()
 
 
 ```
+## MonoBehaviour methods
 
-### Interfaces
+### Awake()
+- ✅ Use Awake for initializing references between components and from different GameObjects.
+- ✅ Cache component references (GetComponent, Find, pool creation).
+- ✅ Initialize internal state that does not depend on other GameObjects
+- ✅ Avoid heavy work, scene-dependent calls or subscribing to external events here.
+
+```csharp
+private void Awake()
+{
+    // Cache component references here
+    m_rigidbody = GetComponent<Rigidbody>();
+}
+```
+      
+### OnEnable()
+- ✅ Subscribe to events, register input callbacks, reset per-enable state.
+- ✅ Keep work small and reversible. Unsubscribe in OnDisable().  
+
+```csharp
+private void Awake()
+{
+    // Cache component references here
+    m_rigidbody = GetComponent<Rigidbody>();
+}
+```
+
+### Start()
+- ✅ Use Start for call initialization methods that require other components to exist and be ready.
+- ✅ Perform initialization that requires other components or scene objects to exist.
+- ✅ Use for one‑time setup (animations, UI wiring) that must run after all Awake()/OnEnable().
+
+```csharp
+private void Start()
+{
+    // Use cached references and perform operations that might depend on other components being initialized
+    m_animator.SetTrigger("Initialize");
+}
+```
+
+### OnDisable()
+- ✅ Use OnDisable for unsubscribing from events and cleaning up state when the object is disabled.
+
+```csharp
+private void OnDisable()
+{
+    // Unsubscribe from events here to prevent memory leaks or unexpected behavior
+}
+```
+
+### FixedUpdate()
+- ⚠️ FixedUpdate runs on the fixed physics timestep and may run zero, one, or many times between Update calls depending on frame time.
+- ✅ Use FixedUpdate for physics-related updates (e.g., applying forces, physics calculations).
+- ✅ Put deterministic physics work here: AddForce, rigidbody velocity, simulation steps.
+- ✅ Do not read input here; read input in Update() and apply it in FixedUpdate() if needed.
+- ✅ Keep it allocation-free and lightweight.
+
+```csharp
+// Use FixedUpdate for physics
+private void FixedUpdate()
+{
+    HandlePhysicsMovement();
+}
+```
+
+### Update()
+- ✅ Use Update for regular frame updates (e.g., input handling, non-physics calculations).
+- ✅ Read input, update timers, run non-physics per-frame logic and state machines.
+- ✅ Avoid allocations, use early returns (e.g., if (!m_isActive) return;) and delegate to well-named helper methods.
+- ❌ Never create new collections in Update() but reuse existing ones.
+- ✅ Use early returns to avoid unnecessary processing.
+- ✅ Instead of having logic directly in the Update loop, move it to methods with descriptive names to improve cleanliness and self-documentation
+- 
+```csharp
+private void Update()
+{
+    // Put all your regular frame logic update code in Update()
+
+    if (!m_isActive) return; // Early return pattern
+
+    // Move logic to well-named methods
+    HandleMovement();
+    UpdateAnimations();
+    CheckPlayerInput();
+}
+ 
+```
+
+### LateUpdate()
+- ✅ Finalize transforms, camera follow, animation-driven adjustments and cleanup after Update().
+- ✅ Use for logic that must run after all Update() work.
+
+```csharp
+// Use LateUpdate for camera or post-processing updates
+private void LateUpdate()
+{
+
+}
+```
+
+### General notes 
+- ✅ Keep related methods together for better readability.
+- ✅ Keep MonoBehaviours focused on a single responsibility.
+- ✅ Use `[RequireComponent(typeof(OtherComponent))]` when dependencies exist. It ensures the required component is always present so we don't need to check for null references later.
+- ✅ Cache expensive operations outside of Update loops to prevent repeated allocations.
+- ❌ Avoid magic numbers and strings. Replace hardcoded values (e.g., `5f` in Speed) with constants or serialized fields for better flexibility and readability.
+
+
+
+```csharp
+// Avoid - expensive operations in Update
+private void Update()
+{
+   // Bad - expensive operation every frame
+   var nearbyEnemies = Physics.OverlapSphere(transform.position, m_detectionRadius);
+
+   // Better - cache and update less frequently
+   if (Time.time > m_nextUpdateTime)
+   {
+       UpdateNearbyEnemies();
+       m_nextUpdateTime = Time.time + m_updateInterval;
+   }
+}
+```
+
+### Methods
+- ✅ Use methods for behavior and event callbacks (actions, side effects, or inputs). Examples: Jump(), TakeDamage(int amount), SetMovementInput(Vector2 input). Unity's PlayerInput and Inspector events call methods, not properties, so prefer methods for input handlers.
+- ✅ Name methods with descriptive verbs to state the action clearly (e.g., ApplyDamage, PlaySound, RotateTurret, SetPosition, CalculateDamage).
+- ✅ Use clear prefixes: SetX for assigning/updating a value (e.g., SetMovementInput(Vector2 input)), ChangeX for modifying or transforming state (e.g., ChangeHealth(int amount)).
+- ✅ Boolean methods should pose a question and return bool, using Is, Has, or Can (e.g., IsPlayerAlive()).
+- ❌Avoid noun-style method names except for factory methods or event handlers; avoid gerund/continuous names like Walking() or Rotating() (those indicate state—use isWalking / isRotating as variables or properties instead).
+- ⚠️Terminology: prefer the term "method" in C# (a function that is part of a class).
+
+```csharp
+// Good: Use a method for actions or operations
+
+// Action: performs behavior / side effects
+public void Jump()
+{
+    m_rigidbody.AddForce(Vector3.up * m_jumpForce, ForceMode.Impulse);
+}
+
+// Setter: clearly assigns or updates a value (suitable for input callbacks)
+public void SetMovementInput(Vector2 input)
+{
+    m_forwardMovementInput = input;
+}
+
+// Modifier: transforms or changes state
+public void ChangeHealth(int amount)
+{
+    m_health += amount;
+}
+
+// Use verb names that describe what the method does
+public void SetInitialPosition(float x, float y, float z)
+{
+    transform.position = new Vector3(x, y, z);
+}
+
+public void SaveGame()
+{
+    // Implementation omitted: use try/catch for I/O and log errors as needed
+}
+
+// Good examples indicates an action being performed
+public void SetInitialPosition(float x, float y, float z);
+public void SaveGame();
+public bool IsPlayerAlive();
+public Player CreatePlayer();
+Walk(); 
+
+// Avoid 'ing as that implies a continuous state or property rather than an action.
+Walking();
+
+// Boolean methods asking questions
+public bool IsNewPosition(Vector3 newPosition)
+{
+    return (transform.position == newPosition);
+}
+
+```
+
+# General tips to cleaner Unity code
+
+## Interfaces
 - ✅ Use interfaces to define clear "contracts" and decouple systems
 - ✅ Use the one responsibility rule per interface (Interface Segregation). Small, focused interfaces are better than large monoliths.
 - ✅ Use the I prefix and PascalCase (e.g., `IDamageable`, `IAudioService`).
@@ -719,13 +559,30 @@ public interface IDamageable<T>
     void Damage(T damageTaken);
 }
 ```
+## Naming files and folders
+- ✅ Use PascalCase for all file and folder names to maintain consistency with class and script naming conventions (e.g., `CharacterController.cs`, `AnimationController.cs`, `CoreSystems/`, `UI/`).
+- ✅ Organize scripts into folders based on functionality or feature areas (e.g., `CoreSystems/`, `UI/`).
+- ✅ Don't worry about long folder paths if they improve organization and clarity. That only helps future maintainers and copilot.
+- ❌ Avoid spaces and special characters in file and folder names to prevent issues with version control systems and cross-platform compatibility.
+- ℹ️ If you have a very long folder name with variations you can consider using _ instead of spaces to seperate words. Example: InputSystemActions_PlayerInputComponent_UnityEvents, InputSystemActions_PlayerInputComponent_CSharpEvents, etc.
+- ❌ Don't use the ´NotImplementedException´ when stubbing out new methods or event handlers. It adds unnecessary noise and makes it harder to read the code. Instead, leave the method body empty or add a comment indicating that the implementation is pending.
 
-## General tips to cleaner Unity code
+```csharp
 
-### Enums
+    private void LookInputReceived(InputAction.CallbackContext context)
+    {
+        // Don't: when Copilot helps create new methods, leave out the the NotImplementedException
+        throw new NotImplementedException();
+    }
 
+```
+
+### Use Enums for managing states
+- ✅ Use enums for mutually exclusive states (e.g., animation, movement, UI, or game phases).
+- ✅ Use enums in switch statements for clear, maintainable logic.
+- ❌ Avoid using strings or integers directly for state tracking.
 - ✅ Use enums when an object or action can only have one value at a time.
-- ✅Use Pascal case for enum names and values.
+- ✅ Use Pascal case for enum names and values.
 - ✅ Use a singular noun for the enum name as it represents a single value from a set of possible values.
 - ❌ Avoid prefixes or suffixes (e.g., don’t add Enum, Type, or E_).
 - ✅ Public enums can be declared outside of a class if they need to be accessed globally.
@@ -789,6 +646,28 @@ if (conditionA)
 // Better - avoid nesting
 if (!conditionA) return;
 
+```
+
+### Managing String Allocations
+- ✅ Use string interpolation ($"") for building strings instead of concatenation (+) to reduce garbage generation and improve readability.
+
+```csharp
+// Efficient string operations
+public class ScoreManager : MonoBehaviour
+{
+   // Bad - creates garbage with string concatenation
+   private string BuildLabelWithConcatenation(int score, float time)
+   {
+       return "Score: " + score + " Time: " + time;
+   }
+
+   // Good - use string interpolation
+   private void UpdateScoreDisplay(int score, float time)
+   {
+       string result = $"Score: {score} Time: {time:F1}";
+       // Display result...
+   }
+}
 ```
 
 ### Collection Type Selection
@@ -858,17 +737,16 @@ private async void Start()
 }
 ```
 
-
 ### Scriptable Objects
-✅ Favor ScriptableObjects for static configuration data and reusable content that stays the same while the game runs (e.g., weapons, enemy stats, skill effects).
-✅ You should not use ScriptableObjects to store data that changes during gameplay (like player health, score, or runtime state).
-✅ Use ScriptableObjects to reduce coupling between systems—feed configuration into MonoBehaviours instead of having them fetch data manually.
-✅ Always mark ScriptableObjects with [CreateAssetMenu] for easy asset creation via the Project window.
-✅ Append a `DataSO` suffix (e.g., `WeaponDataSO`) to make ScriptableObjects easily identifiable.
-✅ Store ScriptableObject assets in a dedicated folder structure (e.g., Assets/Data/Weapons/).
-✅ Keep ScriptableObjects focused on a single responsibility to enhance reusability and maintainability.
-✅ Keep data and logic separate: ScriptableObjects should primarily hold data. Only add logic that directly relates to the data.
-✅ Use properties to expose data from ScriptableObjects instead of public fields for better encapsulation.
+- ✅ Favor ScriptableObjects for static configuration data and reusable content that stays the same while the game runs (e.g., weapons, enemy stats, skill effects).
+- ❌ Don't use ScriptableObjects to store data that changes during gameplay (like player health, score, or runtime state).
+- ✅ Use ScriptableObjects to reduce coupling between systems—feed configuration into MonoBehaviours instead of having them fetch data manually.
+- ✅ Always mark ScriptableObjects with [CreateAssetMenu] for easy asset creation via the Project window.
+- ✅ Append a `DataSO` suffix (e.g., `WeaponDataSO`) to make ScriptableObjects easily identifiable.
+- ✅ Store ScriptableObject assets in a dedicated folder structure (e.g., Assets/Data/Weapons/).
+- ✅ Keep ScriptableObjects focused on a single responsibility to enhance reusability and maintainability.
+- ✅ Keep data and logic separate: ScriptableObjects should primarily hold data. Only add logic that directly relates to the data.
+- ✅ Use properties to expose data from ScriptableObjects instead of public fields for better encapsulation.
 
 ```csharp
 // WeaponData is a ScriptableObject that stores weapon configuration
@@ -886,7 +764,6 @@ public class WeaponDataSO : ScriptableObject
    public GameObject ProjectilePrefab => m_projectilePrefab;
 }
 ```
-
 ### Animation Parameters, Layers, Tags, Sorting Layers, and Input Action Names
 - ✅ **PascalCase**  is recommended for all text-based references such as animation parameters, layers, tags, sorting layers, and input action names. This aligns with Unity conventions and this guide's property naming.
 - ✅ Prefix boolean animation parameters and similar flags with **Is**, **Has**, or **Can** (e.g., `IsRunning` rather than `Running`)
@@ -1065,46 +942,9 @@ public void SaveGame(GameData data)
 - ⚠️ **Service Locator / Dependency Injection**: Consider for managing cross-cutting services and improving testability.
 - ✅ Use enums for mutually exclusive states (e.g., animation, movement, UI, or game phases).
 
-### Use Enums for managing states
-- ✅ Use enums for mutually exclusive states (e.g., animation, movement, UI, or game phases).
-- ✅ Use enums in switch statements for clear, maintainable logic.
-- ❌ Avoid using strings or integers directly for state tracking.
-
-```csharp
-// Enum for animation states
-public enum MovementState
-{
-    Idle,
-    Walking,
-    Running,
-    Jumping
-}
-
-private MovementState m_currentState;
-
-private void Update()
-{
-    switch (m_currentState)
-    {
-        case MovementState.Idle:
-            // Handle idle logic
-            break;
-        case MovementState.Walking:
-            // Handle walking logic
-            break;
-        case MovementState.Running:
-            // Handle running logic
-            break;
-        case MovementState.Jumping:
-            // Handle jumping logic
-            break;
-    }
-}
-```
 
 ### Implementing the State Pattern
 - ✅ Use the State pattern for complex state-dependent behavior, such as character controllers or AI.
-
 
 ```csharp
 // Example of State Pattern for a character controller
@@ -1206,28 +1046,70 @@ public class BulletPool : MonoBehaviour
 
 # UI Toolkit
 
+## UI Toolkit File Naming & Organization
+- ✅ Use PascalCase for UXML filenames to align with Unity conventions and maintain consistency with class and script naming (e.g., `MainMenu.uxml`, `InventoryPanel.uxml`, `SettingsPanel.uxml`, `PlayerHUD.uxml`).
+- ✅ Organize UXML and USS files in a consistent folder structure (e.g., Assets/UI/UXML/ and Assets/UI/USS/).
+- ✅ Name USS files to match their corresponding UXML files for easy association (e.g., `MainMenu.uss` for `MainMenu.uxml`).
 
-## UXML & USS files
-- ✅ Use PascalCase for USS and UXML filenames as well as custom UXML elements (custom controls) to align with Unity conventions and maintain consistency with class and script naming (e.g., MainMenu.uxml, InventoryPanel.uxml, SettingsPanel.uxml, PlayerHUD.uxml)
+## UXML
+- ✅ Use BEM (Block-Element-Modifier) for name and class values to improve maintainability, readability, and consistency between code and style and why it's widely considered a best practice standard
+- ✅ Prefer kebab-case for UXML name and class strings (e.g., navbar-menu, shop-button).
+- ✅ Use name for unique identifiers (e.g., elements you query in C#) and class for reusable styles or shared behavior.
+- ✅ Keep name unique within it's block to improve query performance when using .Q() or .Query() from C#.
+- ✅ Avoid overloading a single element with many unrelated classes; keep classes purposeful and focused.
+- ✅ Group related elements inside a top-level block container to make queries and styling predictable.
+- ✅ For nested blocks, use the parent block name as a prefix for child blocks (e.g., navbar-menu__dropdown).
+- ✅ Add accessibility attributes (e.g., aria-label) to UXML elements where applicable.
 
+**BEM refresher:**
+- ℹ️ Pattern: `block-name__element-name--modifier-name`
+    - ℹ️ Block: standalone component that is meaningful on it's own (e.g., `navbar-menu`, `sidebar`, `login-form`)
+    - ℹ️ Element: part of a block that has no standalone meaning and is semantically tied to it's block (e.g., `__item`, `__button`, `__input-field`)
+    - ℹ️ Modifier: a flag on a block or element used to change appearance or behavior (e.g., `--active`, `--collapsed`, `--error`)
+- ℹ️ Parts joined by `__` (element) and `--` (modifier)
+- ℹ️ Examples: `menu__home-button`, `menu__shop-button`, `navbar-menu__shop-button--small`, `button--primary`
 
-## Visual Elements in UXML
-- ✅ Use kebab-case for UXML elements names (e.g., navbar-menu, shop-button).
-- ✅ Keep name unique within its block to improve query performance when using .Q() or .Query() from C#.
-- ✅ Element name should stay short, semantic, and unique.
+**Examples**
+- These follow the BEM (Block-Element-Modifier) standard, ensuring clarity, structure, and maintainability.
 
+  ***Block Names***: should clearly describe the purpose or role of the block within the UI and be suitable for grouping related elements
+    - ✅ `navbar-menu`(easy to identify navigation menu block)
+    - ✅ `sidebar`
+    - ✅ `login-form`
+    - ❌ `menu` (too generic, lacks context)
+    - ❌ `navBarMenu` (camelCase instead of kebab-case)
+    - ❌ `navbar_menu` (uses underscores instead of dashes)
+
+  ***Element Names***: should describe the specific part of the block they belong to, maintaining a clear relationship to the block
+    - ✅ `navbar-menu__item`
+    - ✅ `sidebar__toggle-button`
+    - ✅ `login-form__input-field`
+    - ❌ `navbar-item` (missing the block reference, should be `navbar-menu__item`)
+    - ❌ `sidebar-button` (missing the block reference, should be `sidebar__button`)
+    - ❌ `login-form-input` (missing the __ for the element, should be `login-form__input`)
+
+  ***Modifier Names***: should indicate variations or states of blocks or elements
+    - ✅ `navbar-menu__item--active`
+    - ✅ `sidebar__toggle-button--collapsed`
+    - ✅ `login-form__input-field--error`
+    - ❌ `navbar-menu__item-active` (missing `--` for the modifier, should be `navbar-menu__item--active`)
+    - ❌ `sidebar__toggleButton--collapsed` (camelCase instead of kebab-case)
+    - ❌ `login-form__input-field_error` (uses underscores instead of -- for the modifier)
 
 **Example (UXML)**
 ```xml
-<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/UI/Runtime/B03_MainMenu/MainMenuStyles.uss?fileID=7433441132597879392&amp;guid=a182ccb84c0dd044a8df49d76f575b05&amp;type=3#MainMenuStyles"/>
-    <Bagel.MainMenuPaneManager name="main-menu-pane-manager">
-        <ui:Label text="Bagel Game" name="title" class="b-title"/>
-        <ui:Button text="Play" name="play-button" class="b-primary"/>
-        <ui:Button text="Settings" name="settings-button"/>
-        <ui:Button text="Leaderboard" name="leaderboard-button"/>
-        <ui:Button text="Exit" name="exit-button"/>
-    </Bagel.MainMenuPaneManager>
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
+  <!-- Block container -->
+  <ui:VisualElement name="navbar-menu" class="navbar-menu">
+    <!-- Element: a specific button inside the block -->
+    <ui:Button name="navbar-menu__shop-button" class="navbar-menu__shop-button button button--primary" aria-label="Shop">
+      <ui:Button.text>Shop</ui:Button.text>
+    </ui:Button>
+    <!-- Variant via modifier -->
+    <ui:Button name="navbar-menu__shop-button--small" class="navbar-menu__shop-button navbar-menu__shop-button--small button button--small" aria-label="Shop (Small)">
+      <ui:Button.text>Shop</ui:Button.text>
+    </ui:Button>
+  </ui:VisualElement>
 </ui:UXML>
 ```
 
@@ -1236,11 +1118,10 @@ public class BulletPool : MonoBehaviour
 // Centralize selectors as constants to avoid typos
 public static class UiSelectors
 {
-   public const string NavbarMenu = "navbar-menu"; // block
-   public const string ShopButton = "shop-button"; // element
-modifier
+    public const string NavbarMenu = "navbar-menu"; // block
+    public const string ShopButton = "navbar-menu__shop-button"; // element
+    public const string ShopButtonSmall = "navbar-menu__shop-button--small"; // modifier
 }
-
 
 // Usage in a MonoBehaviour or UI controller
 var root = GetComponent<UIDocument>().rootVisualElement;
@@ -1248,101 +1129,6 @@ var navbar = root.Q<VisualElement>(UiSelectors.NavbarMenu);
 var shopButton = root.Q<Button>(UiSelectors.ShopButton);
 shopButton.clicked += OnShopClicked;
 ```
-
-
-## USS
-**Guidelines**
-- ✅ Use BEM (Block-Element-Modifier) for styling and thus for naming USS classes to improve maintainability,
-readability, and consistency between code and style and why it's widely considered a best practice standard
-- ✅ Use **kebab-case** for class names. prefer **BEM** to encode structure and variants.
-- ✅ Keep selectors **flat and specific**: prefer `.block__element` over deep descendant chains.
-- ✅ Use **modifiers** as additive classes (e.g., `.button--small`) instead of redefining the base element.
-- ✅ Keep **state** styles separate via state classes (e.g., `.is-selected`, `.is-disabled`) or use built-in pseudo-classes when available.
-- ✅ Define **design tokens** (colors, spacing, sizes) as USS variables at the root when possible.
-- ✅ Do keep class names short, descriptive, and BEM-aligned.
-- ✅ Do centralize string constants used in code to avoid typos.
-- ❌ Don’t rely on deep descendant selectors (e.g., `.a .b .c`) — they become brittle.
-- ❌ Don’t mix unrelated concerns in one class; compose via multiple small classes instead.
-- ✅ For nested blocks, use the parent block name as a prefix for child blocks (e.g., navbar-menu__dropdown).
-
-**BEM refresher:**
-- ℹ️ Pattern: `block-name__element-name--modifier-name`
-   - ℹ️ Block: standalone component that is meaningful on its own (e.g., `navbar-menu`, `sidebar`, `login-form`)
-   - ℹ️ Element: part of a block that has no standalone meaning and is semantically tied to its block (e.g., `__item`, `__button`, `__input-field`)
-   - ℹ️ Modifier: a flag on a block or element used to change appearance or behavior (e.g., `--active`, `--collapsed`, `--error`)
-- ℹ️ Parts joined by `__` (element) and `--` (modifier)
-- ℹ️ Examples: `menu__home-button`, `menu__shop-button`, `navbar-menu__shop-button--small`, `button--primary`
-
-**Examples**
-- These follow the BEM (Block-Element-Modifier) standard, ensuring clarity, structure, and maintainability.
-
-   ***Block Names***: should clearly describe the purpose or role of the block within the UI and be suitable for grouping related elements
-   - ✅ `navbar-menu`(easy to identify navigation menu block)
-   - ✅ `sidebar`
-   - ✅ `login-form`
-   - ❌ `menu` (too generic, lacks context)
-   - ❌ `navBarMenu` (camelCase instead of kebab-case)
-   - ❌ `navbar_menu` (uses underscores instead of dashes)
-
-   ***Element Names***: should describe the specific part of the block they belong to, maintaining a clear relationship to the block
-   - ✅ `navbar-menu__item`
-   - ✅ `sidebar__toggle-button`
-   - ✅ `login-form__input-field`
-   - ❌ `navbar-item` (missing the block reference, should be `navbar-menu__item`)
-   - ❌ `sidebar-button` (missing the block reference, should be `sidebar__button`)
-   - ❌ `login-form-input` (missing the __ for the element, should be `login-form__input`)
-
-
-   ***Modifier Names***: should indicate variations or states of blocks or elements
-   - ✅ `navbar-menu__item--active`
-   - ✅ `sidebar__toggle-button--collapsed`
-   - ✅ `login-form__input-field--error`
-   - ❌ `navbar-menu__item-active` (missing -- for the modifier, should be `navbar-menu__item--active`)
-   - ❌ `sidebar__toggleButton--collapsed` (camelCase instead of kebab-case)
-   - ❌ `login-form__input-field_error` (uses underscores instead of -- for the modifier)
-
-**Example (USS)**
-```css
-/* Block base */
-.navbar-menu { padding: 8px; gap: 8px; }
-
-
-/* Element base */
-.navbar-menu__shop-button { min-width: 120px; }
-
-
-/* Modifier */
-.navbar-menu__shop-button--small { min-width: 80px; }
-
-
-/* Generic button system using BEM-like modifiers */
-.button { height: 32px; padding-left: 12px; padding-right: 12px; }
-.button--primary { background-color: rgb(40, 120, 240); color: white; }
-.button--small { height: 24px; font-size: 11px; }
-
-
-/* State classes (add/remove from C#) */
-.is-selected { outline-color: rgb(255, 200, 0); outline-width: 2px; outline-style: solid; }
-.is-disabled { opacity: 0.5; }
-```
-
-
-**Toggling classes from C#**
-```csharp
-// Toggle modifiers and state via classList
-var btn = root.Q<Button>(UiSelectors.ShopButton);
-btn.classList.Add("button--primary");
-
-
-// Set a state
-btn.classList.Toggle("is-selected", true);
-
-
-// Switch to a different size variant
-btn.classList.Remove("navbar-menu__shop-button--small");
-btn.classList.Add("button--small");
-```
-
 
 ## USS
 **Guidelines**
@@ -1407,266 +1193,4 @@ private void OnDisable()
    m_button.clicked -= OnButtonClicked;
    m_dropdown.UnregisterValueChangedCallback(OnDropdownChanged);
 }
-```
-## Using .editorconfig to Enforce Formatting Rules ##
-
-- ✅ Use an .editorconfig file to define and enforce consistent formatting rules across your project. This ensures all contributors follow the same coding style, improving readability and maintainability.
-- ✅ Place the .editorconfig file in the root of your repository so it applies to the entire project.
-- ✅ Define rules for indentation, spacing, line endings, and other formatting preferences (e.g., Allman braces, max line length).
-- ✅ Use Unity-specific settings where applicable, such as ensuring utf-8 encoding and LF line endings for cross-platform compatibility.
-- ✅ Most modern IDEs, including Visual Studio, Visual Studio Code, and JetBrains Rider, automatically detect and apply .editorconfig settings.
-- ✅ Use tools like dotnet-format or IDE-integrated formatters to apply .editorconfig rules automatically.
-- ✅ Override rules for specific file types or folders as needed to handle Unity-specific files (e.g., .shader, .meta, .asmdef).
-
-```csharp
-# Root .editorconfig file
-root = true
-
-# General settings
-[*]
-charset = utf-8
-end_of_line = lf
-insert_final_newline = true
-trim_trailing_whitespace = true
-
-# C# files
-[*.cs]
-indent_style = space
-indent_size = 4
-dotnet_style_braces_on_new_line_for_methods = true
-dotnet_style_braces_on_new_line_for_types = true
-dotnet_style_braces_on_new_line_for_control_blocks = true
-dotnet_style_qualification_for_field = false
-dotnet_style_qualification_for_property = false
-dotnet_style_qualification_for_method = false
-dotnet_style_qualification_for_event = false
-csharp_new_line_before_open_brace = all
-csharp_indent_case_contents = true
-csharp_indent_switch_labels = true
-csharp_prefer_braces = true
-csharp_style_var_for_built_in_types = true
-csharp_style_var_when_type_is_apparent = true
-csharp_style_var_elsewhere = false
-file_header_template = "File generated based on the Unity C# Style Guide."
-
-# XML files (UXML)
-[*.uxml]
-indent_style = space
-indent_size = 2
-max_line_length = 120
-
-# CSS files (USS)
-[*.css]
-indent_style = space
-indent_size = 2
-max_line_length = 120
-
-# Unity meta files
-[*.meta]
-end_of_line = lf
-insert_final_newline = true
-```
-Here is a quick explanation of some of the key settings:
-
-***General Settings:***
-- 📝 `charset = utf-8`: Ensures all files use UTF-8 encoding.
-- 📝 `end_of_line = lf`: Enforces LF line endings for cross-platform compatibility.
-- 📝 `insert_final_newline = true`: Adds a newline at the end of files for consistency.
-- 📝 `trim_trailing_whitespace = true`: Removes unnecessary trailing whitespace.
-***C# Settings:***
-
-- 📝 `indent_style` = space and `indent_size` = 4: Enforces 4-space indentation for C# files.
-- 📝 `dotnet_style_braces_on_new_line_*`: Configures Allman-style braces (opening braces on a new line).
-- 📝 `csharp_style_var_*`: Configures var usage based on your style guide (e.g., use var for built-in types but not elsewhere).
-- 📝 `file_header_template`: Adds a placeholder for file headers if needed.
-***UXML Settings:***
-
-- 📝 `indent_size` = 2: Enforces 2-space indentation for XML files.
-- 📝 `max_line_length` = 120: Limits line length for better readability.
-
-***USS Settings:***
-- 📝 `indent_size` = 2: Enforces 2-space indentation for CSS/USS files.
-- 📝 `max_line_length` = 120: Limits line length for better readability.
-
-
-# Script examples (putting it all together)
-This example focuses on a CharacterController and a AnimationController, demonstrating some of the concepts and conventions discussed in this style guide.
-
-```csharp
-// This script ties everything together, managing movement, health, and audio.
-using UnityEngine;
-
-namespace CoreSystems
-{
-    [RequireComponent(typeof(Rigidbody))]
-    public class CharacterController : MonoBehaviour
-    {
-        [Header("Movement Settings")]
-        [SerializeField, Tooltip("Movement speed of the character.")]
-        private float m_moveSpeed = 5f;
-
-        [Header("Jump Settings")]
-        [SerializeField, Tooltip("Force applied when the character jumps.")]
-        private float m_jumpForce = 7f;
-
-        [Header("Ground Detection")]
-        [SerializeField, Tooltip("Layer mask used to determine which surfaces count as ground.")]
-        private LayerMask m_groundLayer;
-
-        private Rigidbody m_rigidbody;
-
-        // Event to notify animation changes
-        public event System.Action<Vector3> MovementInputReceived;
-
-        private void Awake()
-        {
-            // Cache the Rigidbody component
-            m_rigidbody = GetComponent<Rigidbody>();
-        }
-
-        private void Update()
-        {
-            // Calculating movement input should go in Update
-            HandleMovement();
-        }
-
-        private void FixedUpdate()
-        {
-            // Physics-related updates like jumping should go in FixedUpdate
-            HandleJump();
-        }
-
-        private void HandleMovement()
-        {
-            float horizontal = Input.GetAxis("Horizontal");
-            float vertical = Input.GetAxis("Vertical");
-
-            Vector3 movement = new Vector3(horizontal, 0, vertical).normalized;
-
-            // We use an early return to simplify the logic and reduce nesting.
-            if (movement == Vector3.zero) return;
-
-            // Move the character
-            transform.Translate(movement * m_moveSpeed * Time.deltaTime, Space.World);
-
-            // Notify listeners about movement input
-            OnMovementInputReceived(movement);
-        }
-
-        private void OnMovementInputReceived(Vector3 movement)
-        {
-            MovementInputReceived?.Invoke(movement);
-        }
-
-        private void HandleJump()
-        {
-            if (Input.GetButtonDown("Jump") && IsGrounded())
-            {
-                m_rigidbody.AddForce(Vector3.up * m_jumpForce, ForceMode.Impulse);
-            }
-        }
-
-        private bool IsGrounded()
-        {
-            // Make use of the visual tools in the Debug class for better debugging
-            Debug.DrawRay(transform.position, Vector3.down * 1.1f, Color.red);
-
-            // Simple ground check
-            return Physics.Raycast(transform.position, Vector3.down, 1.1f, m_groundLayer);
-        }
-    }
-}
-
-// This script listens to the CharacterController's movement events and updates the animator accordingly.
-using UnityEngine;
-
-namespace CoreSystems
-{
-    // RequireComponent ensures necessary components are present so we don't need to check for null references later.
-    [RequireComponent(typeof(Animator))]
-    [RequireComponent(typeof(CharacterController))]
-    public class AnimationController : MonoBehaviour
-    {
-        [Header("Animation Parameters")]
-        [SerializeField, Tooltip("Animator parameter for movement speed.")]
-        private string m_speedParam = "Speed";  // Use constant from centralized class
-
-        [SerializeField, Tooltip("Layer mask for ground detection.")]
-        private LayerMask m_groundLayer;
-
-        private CharacterController m_characterController;
-
-        private Animator m_animator;
-
-        private void Awake()
-        {
-            // Cache the Animator component
-            m_animator = GetComponent<Animator>();
-            m_characterController = GetComponentInParent<CharacterController>();
-        }
-
-        private void OnEnable()
-        {
-            m_characterController.MovementInputReceived += HandleMovementInput;
-        }
-
-        private void OnDisable()
-        {
-            m_characterController.MovementInputReceived -= HandleMovementInput;
-        }
-
-        private void HandleMovementInput(Vector3 movement)
-        {
-            // Update the animator's speed parameter based on movement magnitude
-            float speed = movement.magnitude;
-            m_animator.SetFloat(m_speedParam, speed);
-        }
-    }
-}
-
-```
-# Bonus tips
-
-## Beginner tips: Avoid (too much) shorthand code
-- ✅ It can be tempting to use shorthand syntax to make code more concise, but if you're new to programming or Unity, prioritizing clarity and readability is more important. As you gain experience, you can gradually use more advanced syntax.
-- ✅ Prioritize code clarity and readability over brevity. If a shorthand syntax makes the code harder to understand, prefer the more explicit form.
-- ✅ Use explicit types instead of var when the type is not immediately clear from the right-hand side of the assignment.
-- ✅ Prefer traditional method syntax over lambda expressions for multi-line methods or when the logic is not immediately clear.
-- ❌ Avoid using the ternary operator for complex conditions that reduce readability.
-
-```csharp
-
-    // Calculate the current movement speed based on input
-
-    // Less clear version ternary operator
-    m_currentMovementSpeed = m_forwardMovementInput.y * (m_isRunning ? m_runningSpeed : m_walkSpeed);
-
-    // Clearer version with if-else
-    if (m_isRunning)
-    {
-        m_currentMovementSpeed = m_forwardMovementInput.y * m_runningSpeed;
-    }
-    else
-    {
-        m_currentMovementSpeed = m_forwardMovementInput.y * m_walkSpeed;
-    }
-```
-
-
-## Naming files and folders
-- ✅ Use PascalCase for all file and folder names to maintain consistency with class and script naming conventions (e.g., `CharacterController.cs`, `AnimationController.cs`, `CoreSystems/`, `UI/`).
-- ✅ Organize scripts into folders based on functionality or feature areas (e.g., `CoreSystems/`, `UI/`).
-- ✅ Don't worry about long folder paths if they improve organization and clarity. That only helps future maintainers and copilot.
-- ❌ Avoid spaces and special characters in file and folder names to prevent issues with version control systems and cross-platform compatibility.
-- ℹ️ If you have a very long folder name with variations you can consider using _ instead of spaces to seperate words. Example: InputSystemActions_PlayerInputComponent_UnityEvents, InputSystemActions_PlayerInputComponent_CSharpEvents, etc.
-- ❌ Don't use the ´NotImplementedException´ when stubbing out new methods or event handlers. It adds unnecessary noise and makes it harder to read the code. Instead, leave the method body empty or add a comment indicating that the implementation is pending.
-
-```csharp
-
-    private void LookInputReceived(InputAction.CallbackContext context)
-    {
-        // Don't: when Copilot helps create new methods, leave out the the NotImplementedException
-        throw new NotImplementedException();
-    }
-
 ```
