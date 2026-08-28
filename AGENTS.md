@@ -51,6 +51,39 @@ silent until someone opens the Editor.
 same code path the Inspector does, so GUIDs, fileIDs, prefab overrides and Undo all stay correct.
 See `UnityReferenceGuides/UnityEditorToolingInstructions.md`.
 
+## Deprecated in Unity 6
+
+Never write the left column. These are renamed or obsolete, and the old names dominate tutorials
+and training data — they are the single most common source of stale generated code.
+
+| Don't write | Write |
+|---|---|
+| `FindObjectOfType` | `FindFirstObjectByType` / `FindAnyObjectByType` |
+| `FindObjectsOfType` | `FindObjectsByType(FindObjectsSortMode.None)` |
+| `Rigidbody.velocity` | `Rigidbody.linearVelocity` |
+| `Rigidbody.drag` / `.angularDrag` | `linearDamping` / `angularDamping` |
+| `Rigidbody2D.velocity` / `.drag` / `.angularDrag` | `linearVelocity` / `linearDamping` / `angularDamping` |
+| `Graphics.DrawMesh` | `Graphics.RenderMesh(RenderParams, …)` |
+| `Graphics.DrawMeshInstanced` | `Graphics.RenderMeshInstanced` |
+| `Graphics.DrawMeshInstancedIndirect` | `Graphics.RenderMeshIndirect` |
+| `ParticleSystem.emissionRate` | `emission.rateOverTime` |
+| `ParticleSystem.enableEmission` | `emission.enabled` |
+| `TerrainData.splatPrototypes` | `terrainLayers` |
+| `UxmlFactory` / `UxmlTraits` | `[UxmlElement]` / `[UxmlAttribute]` |
+| `VisualElement.ExecuteDefaultAction` | `HandleEventBubbleUp` / `HandleEventTrickleDown` |
+| `EventBase.PreventDefault()` | `StopPropagation()` |
+| `GraphicsFormat.DepthAuto` / `ShadowAuto` / `VideoAuto` | `GraphicsFormat.None` + `RenderTextureFormat.Depth` / `Shadowmap` |
+| `ScriptableRenderPass.Execute` | `RecordRenderGraph(RenderGraph, ContextContainer)` |
+| `RenderTargetHandle` | `RTHandle` / `TextureHandle` |
+| `ScriptableRenderer.cameraColorTarget` | `cameraColorTargetHandle` |
+| `[CustomEditorForRenderPipeline]` | `[CustomEditor]` + `[SupportedOnRenderPipeline]` |
+| `[VolumeComponentMenuForRenderPipeline]` | `[VolumeComponentMenu]` + `[SupportedOnRenderPipeline]` |
+| `LightingSettings.filteringGaussRadius*` | `filteringGaussianRadius*` (now `float`) |
+
+⚠️ `ParticleSystem` modules are structs that write through to native memory. `ps.emission.enabled =
+true` does not compile — copy to a local, mutate the local, and the change applies:
+`var emission = ps.emission; emission.enabled = true;`
+
 ## If you read nothing else
 
 1. `m_` private fields, `k_` private constants, `s_` statics — camelCase after the prefix. `[opinion]`
@@ -186,9 +219,8 @@ Non-negotiable in `Update`, `FixedUpdate`, `LateUpdate`, and any per-frame path:
 
 Unity 6 API notes:
 
-- `FindObjectOfType` / `FindObjectsOfType` are **deprecated**. Use `FindFirstObjectByType`,
-  `FindAnyObjectByType`, or `FindObjectsByType(FindObjectsSortMode.None)` — and prefer a registry
-  over any of them at runtime.
+- Renamed and obsolete APIs are listed under [Deprecated in Unity 6](#deprecated-in-unity-6).
+  Beyond the rename, prefer a registry over any `Find*` call at runtime.
 - Prefer `Awaitable` over coroutines. Take a `CancellationToken` (`destroyCancellationToken`) and
   guard continuations with `if (this == null || !isActiveAndEnabled) return;`.
 - Avoid `async void`; `async Awaitable` works as a Unity message signature and surfaces exceptions.
@@ -264,6 +296,25 @@ private static void ResetStatics()
 - **Assemblies:** dependencies point inward — nothing references UI. Editor assemblies need
   `"includePlatforms": ["Editor"]`; test assemblies need `UNITY_INCLUDE_TESTS`.
 
+## Physics
+
+- Never assign `transform.position` on an active non-kinematic Rigidbody — it teleports the body,
+  discards velocity and skips continuous collision detection. Use `AddForce`, or `MovePosition` on
+  a kinematic body.
+- Forces and velocity go in `FixedUpdate` with an explicit `ForceMode`. Read input in `Update` and
+  latch it; `FixedUpdate` may run zero or many times per frame.
+- `Time.fixedDeltaTime` inside `FixedUpdate`, never `Time.deltaTime`.
+- **A collider pair with no Rigidbody on either side sends no messages.** A static trigger volume
+  needs the *moving* object to carry the Rigidbody; give a script-moved detector a kinematic one.
+- `OnCollisionEnter(Collision)` and `OnTriggerEnter(Collider)` — the wrong parameter type means
+  Unity silently never calls the method.
+- Tunnelling needs both sides set: the fast body `ContinuousDynamic`, what it hits `Continuous`.
+  Continuous detection only works on Sphere, Capsule and Box colliders.
+- `Interpolate` on the body the camera follows, `None` on the rest.
+- Convex MeshColliders cap at 255 triangles; non-convex can't be a trigger and can't go on a
+  non-kinematic Rigidbody. Prefer primitives and compounds.
+- Prune the Layer Collision Matrix — unchecked pairs are skipped before any contact work.
+
 ## UI
 
 **UI Toolkit** — kebab-case BEM for UXML `name` and `class`
@@ -298,6 +349,7 @@ rather than the GameObject to hide a screen; `RectMask2D` over `Mask`; pool list
 | Testing | `UnityReferenceGuides/UnityTestingInstructions.md` |
 | Editor tooling | `UnityReferenceGuides/UnityEditorToolingInstructions.md` |
 | Input System actions, phases, rebinding | `UnityReferenceGuides/UnityInputSystemInstructions.md` |
+| Rigidbodies, colliders, collision callbacks, queries | `UnityReferenceGuides/UnityPhysicsInstructions.md` |
 | Animator parameters, blend trees, events | `UnityReferenceGuides/UnityAnimationInstructions.md` |
 | Mixers, AudioSource pooling, spatial audio | `UnityReferenceGuides/UnityAudioInstructions.md` |
 | Assembly definitions and dependency boundaries | `UnityReferenceGuides/UnityAssemblyDefinitionsInstructions.md` |

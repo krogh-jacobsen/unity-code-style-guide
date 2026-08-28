@@ -377,6 +377,9 @@ private void Update()
 
 ## Physics Debugging
 
+For the rules themselves — which callbacks fire for which Rigidbody combination, collider
+limits, and tunnelling — see [Physics](UnityPhysicsInstructions.md).
+
 ### Layer and Collision Issues
 
 ```csharp

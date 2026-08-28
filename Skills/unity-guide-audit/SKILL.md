@@ -103,10 +103,38 @@ Inside `Update`, `FixedUpdate`, `LateUpdate`, and `OnGUI`:
 ### Unity 6 API currency
 
 - `FindObjectOfType` / `FindObjectsOfType` (deprecated).
+- `Rigidbody.velocity` / `.drag` / `.angularDrag` — renamed to `linearVelocity` / `linearDamping` /
+  `angularDamping`. Same for `Rigidbody2D`.
+- `Graphics.DrawMesh` / `DrawMeshInstanced` / `DrawMeshInstancedIndirect` — replaced by
+  `RenderMesh` / `RenderMeshInstanced` / `RenderMeshIndirect` with `RenderParams`.
+- `ParticleSystem.emissionRate` / `.enableEmission` — use the `emission` module.
+- `TerrainData.splatPrototypes` — use `terrainLayers`.
+- `UxmlFactory` / `UxmlTraits` — use `[UxmlElement]` / `[UxmlAttribute]`.
+- `VisualElement.ExecuteDefaultAction`, `EventBase.PreventDefault()` — use `HandleEventBubbleUp` /
+  `StopPropagation()`.
+- `ScriptableRenderPass.Execute`, `RenderTargetHandle`, `ScriptableRenderer.cameraColorTarget` —
+  Render Graph replaced these; use `RecordRenderGraph`, `RTHandle`/`TextureHandle`,
+  `cameraColorTargetHandle`.
 - Coroutines used for simple delays where `Awaitable` fits, if the tech stack prefers `Awaitable`.
 - `async void` on anything other than an event handler.
 - `.material` where `.sharedMaterial` was intended.
 - Legacy `Input.GetKey` / `Input.GetAxis` when the project uses the Input System.
+
+### Physics
+
+- `transform.position` assigned on a GameObject with a non-kinematic `Rigidbody`.
+- `AddForce` or velocity writes in `Update` instead of `FixedUpdate`; `Time.deltaTime` used inside
+  `FixedUpdate`.
+- `AddForce` with no explicit `ForceMode`.
+- `OnTriggerEnter(Collision)` or `OnCollisionEnter(Collider)` — wrong parameter type, so Unity
+  never calls it.
+- A trigger volume where neither it nor the object it detects has a `Rigidbody`.
+- `other.tag == "X"` instead of `CompareTag`.
+- Raycasts and overlap queries with no layer mask or no max distance.
+- Non-convex `MeshCollider` on a non-kinematic `Rigidbody`; convex `MeshCollider` over 255
+  triangles.
+- A fast-moving body left on `Discrete` collision detection, or continuous set on only one side of
+  the pair.
 
 ### ScriptableObjects
 

@@ -363,6 +363,9 @@ public class ProjectilePool : MonoBehaviour
 
 # Physics Optimization
 
+**Cost only.** Which physics API is *correct* — movement, collision callbacks, collider choice,
+tunnelling — lives in [Physics](UnityPhysicsInstructions.md).
+
 - ✅ Use layer masks to limit physics queries to relevant layers.
 - ✅ Cache `LayerMask` values — don't call `LayerMask.GetMask()` every frame.
 - ✅ Use non-allocating physics methods: `Physics.RaycastNonAlloc`, `Physics.OverlapSphereNonAlloc`.
@@ -435,10 +438,28 @@ private bool CheckLineOfSight(Vector3 origin, Vector3 direction)
 # Rendering Considerations
 
 - ⚠️ Accessing `.material` creates a material instance — use `.sharedMaterial` when possible.
+- ⚠️ **The instance `.material` creates is a leak.** Unity does not destroy it with the GameObject.
+  If you take `.material`, you own it: `Destroy(m_renderer.material)` in `OnDestroy`. On pooled
+  objects that touch `.material` per spawn, this is a steady leak.
+- ⚠️ Writing to `.sharedMaterial` edits the material **asset**. In the Editor the change persists
+  after exiting play mode, and every renderer using that material changes with it.
 - ✅ Batch material property changes using `MaterialPropertyBlock`.
 - ✅ Use `Renderer.GetPropertyBlock` / `SetPropertyBlock` for per-instance changes.
+- ⚠️ A `MaterialPropertyBlock` breaks SRP Batcher compatibility for that renderer. It's still the
+  right tool for per-instance tints, but it isn't free — see [SRP Batcher](#srp-batcher).
 - ❌ Avoid changing materials at runtime unless necessary.
 - ✅ Use GPU instancing for many similar objects.
+- ✅ Prefer `LocalKeyword` over global keywords when toggling shader features on one material.
+  Toggling keywords per frame forces variant switches and stalls render state.
+- ⚠️ `volume.profile` **clones** the VolumeProfile asset and leaks it the same way `.material` does.
+  Use `volume.sharedProfile` to read, and only take `.profile` when you genuinely need a per-volume
+  copy — then destroy it.
+- ✅ Setting a Volume override from script needs both halves: `vignette.intensity.value = 0.5f;`
+  **and** `vignette.intensity.overrideState = true;`. Without the second line the blend ignores it.
+- ✅ Subscribe to `RenderPipelineManager.beginCameraRendering` in `OnEnable` and unsubscribe in
+  `OnDisable`, like any other event. It fires per camera per frame — keep the body cheap.
+- ⚠️ Every URP Overlay camera in a stack pays full culling, sorting and pass setup. Reach for
+  sorting layers or a render pass before adding a camera.
 
 ```csharp
 // ❌ Bad - creates material instance per object
@@ -448,7 +469,7 @@ private void Start()
 }
 
 // ✅ Good - uses MaterialPropertyBlock (no allocation after first call)
-private static readonly int k_colorId = Shader.PropertyToID("_Color");
+private static readonly int s_baseColorId = Shader.PropertyToID("_BaseColor");
 private MaterialPropertyBlock m_propertyBlock;
 private Renderer m_renderer;
 
@@ -461,7 +482,7 @@ private void Awake()
 private void SetColor(Color color)
 {
     m_renderer.GetPropertyBlock(m_propertyBlock);
-    m_propertyBlock.SetColor(k_colorId, color);
+    m_propertyBlock.SetColor(s_baseColorId, color);
     m_renderer.SetPropertyBlock(m_propertyBlock);
 }
 ```
@@ -470,17 +491,20 @@ private void SetColor(Color color)
 
 - ✅ Cache shader property IDs with `Shader.PropertyToID()`.
 - ❌ Never use string-based property access in update loops.
+- ⚠️ URP shaders use different property names from the Built-in pipeline: `_BaseColor` and
+  `_BaseMap`, not `_Color` and `_MainTex`. A wrong name doesn't error — the property is silently
+  ignored.
 
 ```csharp
 // ❌ Bad - string lookup every call
 m_material.SetFloat("_Intensity", value);
 
 // ✅ Good - cached ID
-private static readonly int k_intensityId = Shader.PropertyToID("_Intensity");
+private static readonly int s_intensityId = Shader.PropertyToID("_Intensity");
 
 private void UpdateShader(float value)
 {
-    m_material.SetFloat(k_intensityId, value);
+    m_material.SetFloat(s_intensityId, value);
 }
 ```
 
