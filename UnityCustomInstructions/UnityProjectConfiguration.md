@@ -5,7 +5,12 @@ applyTo: "**/*.cs"
 
 # Unity Project Configuration
 
-This document covers Unity Editor settings and project configuration optimized for faster iteration and consistent asset imports.
+> **Project-specific. You are expected to edit this file.**
+> The paths, preset names and quality tiers below describe one particular project. Replace them with
+> your own — the *shape* of the document is the reusable part, not the values.
+
+This document covers Unity Editor settings and project configuration optimized for faster iteration
+and consistent asset imports.
 
 ## Table of Contents
 

@@ -1,13 +1,18 @@
 # SOLID & Design Patterns for Unity
 
+> **General Unity best practice.** Applies to any Unity 6 project. Change these only if you
+> know why. Personal style preferences live in [`UnityStyleGuide.md`](../UnityStyleGuide.md);
+> project-specific settings live in [`UnityCustomInstructions/`](../UnityCustomInstructions/).
+
+
 This document outlines some recommended design patterns for Unity development, along with some example code snippets.
 The work is ongoing and will be updated over time. I'm sure there are many more patterns and best practices that could be added.
 It's inspired by the ebook "Level up your code with design patterns and SOLID" I co-authored and which you can find here: https://unity.com/resources/design-patterns-solid-ebook
 
 Intent is to provide a quick reference guide for when you need a refresher.
-It complements the copilot-instructions.md file by providing more detailed guidance on specific patterns and their usage in Unity projects.
+It complements the [style guide](../UnityStyleGuide.md) by providing more detailed guidance on specific patterns and their usage in Unity projects.
 
-> **Cross-references:** For C# code style and naming conventions, see [copilot-instructions.md](copilot-instructions.md). For UI Toolkit patterns including data binding and MVP, see [UIToolkitInstructions.md](UIToolkitInstructions.md).
+> **Cross-references:** For C# code style and naming conventions, see [UnityStyleGuide.md](../UnityStyleGuide.md). For UI Toolkit patterns including data binding and MVP, see [UnityUIToolkitInstructions.md](UnityUIToolkitInstructions.md).
 
 Table of Contents
 =================
@@ -19,7 +24,7 @@ Table of Contents
     - [Interface Segregation Principle](#interface-segregation-principle)
     - [Dependency Inversion Principle](#dependency-inversion-principle)
 - [Design Patterns for Unity](#design-patterns-for-unity)
-    - [Patterns Used in This Project](#patterns-used-in-this-project)
+    - [Worked Example: A Tile-Based Strategy Game](#worked-example-a-tile-based-strategy-game)
     - [Reference Patterns](#reference-patterns)
 - [Observer Pattern](#observer-pattern)
 - [State Pattern](#state-pattern)
@@ -46,7 +51,7 @@ Table of Contents
 - A class should have only one reason to change, meaning it should only have one job or responsibility
 - Break down large classes into smaller, focused classes that handle specific tasks
 
-> See also: [Composition over Inheritance](#composition-over-inheritance) for how this project applies SRP to the MapTile system.
+> See also: [Composition over Inheritance](#composition-over-inheritance) for how SRP applies to a tile system.
 
 ```csharp
 [RequireComponent(typeof(PlayerAudio), typeof(PlayerInput),
@@ -129,7 +134,7 @@ public class AreaCalculator
 - If a method accepts a base class, any derived class should work without unexpected behavior
 - Avoid overriding methods in ways that violate the base class's expected behavior
 
-> See also: [Interfaces](copilot-instructions.md#interfaces) in copilot-instructions.md for guidance on when to use interfaces versus abstract base classes.
+> See also: [Interfaces](../UnityStyleGuide.md#interfaces) in the style guide for guidance on when to use interfaces versus abstract base classes.
 
 ```csharp
 // Good: Both derived classes honor the base contract
@@ -187,7 +192,7 @@ public class RangedUnit : Unit
 - Prefer small, focused interfaces over large monolithic ones
 - Each interface should represent a single capability or role
 
-> See also: [Interfaces](copilot-instructions.md#interfaces) in copilot-instructions.md for naming conventions (`I` prefix, PascalCase).
+> See also: [Interfaces](../UnityStyleGuide.md#interfaces) in the style guide for naming conventions (`I` prefix, PascalCase).
 
 ```csharp
 // Good: Small, focused interfaces
@@ -235,7 +240,7 @@ public interface IEntity
 - High-level modules should not depend on low-level modules; both should depend on abstractions
 - Depend on interfaces or abstract classes rather than concrete implementations
 
-> This project uses a [Service Locator](#service-locator--dependency-injection) to decouple high-level systems from concrete dependencies at runtime.
+> A [Service Locator](#service-locator--dependency-injection) is one way to decouple high-level systems from concrete dependencies at runtime.
 
 ```csharp
 // Good: High-level logic depends on an abstraction
@@ -274,18 +279,18 @@ public class CombatController : MonoBehaviour
 - ✅ Choose patterns pragmatically. Apply them when they solve a real problem or improve maintainability, not just for the sake of using a
   pattern.
 
-### Patterns Used in This Project
+### Worked Example: A Tile-Based Strategy Game
 
 These patterns are actively used in this codebase. When generating new code, match these existing patterns for consistency.
 
 | Pattern | Location | Purpose |
 |---------|----------|---------|
 | [Observer Pattern](#observer-pattern) | `StaticGameEvents.cs` | Centralized event bus for inter-system communication |
-| [State Pattern (Enum)](#enum-based-state-pattern) | `UIGameController.cs` | UI state machine with enum + switch |
-| [Template Method](#template-method-pattern) | `UITKBaseClass.cs` | Base class for all UI Toolkit views |
-| [Singleton](#singleton-pattern) | `UIGameController.cs` | Global access to UI state controller |
+| [State Pattern (Enum)](#enum-based-state-pattern) | `UIRootController.cs` | UI state machine with enum + switch |
+| [Template Method](#template-method-pattern) | `UIViewBase.cs` | Base class for all UI Toolkit views |
+| [Singleton](#singleton-pattern) | `UIRootController.cs` | Global access to UI state controller |
 | [Service Locator](#service-locator--dependency-injection) | `ServiceLocator.cs` / `DependencyInjector.cs` | Runtime dependency resolution |
-| [Composition](#composition-over-inheritance) | `MapTile` + `MapTileMilitary` etc. | Decomposing tile logic into focused components |
+| [Composition](#composition-over-inheritance) | `Tile` + `TileGarrison` etc. | Decomposing tile logic into focused components |
 | ScriptableObject Data | Various `*SO` / `*DataSO` classes | Static configuration data |
 | Data Binding | `[CreateProperty]` + `dataSource` | UI Toolkit automatic UI updates |
 
@@ -311,26 +316,26 @@ These patterns are documented for reference and may be useful for future feature
 - ✅ Subscribe in `OnEnable()` and always unsubscribe in `OnDisable()` to prevent memory leaks.
 - ❌ Avoid using events for tightly coupled systems where a direct method call is simpler.
 
-> See also: [Events](copilot-instructions.md#events) in copilot-instructions.md for naming conventions and subscription patterns.
+> See also: [Events](../UnityStyleGuide.md#events) in the style guide for naming conventions and subscription patterns.
 
-**This project uses a centralized static event system in `StaticGameEvents.cs`:**
+**Worked example — a centralized static event hub (`StaticGameEvents.cs`):**
 
 ```csharp
 // StaticGameEvents.cs — Centralized event bus (actual project pattern)
 public static class StaticGameEvents
 {
     // Events are public for subscribing, but invocation is controlled via static methods
-    public static event Action<MapTile> OnTileSelected;
+    public static event Action<Tile> OnTileSelected;
     public static event Action<ArmyController> OnArmySelected;
     public static event Action OnTurnStarted;
     public static event Action OnTurnEnded;
-    public static event Action<UIGameState> OnUIStateChanged;
+    public static event Action<UIScreen> OnUIStateChanged;
     public static event Action OnResourcesChanged;
 
     // Static methods control invocation — external code cannot fire events directly
-    public static void InvokeOnTileSelected(MapTile tile) => OnTileSelected?.Invoke(tile);
+    public static void InvokeOnTileSelected(Tile tile) => OnTileSelected?.Invoke(tile);
     public static void InvokeOnTurnEnded() => OnTurnEnded?.Invoke();
-    public static void InvokeOnUIStateChanged(UIGameState newState) => OnUIStateChanged?.Invoke(newState);
+    public static void InvokeOnUIStateChanged(UIScreen newState) => OnUIStateChanged?.Invoke(newState);
     public static void InvokeOnResourcesChanged() => OnResourcesChanged?.Invoke();
 }
 ```
@@ -338,7 +343,7 @@ public static class StaticGameEvents
 **Subscribing from a consumer:**
 
 ```csharp
-public class MapTile : MonoBehaviour
+public class Tile : MonoBehaviour
 {
     private void OnEnable()
     {
@@ -366,7 +371,7 @@ public class MapTile : MonoBehaviour
 
 Use the State pattern for complex state-dependent behavior, such as character controllers, AI, or UI flows.
 
-> See also: [Using Enums for Managing States](copilot-instructions.md#use-enums-for-managing-states) in copilot-instructions.md for enum naming conventions.
+> See also: [Use enums for managing states](../UnityStyleGuide.md#use-enums-for-managing-states) in the style guide for enum naming conventions.
 
 ### Class-Based State Pattern
 
@@ -430,48 +435,48 @@ public class PlayerController : MonoBehaviour
 ### Enum-Based State Pattern
 
 - ✅ Prefer enums + switch when states primarily control which panels/behaviors are active rather than having complex per-state logic.
-- ✅ This is the approach used by `UIGameController` in this project.
+- ✅ This is the approach used by `UIRootController` in the worked example below.
 
 ```csharp
-// Enum-based state pattern (actual project pattern from UIGameController.cs)
-public enum UIGameState
+// Enum-based state pattern (actual project pattern from UIRootController.cs)
+public enum UIScreen
 {
     DefaultMapView,
     ArmyView,
     ArmyRecruitmentView,
     EventPopupView,
-    TownView,
+    DetailView,
     TownConstructionView,
     ConquestView
 }
 
-public class UIGameController : MonoBehaviour
+public class UIRootController : MonoBehaviour
 {
-    [SerializeField] private UIGameState m_currentState = UIGameState.DefaultMapView;
+    [SerializeField] private UIScreen m_currentState = UIScreen.DefaultMapView;
 
-    public UIGameState CurrentState => m_currentState;
+    public UIScreen CurrentState => m_currentState;
 
-    public void ChangeState(UIGameState newState)
+    public void ChangeState(UIScreen newState)
     {
         m_currentState = newState;
         StaticGameEvents.InvokeOnUIStateChanged(CurrentState);
         ApplyStateToPanels(newState);
     }
 
-    private void ApplyStateToPanels(UIGameState state)
+    private void ApplyStateToPanels(UIScreen state)
     {
         // Hide all panels first, then enable the ones for the current state
         HideAllPanels();
 
         switch (state)
         {
-            case UIGameState.DefaultMapView:
+            case UIScreen.DefaultMapView:
                 SetPanelsActive(m_resourceControllerView, true);
                 SetPanelsActive(m_gameTurnControllerView, true);
                 SetPanelsActive(m_logPanelView, true);
                 break;
 
-            case UIGameState.ArmyView:
+            case UIScreen.ArmyView:
                 SetPanelsActive(m_resourceControllerView, true);
                 SetPanelsActive(m_commanderView, true);
                 SetPanelsActive(m_armyLowerPanelView, true);
@@ -499,11 +504,11 @@ public class UIGameController : MonoBehaviour
 - ✅ Use the Template Method pattern to define a skeleton algorithm in a base class, letting subclasses fill in the specific steps.
 - ✅ This ensures consistent lifecycle management across all subclasses while allowing each to customize behavior.
 
-**This project uses `UITKBaseClass` as the base for all UI Toolkit views:**
+**Worked example — `UIViewBase` as the base for all UI Toolkit views:**
 
 ```csharp
-// UITKBaseClass.cs — Base class for all UI Toolkit panels (actual project pattern)
-public abstract class UITKBaseClass : MonoBehaviour
+// UIViewBase.cs — Base class for all UI Toolkit panels (actual project pattern)
+public abstract class UIViewBase : MonoBehaviour
 {
     protected UIDocument m_uiDocument;
     protected VisualElement m_rootVisualElement;
@@ -537,14 +542,14 @@ public abstract class UITKBaseClass : MonoBehaviour
 
 ```csharp
 // Example: A concrete UI panel following the template
-public class MapTileView : UITKBaseClass
+public class TileView : UIViewBase
 {
-    private VisualElement m_mapTilePanel;
+    private VisualElement m_tilePanel;
     private Label m_populationLabel;
 
     protected override void InitializeElements()
     {
-        m_mapTilePanel = m_rootVisualElement.Q<VisualElement>("map-tile-panel");
+        m_tilePanel = m_rootVisualElement.Q<VisualElement>("tile-panel");
         m_populationLabel = m_rootVisualElement.Q<Label>("population-label");
     }
 
@@ -560,10 +565,10 @@ public class MapTileView : UITKBaseClass
 
     public override void ShowPanel(bool show)
     {
-        m_mapTilePanel.style.display = show ? DisplayStyle.Flex : DisplayStyle.None;
+        m_tilePanel.style.display = show ? DisplayStyle.Flex : DisplayStyle.None;
     }
 
-    private void HandleTileSelected(MapTile tile)
+    private void HandleTileSelected(Tile tile)
     {
         m_populationLabel.text = tile.CurrentPopulation.ToString();
     }
@@ -572,7 +577,7 @@ public class MapTileView : UITKBaseClass
 
 **Why this pattern:** Every UI view in the project follows the same lifecycle — `InitializeElements → RegisterCallbacks → UnregisterCallbacks → ShowPanel`. The base class enforces this structure and handles the `UIDocument` setup, so subclasses only focus on their specific UI elements and logic.
 
-> See also: [UIToolkitInstructions.md](UIToolkitInstructions.md) for detailed guidance on data binding, querying elements, and BEM naming.
+> See also: [UnityUIToolkitInstructions.md](UnityUIToolkitInstructions.md) for detailed guidance on data binding, querying elements, and BEM naming.
 
 ---
 
@@ -581,24 +586,24 @@ public class MapTileView : UITKBaseClass
 - ⚠️ Consider limiting the use of Singletons for smaller scale projects.
 - ✅ Use the Singleton pattern for global managers that need to be accessed from multiple places (e.g., AudioManager, GameManager).
 - ⚠️ Implement thread-safe lazy initialization to ensure the singleton instance is created only when needed.
-- ✅ Use `s_` prefix for the static instance field per this project's naming conventions.
+- ✅ Use the `s_` prefix for the static instance field, per the [style guide](../UnityStyleGuide.md#fields).
 - ✅ Provide a static Instance property for easy access to the singleton instance.
 - ✅ Use `DontDestroyOnLoad` to persist the singleton across scene loads if necessary.
 - ✅ Ensure proper cleanup of resources when the singleton is destroyed.
 
 ```csharp
-// Singleton pattern matching this project's conventions (from UIGameController.cs)
-public class UIGameController : MonoBehaviour
+// Singleton pattern following the style guide's naming conventions
+public class UIRootController : MonoBehaviour
 {
     // Use s_ prefix for static fields
-    private static UIGameController s_instance;
+    private static UIRootController s_instance;
 
-    public static UIGameController Instance
+    public static UIRootController Instance
     {
         get
         {
             if (s_instance == null)
-                s_instance = FindObjectOfType<UIGameController>();
+                s_instance = FindFirstObjectByType<UIRootController>();
             return s_instance;
         }
     }
@@ -627,7 +632,7 @@ public class AudioManager : MonoBehaviour
         get
         {
             if (s_instance == null)
-                s_instance = FindObjectOfType<AudioManager>();
+                s_instance = FindFirstObjectByType<AudioManager>();
             return s_instance;
         }
     }
@@ -655,7 +660,7 @@ public class AudioManager : MonoBehaviour
 - ✅ Clear the registry in `OnDestroy()` to prevent stale references across scene loads.
 - ⚠️ Avoid overusing the Service Locator — it can obscure dependencies if every class resolves everything through it.
 
-**This project uses `ServiceLocator.cs` for runtime dependency resolution:**
+**Worked example — a `ServiceLocator` for runtime dependency resolution:**
 
 ```csharp
 // ServiceLocator.cs — Lightweight service registry (actual project code)
@@ -697,14 +702,14 @@ public class DependencyInjector : MonoBehaviour
 {
     [SerializeField] private GameResources m_gameResources;
     [SerializeField] private RecruitmentManager m_recruitmentManager;
-    [SerializeField] private MapTileConstructionManager m_mapTileConstructionManager;
+    [SerializeField] private BuildQueueService m_tileConstructionManager;
     [SerializeField] private GameMapController m_gameMapController;
 
     private void Awake()
     {
         ServiceLocator.Register(m_gameResources);
         ServiceLocator.Register(m_recruitmentManager);
-        ServiceLocator.Register(m_mapTileConstructionManager);
+        ServiceLocator.Register(m_tileConstructionManager);
         ServiceLocator.Register(m_gameMapController);
     }
 
@@ -741,37 +746,37 @@ public class RecruitmentManager : MonoBehaviour
 - ✅ Use `GetComponent<T>()` in `Awake()` to wire sibling components on the same GameObject.
 - ✅ This approach makes it easy to add, remove, or swap behaviors without modifying existing classes.
 
-**This project uses composition for the MapTile system:**
+**Worked example — composition for a tile system:**
 
 ```csharp
-// MapTile.cs — The primary tile component delegates to focused sub-components
-public class MapTile : MonoBehaviour
+// Tile.cs — The primary tile component delegates to focused sub-components
+public class Tile : MonoBehaviour
 {
-    [SerializeField] private MapTileMilitary m_mapTileMilitary;
+    [SerializeField] private TileGarrison m_tileMilitary;
 
     private void Awake()
     {
         // Wire sibling components via GetComponent
-        m_mapTileMilitary = GetComponent<MapTileMilitary>();
+        m_tileMilitary = GetComponent<TileGarrison>();
     }
 
-    // MapTile handles population, happiness, and taxation
-    // MapTileMilitary handles recruitment pools and military strength
-    // MapTileBuildings handles construction and building bonuses
+    // Tile handles population, happiness, and taxation
+    // TileGarrison handles recruitment pools and military strength
+    // TileBuildings handles construction and building bonuses
 }
 ```
 
 ```csharp
-// MapTileMilitary.cs — Focused on military/recruitment concerns only
-public class MapTileMilitary : MonoBehaviour
+// TileGarrison.cs — Focused on military/recruitment concerns only
+public class TileGarrison : MonoBehaviour
 {
-    private MapTile m_mapTile;
+    private Tile m_tile;
     [SerializeField] private int m_currentRecruits;
     [SerializeField] private int m_newRecruitsPerTurn = 5;
 
     private void Awake()
     {
-        m_mapTile = GetComponent<MapTile>();
+        m_tile = GetComponent<Tile>();
     }
 
     private void OnEnable()
@@ -791,16 +796,16 @@ public class MapTileMilitary : MonoBehaviour
 }
 ```
 
-**MapTile component architecture:**
+**Tile component architecture:**
 ```
-GameObject: "MapTile_Farmland"
-├── MapTile                  — Population, happiness, taxation
-├── MapTileMilitary          — Recruitment pool, military strength
-├── MapTileBuildings         — Building slots, construction bonuses
-└── MapTileConstructionManager — Active construction logic
+GameObject: "Tile_Farmland"
+├── Tile                  — Population, happiness, taxation
+├── TileGarrison          — Recruitment pool, military strength
+├── TileBuildings         — Building slots, construction bonuses
+└── BuildQueueService — Active construction logic
 ```
 
-**Why composition:** Each component can be developed, tested, and iterated independently. Adding a new tile concern (e.g., trade routes) means adding a new component — not modifying the existing `MapTile` class.
+**Why composition:** Each component can be developed, tested, and iterated independently. Adding a new tile concern (e.g., trade routes) means adding a new component — not modifying the existing `Tile` class.
 
 ---
 
@@ -819,7 +824,7 @@ GameObject: "MapTile_Farmland"
 - ✅ Use `[DisallowMultipleComponent]` and `[RequireComponent]` as needed to enforce correct usage on pooled objects.
 - ❌ Avoid pooling objects with complex or persistent state that is hard to reset.
 
-> See also: [Collection Type Selection](copilot-instructions.md#collection-type-selection) in copilot-instructions.md for guidance on avoiding allocations inside loops.
+> See also: [Collection type selection](../UnityStyleGuide.md#collection-type-selection) in the style guide for guidance on avoiding allocations inside loops.
 
 ```csharp
 // Example: Using Unity's built-in ObjectPool<T>
@@ -1078,9 +1083,42 @@ public class ArmyMovementController : MonoBehaviour
 
 ---
 
+## Troubleshooting
+
+**A singleton is null after reloading the scene that created it.**
+The instance field is static and survived, but the object it pointed at was destroyed. Null-check
+against Unity's overloaded `==` (which reports destroyed objects as null) and re-create, or move the
+object to a bootstrap scene that never unloads. See
+[Scenes & Lifecycle](UnityScenesAndLifecycleInstructions.md#dontdestroyonload-discipline).
+
+**A singleton is null on the second Play with Domain Reload disabled.**
+The static field kept a reference to a destroyed object. Reset it in a
+`[RuntimeInitializeOnLoadMethod]`.
+
+**An event fires twice.**
+Subscribed in both `Awake` and `OnEnable`, so re-enabling adds a second handler. Subscribe only in
+`OnEnable` and unsubscribe in `OnDisable`.
+
+**An event handler runs on a destroyed object.**
+A missed unsubscribe on a static or long-lived event. The publisher is holding the delegate — and
+therefore the object — alive.
+
+**A state machine gets stuck in one state.**
+The transition condition is evaluated in the state's `Update` but the state never re-checks it, or
+`Exit`/`Enter` are called in the wrong order. Log every transition while debugging; it is almost
+always visible immediately.
+
+**Object pool returns objects that are still active, or runs dry.**
+Something took an object and never released it. Set `collectionCheck: true` in development — it
+throws when an object is released twice, which usually reveals the leak.
+
+**A service resolves to null through a Service Locator.**
+Registration order. The consumer's `Awake` ran before the provider's. Register in a bootstrap scene
+that loads first, or resolve lazily in `Start` rather than `Awake`.
+
 ## Additional Resources
 
 - [Level Up Your Code with Design Patterns and SOLID](https://unity.com/resources/design-patterns-solid-ebook) — Unity ebook
-- [copilot-instructions.md](copilot-instructions.md) — C# style guide, naming conventions, and coding patterns
-- [UIToolkitInstructions.md](UIToolkitInstructions.md) — UI Toolkit reference including data binding and MVP pattern
+- [UnityStyleGuide.md](../UnityStyleGuide.md) — C# style guide, naming conventions, and coding patterns
+- [UnityUIToolkitInstructions.md](UnityUIToolkitInstructions.md) — UI Toolkit reference including data binding and MVP pattern
 - [Game Programming Patterns](https://gameprogrammingpatterns.com/) — Robert Nystrom's free online book

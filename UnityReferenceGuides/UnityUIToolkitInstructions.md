@@ -1,5 +1,10 @@
 # Unity UI Toolkit — Complete Reference
 
+> **General Unity best practice.** Applies to any Unity 6 project. Change these only if you
+> know why. Personal style preferences live in [`UnityStyleGuide.md`](../UnityStyleGuide.md);
+> project-specific settings live in [`UnityCustomInstructions/`](../UnityCustomInstructions/).
+
+
 **Target: Unity 6.3.4f1 exclusively.** All APIs here are Unity 6.3. Do not use or reference pre-Unity 6 alternatives.
 
 > For C# code style within UI controllers, follow the conventions in `CLAUDE.md` (`m_` prefix, PascalCase properties, Allman braces, etc.)
@@ -1747,18 +1752,18 @@ This section demonstrates a clean **Model-View-Presenter (MVP)** architecture us
 
 | Class Type | Example | Location | Responsibility |
 |------------|---------|----------|-----------------|
-| View | `BuildingsView.cs` | `Assets/UI Toolkit/Scripts/Map/` | UI display and event subscription only (inherits `UITKBaseClass`) |
+| View | `BuildingsView.cs` | `Assets/UI Toolkit/Scripts/Map/` | UI display and event subscription only (inherits `UIViewBase`) |
 | View | `DiplomacyView.cs` | `Assets/UI Toolkit/Scripts/Diplomacy/` | Render relationship data, subscribe to diplomacy events |
 | View | `ArmyRecruitView.cs` | `Assets/UI Toolkit/Scripts/Army/` | Display recruitable units, handle recruitment UI |
 | Presenter/Controller | `BuildingsController.cs` | `Assets/Scripts/Map/` | Game logic, data manipulation, event orchestration |
 | Presenter/Controller | `DiplomacyController.cs` | `Assets/Scripts/Diplomacy/` | Manage relationships, treaties, AI decisions |
-| Model | `FactionDataSO.cs` | `Assets/Scripts/Core/` | Pure data — no UI or logic |
+| Model | `InventoryDataSO.cs` | `Assets/Scripts/Core/` | Pure data — no UI or logic |
 
 **Why this convention?**
 - ✅ Immediately communicates: "This class handles UI presentation"
 - ✅ Easy to distinguish from Controllers/Presenters (which contain game logic)
 - ✅ Consistent with industry MVP/MVC conventions
-- ✅ All `*View` classes inherit `UITKBaseClass` and use the Template Method pattern
+- ✅ All `*View` classes inherit `UIViewBase` and use the Template Method pattern
 
 **View Responsibilities (Pure MVP View):**
 - Cache UI element references via `InitializeElements()`
@@ -2343,3 +2348,11 @@ namespace Game.Presenters
 - **Official Documentation:** https://docs.unity3d.com/6000.3/Documentation/Manual/UIElements.html
 
 Fetch the official documentation on demand when a question involves an API or behaviour not covered in this file. This reference targets **Unity 6.3.4f1** — do not consult or generate code for older Unity versions.
+
+---
+
+## Learn more
+
+- [UI Toolkit manual](https://docs.unity3d.com/6000.3/Documentation/Manual/UIElements.html)
+- [USS properties reference](https://docs.unity3d.com/6000.3/Documentation/Manual/UIE-USS-SupportedProperties.html)
+- [UI Toolkit for advanced developers](https://docs.unity3d.com/6000.4/Documentation/Manual/best-practice-guides/ui-toolkit-for-advanced-unity-developers/optimizing-performance.html)

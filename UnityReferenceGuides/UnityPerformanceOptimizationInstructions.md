@@ -1,5 +1,10 @@
 # Unity Performance Optimization Instructions for LLM Coding Tools
 
+> **General Unity best practice.** Applies to any Unity 6 project. Change these only if you
+> know why. Personal style preferences live in [`UnityStyleGuide.md`](../UnityStyleGuide.md);
+> project-specific settings live in [`UnityCustomInstructions/`](../UnityCustomInstructions/).
+
+
 Use this guide when reviewing Unity projects for performance issues. These instructions help identify common bottlenecks and suggest optimizations that Claude can apply when analyzing code structure and project organization.
 
 Table of contents:
@@ -22,7 +27,18 @@ Table of contents:
 - [Data Structure Selection](#data-structure-selection)
 - [Unity API Best Practices](#unity-api-best-practices)
 - [Profiling Markers](#profiling-markers)
+- [Garbage Collection](#garbage-collection)
+- [Jobs and Burst](#jobs-and-burst)
+- [Rendering Performance](#rendering-performance)
+    - [SRP Batcher](#srp-batcher)
+    - [GPU Resident Drawer and occlusion culling](#gpu-resident-drawer-and-occlusion-culling)
+    - [Frame pacing](#frame-pacing)
+    - [Animator cost](#animator-cost)
+    - [UI](#ui)
+- [Profiling Workflow](#profiling-workflow)
 - [Common Anti-Patterns](#common-anti-patterns)
+- [Troubleshooting](#troubleshooting)
+- [Learn more](#learn-more)
 
 ---
 
@@ -59,39 +75,40 @@ When reviewing Unity code for performance, check these areas in order of impact:
 - ✅ Use object pooling for frequently instantiated objects.
 
 ```csharp
-// ❌ Bad - allocates every frame
+// ❌ Bad - allocates every frame, and scans the whole scene
 private void Update()
 {
-    var enemies = FindObjectsOfType<Enemy>();           // Allocates array
-    var nearbyEnemies = new List<Enemy>();              // Allocates list
-    string status = $"Enemies: {enemies.Length}";      // Allocates string
-    
-    foreach (var enemy in enemies.Where(e => e.IsAlive)) // LINQ allocates
+    var enemies = FindObjectsByType<Enemy>(FindObjectsSortMode.None); // Scene scan + array alloc
+    var nearbyEnemies = new List<Enemy>();                            // Allocates list
+    string status = $"Enemies: {enemies.Length}";                     // Allocates string
+
+    foreach (var enemy in enemies.Where(e => e.IsAlive))              // LINQ allocates
     {
         nearbyEnemies.Add(enemy);
     }
 }
 
-// ✅ Good - zero allocations in update
-private Enemy[] m_enemyCache = new Enemy[100];
+// ✅ Good - zero allocations, no scene scan
+// There is no non-allocating Find overload. The fix is not a better Find,
+// it is not calling Find at all: have enemies register themselves.
+private readonly List<Enemy> m_activeEnemies = new(100);   // Populated by Enemy.OnEnable/OnDisable
 private readonly List<Enemy> m_nearbyEnemies = new(50);
 private readonly StringBuilder m_statusBuilder = new(64);
 
 private void Update()
 {
-    int count = FindObjectsOfType(m_enemyCache);       // Reuses array
-    
     m_nearbyEnemies.Clear();                            // Reuses list
-    for (int i = 0; i < count; i++)
+
+    for (int i = 0; i < m_activeEnemies.Count; i++)
     {
-        if (m_enemyCache[i].IsAlive)
+        if (m_activeEnemies[i].IsAlive)
         {
-            m_nearbyEnemies.Add(m_enemyCache[i]);
+            m_nearbyEnemies.Add(m_activeEnemies[i]);
         }
     }
-    
+
     m_statusBuilder.Clear();                            // Reuses StringBuilder
-    m_statusBuilder.Append("Enemies: ").Append(count);
+    m_statusBuilder.Append("Enemies: ").Append(m_nearbyEnemies.Count);
 }
 ```
 
@@ -472,7 +489,11 @@ private void UpdateShader(float value)
 # GetComponent and Find Operations
 
 - ❌ **Never call GetComponent in Update** — cache in Awake/Start.
-- ❌ Avoid `FindObjectOfType`, `FindObjectsOfType` at runtime — they are O(n) scene scans.
+- ❌ Avoid `FindFirstObjectByType`, `FindObjectsByType` at runtime — they are O(n) scene scans.
+- ℹ️ `FindObjectOfType` / `FindObjectsOfType` are deprecated in Unity 6. The replacements are
+  `FindFirstObjectByType`, `FindAnyObjectByType`, and `FindObjectsByType`. Pass
+  `FindObjectsSortMode.None` unless you actually need instance-ID ordering — sorting is the
+  expensive part of the old API.
 - ❌ Avoid `GameObject.Find` — string-based, searches entire hierarchy.
 - ✅ Use `[SerializeField]` to assign references in the Inspector.
 - ✅ Use `TryGetComponent` for null-safe lookups (slightly faster than GetComponent + null check).
@@ -483,7 +504,7 @@ private void UpdateShader(float value)
 private void Update()
 {
     var rb = GetComponent<Rigidbody>();                 // Lookup every frame
-    var player = FindObjectOfType<Player>();           // Scene scan every frame
+    var player = FindFirstObjectByType<Player>();       // Scene scan every frame
     var enemy = GameObject.Find("Enemy");              // String search every frame
 }
 
@@ -783,6 +804,214 @@ public class PerformanceCriticalSystem : MonoBehaviour
 
 ---
 
+# Garbage Collection
+
+- ℹ️ Unity 6 uses the Boehm collector with **incremental mode on by default**. It splits collection
+  across frames, turning one long spike into several short ones. Total work is unchanged.
+- ⚠️ **The managed heap never shrinks.** Once a spike grows it, that memory is reserved for the
+  process lifetime. A single sloppy loading screen permanently raises your memory floor.
+- ✅ The goal is fewer *allocations*, not fewer collections. Everything in
+  [Memory Management](#memory-management) feeds this.
+- ✅ For a section that must not hitch — a cutscene, a ranked round — you can suspend collection
+  entirely, provided allocation during that window is bounded.
+
+```csharp
+using UnityEngine.Scripting;
+
+private void BeginNoHitchSection()
+{
+    // The heap grows instead of collecting. Only safe if allocation is bounded.
+    GarbageCollector.GCMode = GarbageCollector.Mode.Disabled;
+}
+
+private void EndNoHitchSection()
+{
+    GarbageCollector.GCMode = GarbageCollector.Mode.Enabled;
+    GC.Collect();   // Pay the cost at a moment you choose
+}
+```
+
+- ℹ️ Asset memory usually dwarfs managed memory. Before optimizing allocations, confirm that's
+  actually where your budget is going — see
+  [UnityAssetsAndMemoryInstructions.md](UnityAssetsAndMemoryInstructions.md).
+
+---
+
+# Jobs and Burst
+
+- ✅ Use the Job System with Burst for **data-parallel, math-heavy** work: pathfinding grids, flocking,
+  procedural mesh generation, large-scale simulation.
+- ❌ Don't job-ify light work. Scheduling has overhead; a job over 50 elements is slower than a loop.
+- ✅ Jobs may only touch blittable types and `NativeContainer`s. No managed objects, no
+  `GameObject`, no `Transform` (except via `TransformAccessArray`).
+- ⚠️ Every `NativeArray` you allocate must be disposed, or the Editor logs a leak on exit.
+- ✅ Schedule early in the frame, complete late — that's the window where parallelism actually buys
+  you anything.
+
+```csharp
+using Unity.Burst;
+using Unity.Collections;
+using Unity.Jobs;
+using Unity.Mathematics;
+
+[BurstCompile]
+public struct MoveTowardsJob : IJobParallelFor
+{
+    [ReadOnly] public NativeArray<float3> Targets;
+    [ReadOnly] public float DeltaTime;
+    [ReadOnly] public float Speed;
+
+    public NativeArray<float3> Positions;
+
+    public void Execute(int index)
+    {
+        float3 offset = Targets[index] - Positions[index];
+        float distance = math.length(offset);
+
+        if (distance < 0.001f) return;
+
+        Positions[index] += (offset / distance) * Speed * DeltaTime;
+    }
+}
+
+// Usage
+private void Update()
+{
+    var job = new MoveTowardsJob
+    {
+        Targets = m_targets,
+        Positions = m_positions,
+        DeltaTime = Time.deltaTime,
+        Speed = m_speed
+    };
+
+    // 64 = batch size; tune it, don't guess once and forget
+    m_handle = job.Schedule(m_positions.Length, 64);
+}
+
+private void LateUpdate()
+{
+    m_handle.Complete();   // Complete as late as possible
+}
+
+private void OnDestroy()
+{
+    // NativeArrays are not garbage collected
+    if (m_positions.IsCreated) m_positions.Dispose();
+    if (m_targets.IsCreated) m_targets.Dispose();
+}
+```
+
+- ✅ Enable **Burst AOT** and **Synchronous Compilation** so you don't measure the JIT warm-up as a
+  first-frame stutter.
+
+---
+
+# Rendering Performance
+
+## SRP Batcher
+
+- ✅ The SRP Batcher is on by default in URP and batches by **shader variant**, not by material. Many
+  materials sharing one shader still batch.
+- ⚠️ A shader is SRP Batcher compatible only if all its per-material properties live in a
+  `UnityPerMaterial` CBUFFER. Shader Graph does this automatically; hand-written shaders often don't.
+- ✅ Check compatibility in the Inspector for the shader asset — it says "SRP Batcher: compatible" or
+  gives the reason it isn't.
+- ❌ `MaterialPropertyBlock` **breaks SRP Batcher compatibility** for that renderer. It's still the
+  right answer for GPU instancing and for occasional per-instance tweaks, but don't reach for it by
+  reflex — see [Rendering Considerations](#rendering-considerations).
+
+## GPU Resident Drawer and occlusion culling
+
+- ✅ Unity 6's **GPU Resident Drawer** moves rendering of static geometry onto the GPU, cutting CPU
+  draw-call submission dramatically for large scenes. Enable it in the URP asset.
+- ⚠️ It requires objects to be marked **Batching Static** and works only with SRP Batcher-compatible
+  shaders.
+- ✅ **GPU Occlusion Culling** pairs with it, skipping objects hidden behind others. Biggest wins are
+  in dense interiors and cities; open vistas benefit less.
+- ✅ Measure both on and off. On scenes with few objects the setup cost can exceed the saving.
+
+## Frame pacing
+
+- ✅ Set `Application.targetFrameRate` explicitly. The default on mobile is 30 and on desktop is
+  uncapped, which burns battery and generates heat for frames nobody sees.
+- ⚠️ `QualitySettings.vSyncCount` overrides `targetFrameRate` when it's non-zero. Set vSync to 0 if
+  you want the target to take effect.
+- ✅ A stable 30 fps feels better than an average 45 that swings. Optimize the worst frame, not the
+  mean.
+
+```csharp
+[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+private static void ConfigureFrameRate()
+{
+    QualitySettings.vSyncCount = 0;        // Otherwise targetFrameRate is ignored
+    Application.targetFrameRate = 60;
+}
+```
+
+## Animator cost
+
+- ⚠️ Each `Animator` has a fixed per-frame cost even when the state machine is idle. Hundreds of them
+  add up before any animation actually plays.
+- ✅ Set **Culling Mode** to `Cull Update Transforms` or `Cull Completely` so offscreen characters
+  stop evaluating.
+- ✅ For simple, non-blended motion — a rotating pickup, a bobbing platform — plain code in `Update`
+  is far cheaper than an Animator.
+- ✅ Disable the Animator component outright when a character is idle and offscreen.
+- ℹ️ Never put an Animator on uGUI elements. See
+  [UnityUGUIInstructions.md](UnityUGUIInstructions.md#never-animate-ui-with-an-animator).
+
+## UI
+
+UI is a frequent and frequently-missed source of CPU cost. Canvas rebuilds don't show up where people
+usually look.
+
+- ℹ️ uGUI: see [UnityUGUIInstructions.md](UnityUGUIInstructions.md#performance-rules) — Canvas
+  granularity, raycast targets, and layout groups are the big three.
+- ℹ️ UI Toolkit: see [UnityUIToolkitInstructions.md](UnityUIToolkitInstructions.md).
+
+---
+
+# Profiling Workflow
+
+Markers are useless without a method for reading them.
+
+## Where to look, in order
+
+1. **Profiler → CPU Usage**, Timeline view. Find the spike, not the average.
+2. Check whether you're **CPU or GPU bound** — Unity 6.3's Highlights module details pane splits this
+   out directly. Optimizing the wrong one wastes days.
+3. Expand `PlayerLoop` and follow the largest child down.
+4. For rendering, switch to the **Frame Debugger** and step through draw calls.
+5. For memory, take a **Memory Profiler** snapshot and diff two of them.
+
+## Rules that save time
+
+- ⚠️ **Profile a development build on the target device.** Editor numbers are not representative —
+  the Editor holds extra copies of assets and adds its own overhead everywhere.
+- ⚠️ **Deep Profile distorts relative cost.** It adds instrumentation to every method, so small
+  frequently-called methods look far worse than they are. Use it to find *where*, then turn it off
+  and measure the real cost with a `ProfilerMarker`.
+- ✅ Profile with **Autoconnect Profiler** or connect over the network. `Development Build` alone
+  isn't enough to get the connection.
+- ✅ Record a few hundred frames and look at the distribution. One bad frame in 200 is a hitch players
+  will notice, and it averages away to nothing.
+- ✅ Unity 6.3's **Captures List** stores Profiler sessions in the project so you can reopen a
+  before/after pair without re-importing.
+- ✅ Change one thing at a time and re-measure. Two simultaneous optimizations can cancel out and look
+  like no change.
+
+| Tool | Use for |
+|---|---|
+| Profiler → CPU | Frame time, spikes, which subsystem |
+| Profiler → Memory | Managed heap, GC allocation rate |
+| Memory Profiler package | Native memory, what holds a reference, leak diffs |
+| Frame Debugger | Draw calls, batch breaks, render order |
+| Profile Analyzer package | Comparing two capture sets statistically |
+| Highlights module (6.3) | Fast CPU/GPU-bound triage |
+
+---
+
 # Common Anti-Patterns
 
 ## Anti-Pattern Checklist for Code Review
@@ -792,7 +1021,7 @@ When reviewing Unity code, flag these patterns:
 | Anti-Pattern | Impact | Solution |
 |--------------|--------|----------|
 | `GetComponent` in Update | High | Cache in Awake |
-| `FindObjectOfType` at runtime | High | Use references or events |
+| `FindFirstObjectByType` at runtime | High | Use references or events |
 | `new List<T>()` in Update | High | Pre-allocate and Clear() |
 | String concatenation in loops | Medium | Use StringBuilder |
 | `Camera.main` in Update | Medium | Cache reference |
@@ -801,6 +1030,11 @@ When reviewing Unity code, flag these patterns:
 | `material` instead of `sharedMaterial` | Medium | Use MaterialPropertyBlock |
 | Lambda in event subscription | Low | Use method group |
 | `new WaitForSeconds` in coroutine loop | Low | Cache wait object |
+| `Animator` on a uGUI element | High | Dirties the canvas every frame — use code or a tween |
+| Monolithic Canvas for the whole UI | High | Split by update frequency |
+| `Raycast Target` on decorative graphics | Medium | Turn it off |
+| `NativeArray` never disposed | Medium | Dispose in `OnDestroy` |
+| Deep Profile used to compare costs | Medium | Distorts relative cost — use `ProfilerMarker` |
 
 ## Code Smell Detection
 
@@ -811,7 +1045,7 @@ Look for these patterns that indicate potential issues:
 void Update()
 {
     GetComponent<T>()                    // 🔴 Uncached lookup
-    FindObjectOfType<T>()                // 🔴 Scene scan
+    FindFirstObjectByType<T>()                // 🔴 Scene scan
     new List<T>()                        // 🔴 Allocation
     new T[]                              // 🔴 Allocation
     string + string                      // 🔴 String allocation
@@ -833,6 +1067,41 @@ void Update()
     Physics.OverlapSphereNonAlloc()      // 🟢 Non-allocating
 }
 ```
+
+---
+
+# Troubleshooting
+
+**The Profiler shows a spike but the call stack is all `PlayerLoop` with nothing underneath.**
+The cost is in native code the Profiler doesn't break down by default. Enable **Deep Profile** to
+locate it, then turn it off and add a `ProfilerMarker` around the suspect region to measure it
+honestly.
+
+**Deep Profile says a method is expensive; removing it changes nothing.**
+Deep Profile instruments every method call, so cost is dominated by call *count*, not real work. A
+tiny method called 10,000 times looks catastrophic. Never compare costs with Deep Profile on.
+
+**Frame rate is fine on average but the game feels bad.**
+Look at the frame time graph, not the average. One 60 ms frame per second is invisible in a mean and
+extremely visible to a player. Sort by worst frame.
+
+**GC spikes with no obvious allocation in your code.**
+Common hidden sources: `foreach` over a non-generic collection (boxes the enumerator), a lambda that
+captures a local (allocates a closure), string interpolation in a log call that still evaluates even
+when the log is stripped, and `GetComponents<T>()` returning a fresh array.
+
+**Editor performance is bad, build is fine (or vice versa).**
+The Editor adds overhead everywhere and holds extra copies of assets. Always confirm a problem in a
+development build on the target device before optimizing it.
+
+**Optimization made no measurable difference.**
+You optimized something that wasn't the bottleneck, or you're GPU-bound and optimized CPU work.
+Check which you are first — Unity 6.3's Highlights module details pane splits CPU and GPU directly.
+
+**Frame rate drops the longer the game runs.**
+Something is accumulating: a growing static collection, event subscribers never removed, pooled
+objects never returned, or a leak of native memory. See
+[Assets & Memory](UnityAssetsAndMemoryInstructions.md#troubleshooting).
 
 ---
 
@@ -862,11 +1131,22 @@ void Update()
 - Profile on target platform
 - Use Jobs/Burst for heavy computation
 - Configure physics collision matrix
+- Enable the GPU Resident Drawer for large static scenes
+- Set `Application.targetFrameRate` explicitly (and vSync to 0)
+- Suspend GC across a known-bounded no-hitch section
 
 ---
 
 # Version Information
 
-- **Target Unity Version**: Unity 6 (6000.x) and later
+- **Target Unity Version**: Unity 6.3 (6000.3.x) and later
 - **C# Version**: C# 9.0+ features supported
-- **Last Updated**: January 2026
+- **Last Updated**: August 2026
+
+---
+
+# Learn more
+
+- [Optimizing your game performance](https://docs.unity3d.com/6000.3/Documentation/Manual/performance-profiling-tools.html)
+- [Profiler window](https://docs.unity3d.com/6000.3/Documentation/Manual/Profiler.html)
+- [Understanding optimization in Unity](https://unity.com/how-to/best-practices-performance-optimization-unity)
