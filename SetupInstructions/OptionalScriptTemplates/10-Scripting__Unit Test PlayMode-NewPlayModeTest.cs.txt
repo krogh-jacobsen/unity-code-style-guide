@@ -1,0 +1,14 @@
+using System.Collections;
+using NUnit.Framework;
+using UnityEngine.TestTools;
+
+    #ROOTNAMESPACEBEGIN#
+public sealed class #SCRIPTNAME#
+{
+    [UnityTest, Ignore("Provide a runtime fixture, cleanup, and assertion before enabling this test.")]
+    public IEnumerator Behavior_WhenCondition_ProducesExpectedResult()
+    {
+        yield return null;
+    }
+}
+#ROOTNAMESPACEEND#

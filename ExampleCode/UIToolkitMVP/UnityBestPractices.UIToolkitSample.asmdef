@@ -1,0 +1,7 @@
+{
+  "name": "UnityBestPractices.UIToolkitSample",
+  "rootNamespace": "UnityBestPractices.Samples",
+  "references": [],
+  "includePlatforms": [],
+  "autoReferenced": true
+}

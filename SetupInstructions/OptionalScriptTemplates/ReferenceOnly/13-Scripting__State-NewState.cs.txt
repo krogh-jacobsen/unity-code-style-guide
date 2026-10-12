@@ -1,0 +1,6 @@
+#ROOTNAMESPACEBEGIN#
+// Reference-only sketch: choose and supply your project's state contract before installation.
+public sealed class #SCRIPTNAME#
+{
+}
+#ROOTNAMESPACEEND#

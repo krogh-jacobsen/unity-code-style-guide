@@ -1,0 +1,21 @@
+using System;
+using UnityEngine;
+
+    #ROOTNAMESPACEBEGIN#
+/// <summary>Session-scoped event; listeners own their subscription lifetime.</summary>
+public static class #SCRIPTNAME#
+{
+    public static event Action EventRaised;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics()
+    {
+        EventRaised = null;
+    }
+
+    public static void Raise()
+    {
+        EventRaised?.Invoke();
+    }
+}
+#ROOTNAMESPACEEND#

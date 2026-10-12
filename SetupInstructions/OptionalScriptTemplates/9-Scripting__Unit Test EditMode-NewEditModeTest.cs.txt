@@ -1,0 +1,11 @@
+using NUnit.Framework;
+
+    #ROOTNAMESPACEBEGIN#
+public sealed class #SCRIPTNAME#
+{
+    [Test, Ignore("Replace this placeholder with a behavioral assertion before enabling it.")]
+    public void Behavior_WhenCondition_ProducesExpectedResult()
+    {
+    }
+}
+#ROOTNAMESPACEEND#

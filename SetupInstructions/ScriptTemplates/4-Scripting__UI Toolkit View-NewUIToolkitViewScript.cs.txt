@@ -1,0 +1,25 @@
+using UnityEngine;
+using UnityEngine.UIElements;
+
+    #ROOTNAMESPACEBEGIN#
+/// <summary>Standalone document host. Add selected element bindings with paired cleanup.</summary>
+[RequireComponent(typeof(UIDocument))]
+public sealed class #SCRIPTNAME# : MonoBehaviour
+{
+    private UIDocument m_document;
+
+    private void Awake()
+    {
+        m_document = GetComponent<UIDocument>();
+    }
+
+    public void SetVisible(bool isVisible)
+    {
+        VisualElement root = m_document.rootVisualElement;
+        if (root != null)
+        {
+            root.style.display = isVisible ? DisplayStyle.Flex : DisplayStyle.None;
+        }
+    }
+}
+#ROOTNAMESPACEEND#

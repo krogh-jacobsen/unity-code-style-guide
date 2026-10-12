@@ -1,0 +1,14 @@
+using Unity.Netcode;
+
+    #ROOTNAMESPACEBEGIN#
+/// <summary>Requires Netcode for GameObjects 2.x/3.x; validate requests against authoritative state.</summary>
+public sealed class #SCRIPTNAME# : NetworkBehaviour
+{
+    // Add spawn-scoped subscriptions with paired OnNetworkDespawn cleanup when needed.
+    [Rpc(SendTo.Server)]
+    private void RequestActionRpc()
+    {
+        // Validate sender, ownership, and game rules before changing server state.
+    }
+}
+#ROOTNAMESPACEEND#

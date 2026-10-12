@@ -1,0 +1,9 @@
+using UnityEngine;
+
+    #ROOTNAMESPACEBEGIN#
+/// <summary>Shared configuration; runtime state needs a separate owner.</summary>
+[CreateAssetMenu(fileName = "#SCRIPTNAME#", menuName = "Configuration/#SCRIPTNAME#")]
+public sealed class #SCRIPTNAME# : ScriptableObject
+{
+}
+#ROOTNAMESPACEEND#

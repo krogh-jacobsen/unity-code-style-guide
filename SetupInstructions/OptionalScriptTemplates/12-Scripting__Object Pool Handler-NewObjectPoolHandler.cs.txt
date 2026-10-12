@@ -1,0 +1,81 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Pool;
+
+    #ROOTNAMESPACEBEGIN#
+/// <summary>Owns all retained and checked-out objects. Return leases before destroying the host.</summary>
+public sealed class #SCRIPTNAME# : MonoBehaviour
+{
+    [SerializeField] private GameObject m_prefab;
+    [SerializeField, Min(1)] private int m_maxRetained = 32;
+
+    private readonly HashSet<GameObject> m_checkedOut = new HashSet<GameObject>();
+    private ObjectPool<GameObject> m_pool;
+    private bool m_isDisposed;
+
+    private void Awake()
+    {
+        if (m_prefab == null)
+        {
+            throw new InvalidOperationException("Assign the owned pool prefab before use.");
+        }
+
+        m_pool = new ObjectPool<GameObject>(CreateItem, TakeItem, ReturnItem, DestroyItem,
+            collectionCheck: true, defaultCapacity: 8, maxSize: Mathf.Max(1, m_maxRetained));
+    }
+
+    private void OnDestroy()
+    {
+        m_isDisposed = true;
+        foreach (GameObject item in m_checkedOut)
+        {
+            if (item != null) Destroy(item);
+        }
+        m_checkedOut.Clear();
+        m_pool?.Dispose();
+        m_pool = null;
+    }
+
+    public GameObject Acquire()
+    {
+        if (m_isDisposed || m_pool == null) throw new InvalidOperationException("Pool is unavailable.");
+        return m_pool.Get();
+    }
+
+    public void Release(GameObject item)
+    {
+        if (m_isDisposed) return;
+        if (item == null || !m_checkedOut.Remove(item))
+        {
+            throw new InvalidOperationException("Return each live lease to its owning pool exactly once.");
+        }
+        m_pool.Release(item);
+    }
+
+    private GameObject CreateItem()
+    {
+        // The prefab must be inactive so initialization completes before OnEnable.
+        if (m_prefab.activeSelf) throw new InvalidOperationException("Use an inactive pool prefab.");
+        return Instantiate(m_prefab, transform);
+    }
+
+    private void TakeItem(GameObject item)
+    {
+        m_checkedOut.Add(item);
+        // Reset selected per-lease state here before enabling.
+        item.SetActive(true);
+    }
+
+    private void ReturnItem(GameObject item)
+    {
+        // Stop lease-scoped subscriptions/work and reset selected state here.
+        item.SetActive(false);
+    }
+
+    private void DestroyItem(GameObject item)
+    {
+        if (item != null) Destroy(item);
+    }
+}
+#ROOTNAMESPACEEND#

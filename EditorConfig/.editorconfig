@@ -1,0 +1,133 @@
+# .editorconfig
+# Enforce Unity C# style (Rider / Roslyn / dotnet-format compatible)
+root = true
+
+# Global defaults
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+max_line_length = 140
+
+# Binary and generated assets - don't rewrite these
+[*.{png,jpg,jpeg,gif,ico,exe,dll,so,zip}]
+trim_trailing_whitespace = false
+insert_final_newline = false
+
+# Unity YAML assets - preserve exactly as Unity writes them
+[*.{unity,asset,prefab,mat,anim,controller,overrideController,preset,meta,renderTexture,lighting,mixer,playable,terrainlayer}]
+trim_trailing_whitespace = false
+insert_final_newline = false
+
+# C# files
+[*.cs]
+indent_style = space
+indent_size = 4
+
+# Allman brace style
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+
+# Spacing rules
+csharp_space_after_keywords_in_control_flow_statements = true
+csharp_space_between_method_call_name_and_open_parenthesis = false
+csharp_space_between_method_declaration_name_and_open_parenthesis = false
+csharp_space_after_comma = true
+csharp_space_around_binary_operators = before_and_after
+csharp_space_within_square_brackets = false
+
+# var preferences - explicit types unless the type is already obvious
+csharp_style_var_for_built_in_types = true:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = false:suggestion
+
+# Prefer expression-bodied members where concise (optional)
+csharp_style_expression_bodied_methods = when_on_single_line:suggestion
+csharp_style_expression_bodied_properties = when_on_single_line:suggestion
+
+# Naming conventions
+# Roslyn selects rules by symbol specificity, not file order.
+dotnet_naming_symbols.const_fields.applicable_kinds = field
+dotnet_naming_symbols.const_fields.applicable_accessibilities = private, protected, private_protected
+dotnet_naming_symbols.const_fields.required_modifiers = static, const
+
+dotnet_naming_symbols.static_fields.applicable_kinds = field
+dotnet_naming_symbols.static_fields.applicable_accessibilities = private, protected, private_protected
+dotnet_naming_symbols.static_fields.required_modifiers = static
+
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private, protected, private_protected
+
+dotnet_naming_symbols.public_const_fields.applicable_kinds = field
+dotnet_naming_symbols.public_const_fields.applicable_accessibilities = public, internal
+dotnet_naming_symbols.public_const_fields.required_modifiers = const
+
+dotnet_naming_symbols.properties.applicable_kinds = property
+dotnet_naming_symbols.properties.applicable_accessibilities = *
+
+dotnet_naming_symbols.interfaces.applicable_kinds = interface
+
+# Styles - note all three prefixes use camelCase after the prefix
+dotnet_naming_style.m_prefix_style.required_prefix = m_
+dotnet_naming_style.m_prefix_style.capitalization = camel_case
+
+dotnet_naming_style.k_prefix_style.required_prefix = k_
+dotnet_naming_style.k_prefix_style.capitalization = camel_case
+
+dotnet_naming_style.s_prefix_style.required_prefix = s_
+dotnet_naming_style.s_prefix_style.capitalization = camel_case
+
+dotnet_naming_style.pascal_case_style.capitalization = pascal_case
+
+dotnet_naming_style.i_prefix_style.required_prefix = I
+dotnet_naming_style.i_prefix_style.capitalization = pascal_case
+
+# Explicit static+const intersection disambiguates constants from other static fields.
+dotnet_naming_rule.const_fields_should_have_k_prefix.symbols = const_fields
+dotnet_naming_rule.const_fields_should_have_k_prefix.style = k_prefix_style
+dotnet_naming_rule.const_fields_should_have_k_prefix.severity = suggestion
+
+dotnet_naming_rule.static_fields_should_have_s_prefix.symbols = static_fields
+dotnet_naming_rule.static_fields_should_have_s_prefix.style = s_prefix_style
+dotnet_naming_rule.static_fields_should_have_s_prefix.severity = suggestion
+
+dotnet_naming_rule.private_fields_should_have_m_prefix.symbols = private_fields
+dotnet_naming_rule.private_fields_should_have_m_prefix.style = m_prefix_style
+dotnet_naming_rule.private_fields_should_have_m_prefix.severity = suggestion
+
+dotnet_naming_rule.public_consts_should_be_pascal_case.symbols = public_const_fields
+dotnet_naming_rule.public_consts_should_be_pascal_case.style = pascal_case_style
+dotnet_naming_rule.public_consts_should_be_pascal_case.severity = suggestion
+
+dotnet_naming_rule.properties_should_be_pascal_case.symbols = properties
+dotnet_naming_rule.properties_should_be_pascal_case.style = pascal_case_style
+dotnet_naming_rule.properties_should_be_pascal_case.severity = suggestion
+
+dotnet_naming_rule.interfaces_should_have_i_prefix.symbols = interfaces
+dotnet_naming_rule.interfaces_should_have_i_prefix.style = i_prefix_style
+dotnet_naming_rule.interfaces_should_have_i_prefix.severity = suggestion
+
+# Analyzer severities (tunable)
+dotnet_analyzer_diagnostic.category-Style.severity = suggestion
+
+# File headers (optional template, uncomment and edit if desired)
+# file_header_template = Copyright (c) %year% YourCompany. All rights reserved.
+
+# UXML / XML files (UI Toolkit)
+[*.uxml]
+indent_style = space
+indent_size = 2
+max_line_length = 120
+
+[*.xml]
+indent_style = space
+indent_size = 2
+
+# USS / CSS-like files
+[*.uss]
+indent_style = space
+indent_size = 2
+max_line_length = 120
