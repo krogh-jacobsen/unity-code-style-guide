@@ -28,7 +28,7 @@ However, feel free to adapt agent.md  and everything else as you want to your sp
 | [AuditGuides](AuditGuides/README.md) | Focused review lenses: risks, evidence, and validation | Load only the applicable subsystems |
 | [SetupInstructions](SetupInstructions/README.md) | One-time stack, settings, structure, and import configuration | Tailor to the actual project |
 | [EditorConfig](EditorConfig/README.md) | The shipped `.editorconfig` and its explanation | Copy `.editorconfig` to the target root |
-| [Base audit workflow](Skills/unity-guide-audit/UnityProjectReview.md) | Checks documented project conformance | Reference from the project's audit workflow |
+| [Base audit workflow](AuditGuides/ProjectReview.md) | Checks documented project conformance | Reference from the project's audit workflow |
 
 [AuditGuides](AuditGuides/README.md) complement installed Unity skills. Skills own implementation,
 diagnosis, and tool execution; the guides identify what evidence a review needs and the recurring
@@ -51,7 +51,7 @@ Adapt the Project Setup block and [tech-stack template](SetupInstructions/UnityT
 same actual engine/packages and systems before using them in a Unity project.
 
 For an audit, `AGENTS.md` points to [the audit index](AuditGuides/README.md), which selects the
-relevant subsystem lenses. The [base workflow](Skills/unity-guide-audit/UnityProjectReview.md) adds
+relevant subsystem lenses. The [base workflow](AuditGuides/ProjectReview.md) adds
 conformance to your style and setup rules; a broader project-audit skill can add architecture,
 behavioral coverage, documentation drift, and unfinished-plan reconciliation.
 

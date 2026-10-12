@@ -18,7 +18,7 @@ resolved. Avoid a general architecture interview for a small project.
 
 ## 2. Select and copy resources
 
-Use [the installation table](../README.md#installation) for destinations. Copy documentation outside
+Use [the installation guidance](../README.md#how-to-install) for destinations. Copy documentation outside
 `Assets`; install only selected asset groups inside `Assets`. Preserve existing imported metadata
 when copying the shipped resources. Do not overwrite the destination's instructions/configuration
 without inspecting and merging them. Include the MIT license with reused resources.
@@ -33,7 +33,7 @@ selected presets/templates/examples are staged for import.
 | [Tech stack](UnityTechStack.md) | Exact Editor/packages, selected systems, targets | Baseline |
 | [Project settings](ProjectSettings.md) | Settings match the agreed project/platform | Baseline plus explicit options |
 | [Folder layout](FolderStructure.md) | Small owned feature layout and correct special folders | Baseline; expand when used |
-| [Presets](Presets.md) | Scoped import policy registered with tested filters | Optional assets |
+| [Presets](Presets/readme.md) | Scoped import policy registered with tested filters | Optional assets |
 | [Script templates](ScriptTemplates.md) | Selected menu templates compile under their prerequisites | Optional assets |
 | [Testing](Testing.md) | Tests discoverable and excluded from normal players | When tests/examples selected |
 

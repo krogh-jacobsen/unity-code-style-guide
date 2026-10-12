@@ -1,5 +1,13 @@
 # Change log
 
+## 2026-10-12 — Optional ownership and CLI examples
+
+- Added screen cancellation with request identity guards, an enabled-screen adapter, and controlled/PlayMode tests.
+- Added pooled notification leases with state reset, subscription/timer cleanup, safe reuse, and owner teardown tests.
+- Added a custom Pipeline CLI command that previews/generates a C# script, preserves existing files/GUIDs, and demonstrates focused behavioral test execution.
+- Kept examples optional, recorded 15 EditMode and 4 PlayMode passes and a normal player build, and inventoried Unity-generated resource identities.
+- Repaired four setup/preset links after documentation restoration; preserved the restored style guide and READMEs.
+
 ## 2026-10-12 — Starter kit restructuring
 
 - Reduced AGENTS.md to conventions, asset safety, CLI execution, and on-demand routing; added CLAUDE pointer.

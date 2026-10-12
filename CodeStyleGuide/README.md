@@ -122,7 +122,7 @@ else
 ## Using `.editorconfig` to enforce formatting rules
 
 Use an `.editorconfig` file to define and enforce consistent formatting rules across the project. This helps keep your editor, formatters, and AI tools aligned with the same conventions. 
-I've included an example in the /EditorConfig/ folder.
+I've included an example in the [EditorConfig](../EditorConfig/) folder.
 The important part is making sure the file actually exists in your repo and is picked up by your editor. The README example is useful for reference, but the effective enforcement happens when it is placed at the repository root as a real `.editorconfig` file.
 
 

@@ -3,7 +3,7 @@
 Load for asset loading/release, retained memory, import cost, or build content. Apply the
 [shared evidence standard](README.md#evidence-standard). Import recipes belong to skills such as
 `prepare-unity-3d-asset`, `optimize-audio`, and sprite atlas management, or
-[project presets](../SetupInstructions/Presets.md).
+[project presets](../SetupInstructions/Presets/readme.md).
 
 ## Establish ownership
 

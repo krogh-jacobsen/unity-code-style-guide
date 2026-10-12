@@ -1,0 +1,9 @@
+{
+  "name": "Starter.Cli.Editor",
+  "references": [
+    "Unity.Pipeline"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ]
+}

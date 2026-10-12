@@ -1,0 +1,16 @@
+{
+  "name": "Starter.ScreenCancellation.EditMode.Tests",
+  "references": [
+    "Starter.ScreenCancellation"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "autoReferenced": false,
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ],
+  "defineConstraints": [
+    "UNITY_INCLUDE_TESTS"
+  ]
+}

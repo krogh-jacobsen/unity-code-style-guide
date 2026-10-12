@@ -1,0 +1,20 @@
+using System;
+
+namespace UnityBestPractices.Samples.Cli.Generated
+{
+    /// <summary>Generated demonstration of a small, testable script with explicit input policy.</summary>
+    public sealed class SampleScoreCounter
+    {
+        public int Score { get; private set; }
+
+        /// <summary>Adds a nonnegative amount; invalid input leaves the score unchanged.</summary>
+        public void AddScore(int amount)
+        {
+            if (amount < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(amount));
+            }
+            Score = checked(Score + amount);
+        }
+    }
+}

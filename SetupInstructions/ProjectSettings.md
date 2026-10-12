@@ -55,4 +55,4 @@ Project Settings and Preferences/Settings for the appropriate ownership.
 **Done:** selected values read back correctly, saved scene/pipeline references survive reopening,
 repeated Play matches the selected reload contract, and an agreed platform build completes. Record
 unperformed device/backend checks as Not verified. Source control setup is in
-[the installation guide](../README.md#installation) and [Git attributes](../EditorConfig/README.md#git-attributes).
+[the installation guide](../README.md#how-to-install) and [Git attributes](../EditorConfig/README.md#git-attributes).
