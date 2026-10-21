@@ -16,7 +16,7 @@ trim_trailing_whitespace = false
 insert_final_newline = false
 
 # Unity YAML assets - preserve exactly as Unity writes them
-[*.{unity,asset,prefab,mat,anim,controller,overrideController,preset,meta,renderTexture,lighting,mixer,playable,terrainlayer}]
+[*.{unity,scenetemplate,asset,prefab,mat,anim,controller,overrideController,preset,meta,renderTexture,lighting,mixer,playable,terrainlayer}]
 trim_trailing_whitespace = false
 insert_final_newline = false
 
@@ -127,7 +127,7 @@ indent_style = space
 indent_size = 2
 
 # USS / CSS-like files
-[*.uss]
+[*.{uss,tss}]
 indent_style = space
 indent_size = 2
 max_line_length = 120

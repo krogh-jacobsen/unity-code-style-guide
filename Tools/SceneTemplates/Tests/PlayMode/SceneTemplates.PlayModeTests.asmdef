@@ -1,0 +1,5 @@
+{
+    "name": "SceneTemplates.PlayModeTests",
+    "references": ["UnityStarter.SceneTemplates", "Unity.InputSystem"],
+    "optionalUnityReferences": ["TestAssemblies"]
+}

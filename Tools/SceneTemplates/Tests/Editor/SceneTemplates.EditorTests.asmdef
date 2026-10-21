@@ -1,0 +1,6 @@
+{
+    "name": "SceneTemplates.EditorTests",
+    "references": ["UnityStarter.SceneTemplates", "Unity.InputSystem", "Unity.RenderPipelines.Core.Runtime"],
+    "includePlatforms": ["Editor"],
+    "optionalUnityReferences": ["TestAssemblies"]
+}

@@ -1,0 +1,14 @@
+using UnityEditor;
+using UnityEngine.UIElements;
+
+    #ROOTNAMESPACEBEGIN#
+// Add CustomPropertyDrawer(typeof(YourAttributeOrDataType)) after selecting the target.
+public sealed class #SCRIPTNAME# : PropertyDrawer
+{
+    public override VisualElement CreatePropertyGUI(SerializedProperty property)
+    {
+        // Bind child properties with PropertyField; drawing property itself would recurse.
+        return new Label("Implement the selected field layout.");
+    }
+}
+#ROOTNAMESPACEEND#

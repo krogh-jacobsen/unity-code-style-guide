@@ -1,11 +1,16 @@
 """Dependency-free static checks for the starter checkout; does not import Unity assets."""
 from pathlib import Path
 from urllib.parse import unquote
+import argparse
 import json
 import re
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("--resources-only", action="store_true", help="Check resource safety and inventories without scanning Markdown links")
+parser.add_argument("--markdown-path", action="append", default=[], help="Limit Markdown checks to a repository-relative file; repeatable")
+args = parser.parse_args()
 errors = []
 links = 0
 
@@ -26,7 +31,9 @@ def headings(path):
     return result
 
 markdown = [p for p in ROOT.rglob("*.md") if ".git" not in p.parts]
-for path in markdown:
+if args.markdown_path:
+    markdown = [ROOT / name for name in args.markdown_path]
+for path in ([] if args.resources_only else markdown):
     content = re.sub(r"```.*?```", "", path.read_text(), flags=re.S)
     for raw in re.findall(r"\[[^]]*\]\(([^)]+)\)", content):
         target = raw.strip().strip("<>")
@@ -51,11 +58,12 @@ for path in ROOT.rglob("*.meta"):
         require(guid not in guids, f"Duplicate GUID: {path.relative_to(ROOT)} and {guids.get(guid)}")
         guids[guid] = str(path.relative_to(ROOT))
 
-presets = list((ROOT / "SetupInstructions/Presets").rglob("*.preset"))
-require(len(presets) == 10, "Expected ten presets")
-inventory = (ROOT / "SetupInstructions/Presets/readme.md").read_text()
+presets = list((ROOT / "LLMInstructions/SetupInstructions/Presets").rglob("*.preset"))
+require(len(presets) == 13, "Expected thirteen presets")
+inventory = (ROOT / "LLMInstructions/SetupInstructions/Presets/readme.md").read_text()
 for path in presets:
     require(path.name in inventory, f"Undocumented preset: {path.name}")
+    require(Path(str(path) + ".meta").exists(), f"Missing preset metadata: {path.name}")
     content = path.read_text()
     properties = re.findall(r"propertyPath: (.+)", content)
     exclusions = content.partition("m_ExcludedProperties:")[2]
@@ -65,11 +73,12 @@ for path in presets:
     for prop in included:
         require(not re.search(r"SpriteSheet|SpritePivot|SpriteBorder|ExternalObjects|PlatformSetting|UserData|AssetBundle", prop), f"Unsafe included preset property: {path.name}: {prop}")
 
-defaults = list((ROOT / "SetupInstructions/ScriptTemplates").glob("*.cs.txt"))
-optional = list((ROOT / "SetupInstructions/OptionalScriptTemplates").glob("*.cs.txt"))
-retired = list((ROOT / "SetupInstructions/OptionalScriptTemplates/ReferenceOnly").glob("*.cs.txt"))
-require((len(defaults), len(optional), len(retired)) == (5, 8, 1), "Template selection inventory must be 5 default, 8 optional, 1 retired")
+defaults = list((ROOT / "LLMInstructions/SetupInstructions/ScriptTemplates").glob("*.cs.txt"))
+optional = list((ROOT / "LLMInstructions/SetupInstructions/ScriptTemplates/OptionalScriptTemplates").glob("*.cs.txt"))
+retired = list((ROOT / "LLMInstructions/SetupInstructions/ScriptTemplates/OptionalScriptTemplates/ReferenceOnly").glob("*.cs.txt"))
+require((len(defaults), len(optional), len(retired)) == (5, 11, 1), "Template selection inventory must be 5 default, 11 optional, 1 retired")
 for path in defaults + optional + retired:
+    require(Path(str(path) + ".meta").exists(), f"Missing template metadata: {path.name}")
     content = path.read_text()
     tokens = set(re.findall(r"#[A-Z][A-Z0-9_]*#", content))
     require(tokens <= {"#SCRIPTNAME#", "#ROOTNAMESPACEBEGIN#", "#ROOTNAMESPACEEND#", "#NOTRIM#"}, f"Unknown template tokens: {path.name}")
@@ -79,13 +88,13 @@ for path in defaults + optional + retired:
     require(not re.search(r"\b[msk]_[A-Z]", re.sub(r'"[^"\n]*"', "", content)), f"Wrong prefix casing: {path.name}")
 
 agents = (ROOT / "AGENTS.md").read_text()
-stack = (ROOT / "SetupInstructions/UnityTechStack.md").read_text()
+stack = (ROOT / "LLMInstructions/SetupInstructions/UnityTechStack.md").read_text()
 require("6000.7.x" in stack, "Intended version must remain Unity 6.7")
 require(not re.search(r"6000\.[0-9]|C# version:", agents), "AGENTS must route version choices to one source")
-require("AuditGuides/README.md" in agents and "SetupInstructions/README.md" in agents, "AGENTS routing missing")
+require("LLMInstructions/AuditGuides/ProjectReview.md" in agents and "LLMInstructions/SetupInstructions/README.md" in agents, "AGENTS routing missing")
 require("preset" in (ROOT / "EditorConfig/.editorconfig").read_text(), "Preset formatter exclusion missing")
 require("CLAUDE.md" not in (ROOT / ".gitignore").read_text().splitlines(), "CLAUDE compatibility stub ignored")
-for directory in ("SetupInstructions", "AuditGuides"):
+for directory in ("LLMInstructions/SetupInstructions", "LLMInstructions/AuditGuides"):
     for path in (ROOT / directory).rglob("*.md"):
         require(not re.search(r"setup-project\.sh|ConfigurePresets\.cs|unity-project-setup|tbkj-project-audit", path.read_text()), f"Missing/private automation dependency: {path.relative_to(ROOT)}")
 
@@ -97,7 +106,23 @@ if resource_inventory.exists():
         require(path.exists(), f"Inventory resource missing: {relative}")
         require(guids.get(expected) == relative + ".meta", f"Resource GUID drift: {relative}")
 
+scene_root = ROOT / "LLMInstructions/SetupInstructions/SceneTemplates"
+scene_templates = list(scene_root.rglob("*.scenetemplate"))
+require(len(scene_templates) == 3, "Expected three initial scene templates")
+for name in ("StrategySandbox", "UIPreview", "AssetLookDev"):
+    for filename in (name + ".unity", name + ".scenetemplate", "Preview.png"):
+        path = scene_root / name / filename
+        require(path.exists(), f"Scene template resource missing: {name}/{filename}")
+for path in scene_root.rglob("*"):
+    if path.suffix == ".meta":
+        continue
+    require(Path(str(path) + ".meta").exists(), f"Scene template metadata missing: {path.relative_to(ROOT)}")
+    if path.suffix == ".cs":
+        require(not re.search(r"RailroadTycoon|StrategyCore|UnityEditor|NUnit", path.read_text()),
+                f"Unexpected game/editor/test dependency: {path.relative_to(ROOT)}")
+
 if errors:
     print("\n".join(errors), file=sys.stderr)
     raise SystemExit(1)
-print(f"PASS: {len(markdown)} Markdown files, {links} local links/anchors, {len(guids)} unique GUIDs, {len(presets)} partial presets, 14 template sources")
+scope = "resource checks; Markdown links not checked" if args.resources_only else f"{len(markdown)} Markdown files, {links} local links/anchors"
+print(f"PASS: {scope}, {len(guids)} unique GUIDs, {len(presets)} partial presets, {len(defaults) + len(optional) + len(retired)} script template sources, {len(scene_templates)} scene templates")

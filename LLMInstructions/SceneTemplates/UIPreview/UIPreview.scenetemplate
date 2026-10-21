@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 13966, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: UIPreview
+  m_EditorClassIdentifier: UnityEditor.dll::UnityEditor.SceneTemplate.SceneTemplateAsset
+  templateScene: {fileID: 102900000, guid: fb28afd29c4c04670b09cfd4853ba823, type: 3}
+  templateName: Strategy / UI Preview
+  description: Strategy HUD, catalogue, controls and modal focus. Sample data only; no game framework.
+  preview: {fileID: 2800000, guid: 797bd8794222e4d22b90fda4b58c1e2a, type: 3}
+  dependencies:
+  - dependency: {fileID: -4733365628477956816, guid: 9f4dd1786a9ec416bad60817ebdaba67, type: 3}
+    instantiationMode: 0
+  - dependency: {fileID: 9197481963319205126, guid: 0013bd2f76bd14cdf953e002c1838134, type: 3}
+    instantiationMode: 0
+  - dependency: {fileID: 11400000, guid: 7c089d13bdbda413ba84b2dc81334e51, type: 2}
+    instantiationMode: 0
+  - dependency: {fileID: 7433441132597879392, guid: 4903d2db22b5543cb8be6fe0eb305696, type: 3}
+    instantiationMode: 0
+  templatePipeline: {fileID: 0}
+  badge: {fileID: 0}
+  addToDefaults: 1

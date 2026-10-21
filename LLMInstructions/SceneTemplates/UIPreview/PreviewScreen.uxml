@@ -1,0 +1,48 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+  <ui:VisualElement name="previewRoot" class="preview-root">
+    <ui:VisualElement name="workspace" class="workspace">
+      <ui:VisualElement class="resource-bar">
+        <ui:Label text="STRATEGY / UI PREVIEW" class="title resource" />
+        <ui:Label text="Treasury  12,500" class="resource" />
+        <ui:Label text="Population  840" class="resource" />
+        <ui:Label text="Day  24" class="resource" />
+      </ui:VisualElement>
+      <ui:VisualElement class="content">
+        <ui:VisualElement class="sidebar">
+          <ui:Label text="Settlement" class="section-title" />
+          <ui:TextField label="Name" value="New settlement" />
+          <ui:Slider label="Simulation speed" low-value="0" high-value="3" value="1" />
+          <ui:Toggle label="Show overlays" value="true" />
+          <ui:Button name="openModal" text="Preview modal" />
+          <ui:Label text="Tooltip appearance" class="section-title" />
+          <ui:VisualElement class="tooltip-sample">
+            <ui:Label text="Workshop" />
+            <ui:Label text="Converts raw materials into goods. Cost: 500." class="description" />
+          </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement class="main-area">
+          <ui:Label text="Building catalogue" class="section-title" />
+          <ui:Label text="Sample content. Tab changes focus; scroll the list; open the modal and press Escape to return." class="description" />
+          <ui:ScrollView name="catalogue" class="catalogue">
+            <ui:VisualElement class="catalogue-row"><ui:Label text="Workshop / Production" /><ui:Button name="selectItem" text="Select workshop" /></ui:VisualElement>
+            <ui:VisualElement class="catalogue-row"><ui:Label text="Warehouse / Storage / Capacity 120" /></ui:VisualElement>
+            <ui:VisualElement class="catalogue-row"><ui:Label text="Market / Commerce / Range 80 m" /></ui:VisualElement>
+            <ui:VisualElement class="catalogue-row"><ui:Label text="Farm / Food / Workers 12" /></ui:VisualElement>
+            <ui:VisualElement class="catalogue-row"><ui:Label text="Sawmill / Materials / Workers 8" /></ui:VisualElement>
+            <ui:VisualElement class="catalogue-row"><ui:Label text="Housing / Population / Residents 20" /></ui:VisualElement>
+            <ui:VisualElement class="catalogue-row"><ui:Label text="Depot / Logistics / Vehicles 4" /></ui:VisualElement>
+            <ui:VisualElement class="catalogue-row"><ui:Label text="Town hall / Administration" /></ui:VisualElement>
+          </ui:ScrollView>
+        </ui:VisualElement>
+      </ui:VisualElement>
+      <ui:Label name="status" text="Select a sample building to inspect its status." class="footer" />
+    </ui:VisualElement>
+    <ui:VisualElement name="modalOverlay" class="modal-overlay is-hidden">
+      <ui:VisualElement class="modal-card">
+        <ui:Label text="Modal preview" class="section-title" />
+        <ui:Label text="The workspace is disabled while this dialog owns focus. Close it to return to the opener." class="description" />
+        <ui:Button name="closeModal" text="Close / Escape" />
+      </ui:VisualElement>
+    </ui:VisualElement>
+  </ui:VisualElement>
+</ui:UXML>

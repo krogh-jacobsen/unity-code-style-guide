@@ -1,0 +1,19 @@
+using UnityEditor;
+using UnityEngine.UIElements;
+
+    #ROOTNAMESPACEBEGIN#
+public sealed class #SCRIPTNAME# : EditorWindow
+{
+    [MenuItem("Window/#SCRIPTNAME#")]
+    public static void ShowWindow()
+    {
+        GetWindow<#SCRIPTNAME#>("#SCRIPTNAME#");
+    }
+
+    public void CreateGUI()
+    {
+        rootVisualElement.Clear();
+        rootVisualElement.Add(new Label("#SCRIPTNAME#"));
+    }
+}
+#ROOTNAMESPACEEND#

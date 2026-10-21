@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 13966, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: AssetLookDev
+  m_EditorClassIdentifier: UnityEditor.dll::UnityEditor.SceneTemplate.SceneTemplateAsset
+  templateScene: {fileID: 102900000, guid: 04b06482fa6e3464ea47feb5b4764e22, type: 3}
+  templateName: Strategy / Asset LookDev
+  description: Compare asset scale, materials and silhouettes under neutral strategy-game lighting.
+  preview: {fileID: 2800000, guid: c5192cd697f934038808eb1abac1a28f, type: 3}
+  dependencies:
+  - dependency: {fileID: 2800000, guid: 177b2538515c71b4a86aa1cad939807a, type: 2}
+    instantiationMode: 1
+  - dependency: {fileID: 2100000, guid: 4480bad88dad94ea9965740fcee5c4a0, type: 2}
+    instantiationMode: 1
+  - dependency: {fileID: 2100000, guid: d724f4061a15a416a80de1b7813948f0, type: 2}
+    instantiationMode: 1
+  - dependency: {fileID: 11400000, guid: 2bad5f90e35c743ad953f70ae59c7f4b, type: 2}
+    instantiationMode: 0
+  - dependency: {fileID: 4916874251583510937, guid: 6c9458c10231c4d55b1b4840ba5e3f69, type: 3}
+    instantiationMode: 1
+  - dependency: {fileID: 2100000, guid: 96eca2ff2f1c8439981f129bab956019, type: 2}
+    instantiationMode: 1
+  - dependency: {fileID: -944628639613478452, guid: 3f5680884727240e1910dded77012e54, type: 3}
+    instantiationMode: 1
+  templatePipeline: {fileID: 0}
+  badge: {fileID: 0}
+  addToDefaults: 1

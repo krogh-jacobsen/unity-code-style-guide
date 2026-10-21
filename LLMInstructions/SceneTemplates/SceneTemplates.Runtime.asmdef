@@ -1,0 +1,5 @@
+{
+    "name": "UnityStarter.SceneTemplates",
+    "rootNamespace": "UnityStarter.SceneTemplates",
+    "references": ["Unity.InputSystem"]
+}

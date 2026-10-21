@@ -1,7 +1,7 @@
 # Editor configuration
 
 Merge `EditorConfig/.editorconfig` from this kit into the target project's root `.editorconfig`. It encodes the enforceable
-subset of [the style policy](../CodeStyleGuide/UnityStyleGuide.md); ownership, serialized migrations,
+subset of [the style policy](../LLMInstructions/CodeStyleGuide/UnityStyleGuide.md); ownership, serialized migrations,
 member order, and architectural choices still require review. C# uses four spaces; UXML/USS two.
 
 ## Naming analyzers

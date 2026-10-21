@@ -1,7 +1,0 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements">
-  <ui:Style src="SampleView.uss" />
-  <ui:VisualElement class="counter">
-    <ui:Label name="counter__count" text="0" class="counter__count" />
-    <ui:Button name="counter__increment-button" text="Increment" class="counter__increment-button" />
-  </ui:VisualElement>
-</ui:UXML>
