@@ -199,7 +199,11 @@ Only the preset installations or updates confirmed in stage 4. Stage first, then
    safe and in scope. Read each installed asset's bytes and GUID; check the logs for fresh errors.
    For updates, also read back effective properties/exclusions and existing references after a
    targeted save and reload; metadata must remain unchanged. Record actual per-preset source revisions
-   for partial outcomes. A repeat run must plan no copies or updates. With no safe import route,
+   for partial outcomes. If a changed preset is referenced by default rules, report the potential
+   policy change for future matching imports even when registrations are unchanged. Existing
+   importers remain outside scope unless application was separately selected; verify effective
+   future behavior rather than claiming a live result from the reference alone.
+   A repeat run must plan no copies or updates. With no safe import route,
    report files copied (first installations only) and import **Not verified**, with the next action.
 
 **Done:** every selected preset is installed, updated, already present, or explicitly unresolved;
@@ -294,7 +298,7 @@ separate recommendation/handoff, rather than an incomplete preset operation.
 | Item | Status | Detail |
 |---|---|---|
 | Source URL and revision | | |
-| Each selected preset | Installed / Updated / Already installed / Conflict | Path, GUID, actual source revision, local adaptations |
+| Each selected preset | Installed / Updated / Already installed / Conflict | Path, GUID, actual source revision, local adaptations, future-import policy impact |
 | License | Placed / Already present | Location |
 | Repeat run | Nothing to do / Work found / Not verified | Copies/updates and registration setter/save calls; configuration-byte comparison |
 | Unity import | Verified / Not verified | Next action if pending |

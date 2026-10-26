@@ -68,7 +68,7 @@
         "filter": "A helper suggests glob:\"(Assets/FixtureGame/Audio/SFX/**)\". The project has sibling Audio/SFXExtra, case-variant audio/sfx, vendor copies, and overlapping generic audio rules."
       },
       "expected": [
-        "Use a quoted single pattern and correctly grouped alternatives outside quotes; preview through the target Unity matcher.",
+        "Use correctly quoted single patterns; if alternatives are combined, group them outside the quoted globs. Preview through the target Unity matcher.",
         "Check direct/nested positives, case/sibling/vendor negatives, and the effective ordered overlap outcome; shell/Python glob is not Unity evidence."
       ]
     },

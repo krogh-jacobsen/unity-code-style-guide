@@ -78,7 +78,7 @@ validation entries retain their original wording.
 | Replay generation and integrity | Passed | 204 unique fixtures generated outside the repository; five new approval scenario families apply to all 18 entry points, plus four review-specific evidence/acceptance/scope scenarios. Default audit prompts remain read-only; decision prompts retain their scenario authorization and prohibit real workspace mutation from fictional evidence |
 | Syntax and whitespace | Passed | AST parsing of the two changed Python modules and `git diff --check` |
 | Concurrent-edit preservation | Passed | Saved the starting text snapshot and diff outside the repository; compared pre-existing added lines. All remain except the old hard-coded replay stop instruction, now preserved as the default task so decision scenarios can continue. No resets, stashes, or whole-file restoration |
-| Fresh-agent behavioral replay | Not verified | New cases and expected decisions were reviewed and generated, but no fresh-agent session or disposable Unity target was executed. Fixture/contract tests establish structure, not agent compliance |
+| Fresh-agent behavioral replay | Not verified at that implementation checkpoint | Subsequent project-review and workflow decision results are recorded above; no disposable Unity target was executed in this implementation pass |
 | Unity gameplay, Editor, and player validation | Not verified | Documentation and maintenance tooling only; no Unity implementation/assets changed and no Editor/test/build run was needed |
 
 The validated source was this dirty working tree, including concurrent workflow changes and the
@@ -88,55 +88,62 @@ successfully, including required .NET gates.
 
 ## Fresh-agent workflow replays — 2026-10-26
 
-The original checkpoint and its corrective replays are complete. Each case used a new built-in
-leaf agent with `fork_turns=none`, inherited model/reasoning, and no model override. Expected outcomes
-were withheld from the leaf; a coordinator graded each response and quoted its evidence. The parent
-independently checked source hashes, unique identities, expected arrays, counts, and verbatim quotations.
+Completed the fixed 213-case checkpoint. Each execution used a new built-in leaf agent with
+`fork_turns=none`, inherited model/reasoning, and no override. Expected outcomes were withheld from
+leaves; a coordinator graded full responses with exact quotations. The parent independently checked
+source hashes, unique identities, expected arrays, counts, and quotation fidelity.
 
 | Run | Cases | Pass | Fail | Not verified |
 |---|---:|---:|---:|---:|
 | Original frozen snapshot | 106 | 77 | 3 | 26 |
 | Corrected guides and concrete fixture evidence | 55 | 55 | 0 | 0 |
 | Nested-project and ArtSource scope checks | 4 | 4 | 0 | 0 |
-| Latest observed verdict per original/added case ID | 110 | 110 | 0 | 0 |
+| Expanded decision and authorization checkpoint | 103 | 95 | 2 | 6 |
+| Focused corrections and approval regressions | 18 | 18 | 0 | 0 |
+| Latest observed verdict per case ID | 213 | 213 | 0 | 0 |
 
-This is **165 fresh-agent case executions**, retaining the original failures and incomplete verdicts.
-The original three failures were dirty-tree rules pausing independent read-only audit. Eighteen
-incomplete cases lacked the identity of the missing prerequisite; seven omitted a fallback decision;
-one had ambiguous platform evidence. Corrected replays resolve those cases. Additional agent
-compensations exposed unknown-versus-unset status, unconditional platform profiles, ArtSource scope,
-standalone budget handoff, older-project reload policy, and missing delegated-guide reporting.
+286 fresh-agent executions cover 213 unique case IDs and 432 latest expected
+outcomes. Earlier failures and incomplete observations remain archived; successful targeted reruns
+supersede their latest verdicts without erasing the original evidence.
 
-The [replay evidence archive](AuditInstructions/Tools/replay_results_2026-10-26.json) contains frozen
-source documents, case inputs, full responses, agent identities, hashes, grades, and exact quotations.
-Raw temporary inputs/responses also remain under `/private/tmp/audit-replays-20261026-v1`, `v2`, and
-`v4`; `v3` was prepared but never executed. Data in the archive is the portable evidence source.
+The first three failures paused independent read-only audit merely because the tree was dirty.
+Corrections scope clean-tree/checkpoint rules to execution, distinguish unknown from observed-unset
+values, preserve existing reload policies during audit, and align selected-platform profiles,
+CLI-free routes, CoreCLR isolation, ArtSource scope, preset budget handoffs, and missing delegated
+guides. Concrete prerequisite identities and nested-project evidence corrected incomplete fixtures.
 
-**Expanded checkpoint: partial evidence captured for publication.** The fixed checkpoint contains
-213 generated cases, including 103 new case IDs. The archived capture has 42 graded expanded cases:
-38 Pass, two Fail, and two Not verified; 61 selected IDs lack grades in this capture. Later concurrent
-work remains unfinished and is not included in these counts. Together with the earlier checkpoint,
-the archive contains 207 case executions across 152 observed IDs: latest verdicts are 148 Pass,
-two Fail, and two Not verified. These are observed decisions, not physical tool execution.
+The expanded checkpoint found two wrong-scope decisions: CI inferred Tier A from `R1`, and folder
+review inferred a move-and-commit batch from `R1`. Guides now recover the actual prior change list
+before execution while preserving valid authorization. Three responses omitted available independent
+read-only inspection while asking for missing scope; CI, folder review, and script templates now make
+that continuation explicit. Preset updates explicitly report future-import policy effects even when
+the registration list stays unchanged. A filter expectation was over-strict about unnecessary
+alternatives, and an incidental-observation fixture lacked concrete evidence; their corrected inputs
+were replayed separately. All five approval branches in each of the three affected workflows were
+rerun to check interactions with existing authorization.
 
-The two failures concern invented execution scope after duplicate approval in the CI and folder-review
-fixtures. The two Not verified cases concern omission of continued independent inspection when concrete
-scope was missing. Subsequent wording clarifies both boundaries; no corrective replay pass is inferred.
-All grades retain their original source hashes, expected outcomes, response quotations, and limitations.
-Source hashes, grade/fixture identity and expected arrays, quotations, and counts were checked during
-publication. Pending IDs are retained explicitly in the archive's partial-checkpoint integrity record.
+The [portable replay evidence archive](AuditInstructions/Tools/replay_results_2026-10-26.json) includes
+frozen guide text, case inputs, complete answers, fresh-agent identities, hashes, grades, and exact
+quotations for every attempt. Its completed expanded phase supersedes the earlier partial publication.
+Raw temporary records remain under `/private/tmp/audit-replays-20261026-v1`, `v2`, `v4`, `v5`, and
+`v6`; `v3` was prepared but never executed. The checkpoint stays fixed at 213 IDs; later catalog
+additions are outside these results.
 
-**Limits:** these are decision replays against fictional project evidence, not observed Unity, asset,
-build, GitHub, or publication operations. Fresh conversations share ambient repository instructions
-and filesystem access. The canonical confirmation policy changed concurrently; frozen payloads and
-that mismatch are preserved. All original/corrective cases withhold implementation authorization,
-so both contract wordings require the same no-write decision. Positive authorization has only partial observed coverage
-in the expanded checkpoint; its failing and unverified cases remain unresolved. Earlier passing cases were retained while affected branches
-were rerun; no statistical reliability or fully hermetic environment claim is made.
+**Limits:** these are decisions against fictional project evidence and review history. Positive
+implementation authorization is exercised inside fixtures only; no real Unity, asset, build,
+GitHub, or publication actions were performed. Fresh conversations share ambient repository
+instructions and filesystem access. The canonical confirmation policy changed concurrently;
+frozen payloads and source hashes preserve the supplied instructions. Earlier passing cases were
+retained while affected branches were rerun, so this is neither a fully hermetic run nor a complete
+rerun against one final environment. No statistical reliability claim is made. Separate authenticated
+CLI execution was rejected by automatic review before process creation; built-in agents supplied
+all observed responses.
 
-The current static validator (including required .NET gates) and naming check passed after the guide
-fixes: 74 Markdown files, 467 local links/anchors, 75 unique GUIDs, six topic validators, 14 workflow
-regression tests, 22 CI fixtures, and expected naming diagnostics. Final record links will be rechecked.
+Verification after the guide fixes: `python3 -u AuditInstructions/Tools/validate_all.py --require-dotnet`
+passed (83 Markdown files, 536 local links/anchors, 75 unique GUIDs, six folder validators, 14 workflow
+regressions, 22 CI fixture projects, and required style gates). The naming gate passed with SDK
+10.0.302: good sample zero IDE1006 diagnostics; bad sample six expected diagnostics. Final evidence
+integrity and `git diff --check` passed. Documentation-only changes did not require a Unity run.
 
 ## Audit pressure-test implementation — 2026-10-26
 
@@ -646,9 +653,10 @@ from the current checkout. Preset checks do not imply that the nine agent decisi
 were exercised. The initial sandboxed integrated-check attempt required a rerun with local .NET
 access; the isolated publication run above completed successfully.
 
-Not verified in this change: fresh-agent grading of the nine new decision scenarios, a Unity
-update/save helper, actual first-import filters/persistence/no-op behavior, model crash reproduction,
-player builds, or profiling. The disposable-project procedure defines those checks without claiming
+At the original preset publication, fresh-agent grading of the nine scenarios and all Unity
+update/save, first-import filter/persistence/no-op, crash reproduction, player-build and profiling
+checks were Not verified. Subsequent workflow decision evidence above covers the fixed replay inputs;
+Unity behavior remains Not verified. The disposable-project procedure defines those checks without claiming
 they ran. No Unity project is part of this documentation repository.
 
 Sources checked for the review in October 2026: Unity's
@@ -660,55 +668,72 @@ stale name. No universal targeted-save API or tested identity-preserving update 
 asserted by these documentation changes; the guide requires target-version discovery and validation.
 
 
-## Independent publication: authorization contract — 2026-10-26
+## Historical publication: authorization contract — 2026-10-26
 
-Group 1 is validated as its own cumulative publication snapshot, excluding changes assigned to
-later groups and edits arriving after capture. The staged content is checked against this snapshot
-before committing. Validation results follow.
+At the earlier publication, group 1 was validated as its own cumulative snapshot, excluding
+changes assigned to later groups and edits arriving after capture. Its committed content was checked
+against that snapshot. These results describe that publication, not the current checkout.
 
 | Check | Result | Scope/limits |
 |---|---|---|
 | Full repository validator with required .NET gates | Passed | Group 1: 75 Markdown files, 472 local links/anchors, 75 unique GUIDs, 6 folder validators; 12 shared regression tests; 22 CI fixtures and required style gates |
 | Roslyn naming intersections | Passed | Group 1: .NET SDK 10.0.302; Good fixture zero IDE1006 diagnostics, Bad fixture six expected diagnostics |
-| Replay execution | Not performed | Static fixtures are not observed agent or Unity behavior |
+| Replay execution | Not performed during that publication | Later decision-replay evidence appears above; it does not establish Unity behavior |
 
 No Unity assets or metadata changed. No Editor imports, gameplay tests, or player builds were run.
 
 
-## Independent publication: review evidence and acceptance — 2026-10-26
+## Historical publication: review evidence and acceptance — 2026-10-26
 
-Group 2 is validated as its own cumulative publication snapshot, excluding changes assigned to
-later groups and edits arriving after capture. The staged content is checked against this snapshot
-before committing. Validation results are recorded below after execution.
+At the earlier publication, group 2 was validated as its own cumulative snapshot, excluding
+changes assigned to later groups and edits arriving after capture. Its committed content was checked
+against that snapshot. These results describe that publication, not the current checkout.
 
 | Check | Result | Scope/limits |
 |---|---|---|
 | Full repository validator with required .NET gates | Passed | Group 2: 75 Markdown files, 472 local links/anchors, 75 unique GUIDs, 6 folder validators; 12 shared regression tests; 22 CI fixtures and required style gates |
 | Roslyn naming intersections | Passed | Group 2: .NET SDK 10.0.302; Good fixture zero IDE1006 diagnostics, Bad fixture six expected diagnostics |
-| Replay execution | Not performed | Static fixtures are not observed agent or Unity behavior |
+| Replay execution | Not performed during that publication | Later decision-replay evidence appears above; it does not establish Unity behavior |
 
 No Unity assets or metadata changed. No Editor imports, gameplay tests, or player builds were run.
 
 
-## Independent publication: workflow corrections and replay evidence — 2026-10-26
+## Historical publication: workflow corrections and replay evidence — 2026-10-26
 
-Group 3 is validated as its own cumulative publication snapshot, excluding changes assigned to
-later groups and edits arriving after capture. The staged content is checked against this snapshot
-before committing. Validation results are recorded below after execution.
+At the earlier publication, group 3 was validated as its own cumulative snapshot, excluding
+changes assigned to later groups and edits arriving after capture. Its committed content was checked
+against that snapshot. These results describe that publication, not the current checkout.
 
 | Check | Result | Scope/limits |
 |---|---|---|
 | Full repository validator with required .NET gates | Passed | Group 3: 75 Markdown files, 475 local links/anchors, 75 unique GUIDs, 6 folder validators; 14 shared regression tests; 22 CI fixtures and required style gates |
 | Roslyn naming intersections | Passed | Group 3: .NET SDK 10.0.302; Good fixture zero IDE1006 diagnostics, Bad fixture six expected diagnostics |
-| Replay execution | Not performed | Static fixtures are not observed agent or Unity behavior |
+| Replay execution | Not performed during that publication | Later decision-replay evidence appears above; it does not establish Unity behavior |
 
 No Unity assets or metadata changed. No Editor imports, gameplay tests, or player builds were run.
 
-Replay-archive integrity validation passed for all four retained phases: 207 unique fresh-agent
-executions, 152 observed case IDs, verified source hashes/quotations and consistent aggregate verdicts.
-The expanded phase remains partial (42/103 graded); its two failures and two unverified outcomes are
-retained. The local live replay directories are not modified or retired by publication.
+At that historical publication, archive integrity validation passed for four retained phases:
+207 fresh-agent executions and 152 observed IDs. The expanded phase was then partial (42/103 graded),
+with two failures and two unverified outcomes retained. The completed five-phase archive described
+above supersedes that partial status while preserving all 207 original attempts unchanged.
+The historical publication did not modify or retire the live replay directories.
 
-The publication catalog generates 204 current prompts. The expanded historical checkpoint generated
+At that publication, the catalog generated 204 prompts. The expanded historical checkpoint generated
 213 from its frozen catalog; its observed results are attributed to those original inputs, not to
 the current catalog or current guide revisions.
+
+
+## Publication verification: replay evidence and audit lenses — 2026-10-26
+
+The three publication groups are checked independently as immutable cumulative snapshots. The first
+was already committed by a concurrent session as `ef08fff`; this publication retains that commit and
+independently checks its exact contents. Later edits are preserved outside the frozen snapshots.
+
+| Group | Full repository / required .NET gates | Roslyn naming intersections | Evidence boundary |
+|---|---|---|---|
+| 1: project-review replay report (`ef08fff`) | Passed: 75 Markdown files, 477 local links/anchors, 75 unique GUIDs, 6 folder validators; 14 shared tests and required CI style gates | Passed: .NET 10.0.302, Good zero / Bad six expected IDE1006 diagnostics | Historical 94-case decisions; not validation of later lens/preset/template text |
+| 2: completed workflow replay and targeted follow-ups | Passed: 75 Markdown files, 477 local links/anchors, 75 unique GUIDs, 6 folder validators; 14 shared tests and required CI style gates | Passed: .NET 10.0.302, Good zero / Bad six expected IDE1006 diagnostics | Frozen 213-case checkpoint; no live Unity/tool behavior claim |
+
+No Unity asset bytes or metadata changed. No Editor, gameplay tests, player builds, device tests, or
+new LLM replays were run for publication. Archive integrity checks validate source hashes, identities,
+quotations and aggregate results; they do not turn historical decisions into runtime evidence.

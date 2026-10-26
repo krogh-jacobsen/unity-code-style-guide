@@ -337,7 +337,7 @@
       "task": "Continue the workflow from the supplied review/decision state. Follow its authorization and evidence limits; execute only authorized work when a real target and tools exist. The fictional fixture itself authorizes no real workspace changes.",
       "context": {
         "scope": "Quick health check selected. Rendering correctness was not selected.",
-        "observation": "While reading lifecycle code, an owned renderer feature contains a material rendering risk supported by the nearby code."
+        "observation": "While inspecting lifecycle code, the reviewer read only the field declaration and RecordRenderGraph in Assets/FixtureGame/Rendering/OutlineFeature.cs:52. It stores an internal CreateTexture result in m_previousFrame and passes that old handle to UseTexture on the next frame without recreating/importing it into the new graph. Supplied API contract: internal Render Graph resources belong to their graph instance and cannot be retained across frames/cameras. No runtime output, renderer asset, or other rendering files were inspected."
       },
       "expected": [
         "Report the material observation separately under Incidental observations with evidence, consequence, location, and narrow inspection scope.",

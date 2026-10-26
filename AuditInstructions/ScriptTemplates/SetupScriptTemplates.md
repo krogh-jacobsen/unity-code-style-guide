@@ -27,6 +27,9 @@ URL-encode them. The license is
   prerequisites the project meets, and defer the rest instead of installing packages.
 - Report observed results separately from checks you could not run (**Not verified**). A template is a
   text asset: a successful import does not prove the C# it generates compiles.
+- Missing recommendation details do not block independent read-only preflight. Inspect the Editor,
+  packages, namespace, and existing templates while recovering the prior change list or gathering
+  the evidence needed to present concrete changes; keep execution pending until scope is known.
 
 ## Review, recommend, confirm
 
