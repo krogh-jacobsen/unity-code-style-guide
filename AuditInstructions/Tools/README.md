@@ -9,6 +9,7 @@
 | Run contract-discovery and wording regressions | `python3 AuditInstructions/Tools/test_audit_contract.py` |
 | Generate audit and decision replay prompts per applicable scenario | `python3 AuditInstructions/Tools/replay_workflows.py --output /absolute/temp/workflow-fixtures.json` |
 | Review replay contexts and expected decisions | [workflow_scenarios.json](workflow_scenarios.json) |
+| Inspect discipline-guide pressure tests and corrective replays | [2026-10-26 discipline results](discipline_review_replay_results_2026-10-26.json) |
 | Inspect observed project-review decision replays | [2026-10-26 results](project_review_replay_results_2026-10-26.json) |
 | Inspect observed fresh-agent results, frozen sources, and grading evidence | [2026-10-26 replay results](replay_results_2026-10-26.json) |
 

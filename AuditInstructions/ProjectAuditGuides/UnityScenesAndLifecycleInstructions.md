@@ -16,13 +16,13 @@ A bootstrap scene is one valid choice; it is not mandatory for every game.
 
 | Check | Evidence to inspect | Finding when |
 |---|---|---|
-| Readiness | Bootstrap/composition path, required services, inactive and spawned objects | A component reads another object's or service's state in `Awake`/`OnEnable` where that object is on another GameObject, spawned, inactive, or in another scene, and no bootstrap order, Script Execution Order entry, or explicit initialization call precedes the read (grep field/service reads in those callbacks, then read the setup path) |
+| Readiness | Bootstrap/composition path, required services, inactive and spawned objects | A consumed value depends on initialization that is not guaranteed to precede the read, leaving an inspected failure path or a reproduced wrong value. Serialized/default state independent of the other object’s callbacks need not have explicit execution ordering |
 | Enable lifetime | Publisher/delegate identity and cleanup paths | A subscription made in `OnEnable`/`Start` has no matching unsubscribe in `OnDisable`/`OnDestroy`, or a Play-toggle of `enabled` doubles a callback count (live run) |
 | Registration ownership | Registry entries on disable, destroy, scene exit, and replacement | A registry still holds an entry after its owner's disable/destroy (count before and after), or a removal keyed by type/name rather than owner identity can delete a newer owner's entry |
 | Session reset | Mutable statics, static events, caches, SO channels, reload settings | A static field, static event, cache, or SO channel holds state that survives into the next Play and no documented reset policy covers it (see the policy below); confirm with a second Play where a counter or subscriber from the first run is still present |
 | Persistence scope | Persistent roots and scene reload behavior | Reloading a scene creates a second instance of a service marked persistent (`DontDestroyOnLoad` with no duplicate guard), or a persistent object keeps references to objects of an unloaded scene |
 | Scene transitions | Load/activation/unload order, failure and overlapping requests | An overlapping request or unload/activation ordering loses required scene state, deadlocks a queued operation, or leaves loading/input-block flags set. Unloading first to fit a memory budget is valid with a defined recovery path |
-| Active scene | Instantiation and lighting expectations after additive loads | `Instantiate`/`new GameObject` runs after an additive load without `SceneManager.SetActiveScene` or `MoveGameObjectToScene` while the intended scene is not active, or the active scene's lighting settings differ from the expected scene's (live read) |
+| Active scene | Instantiation and lighting expectations after additive loads | Actual object scene ownership or effective lighting differs from the intended additive-scene contract. Inspect supported explicit destination-scene instantiation, parent placement, SetActiveScene and MoveGameObjectToScene paths; absence of one API alone is not a finding |
 | Async ownership | Every await and operation start, cancellation and error observation | Pending work can outlive its consumer with an unsafe continuation or unreleased result, or an operation error has no observing owner. Bounded or intentionally application-owned work need not accept a cancellation token merely because it awaits |
 
 ## Async cases that basic null checks miss
@@ -105,3 +105,6 @@ baseline; inspect asset ownership with [Assets](UnityAssetsAndMemoryInstructions
 
 Technical reference: [Awaitable introduction](https://docs.unity3d.com/Manual/async-awaitable-introduction.html).
 Match the reference to the installed engine version when implementing a fix.
+
+Scene placement reference: [Object.Instantiate overloads](https://docs.unity3d.com/ScriptReference/Object.Instantiate.html).
+Match the installed engine before recommending an explicit destination-scene overload.

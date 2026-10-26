@@ -4,6 +4,37 @@ The intended profile is [Unity 6.7](AgentsInstructions/UnityTechStack/UnityTechS
 that choice from the exact prerelease Editor tested. It is not a guarantee for every 6000.7 patch,
 package upgrade, target platform, or copied project. Date: 2026-10-12.
 
+## Fresh-agent discipline pressure tests — 2026-10-26
+
+Five fresh agents (`fork_turns=none`, inherited model/reasoning with no overrides) tested frozen copies
+of all 22 lenses, the review router and diagnosis routing. Three initial sessions evaluated 38 cases;
+two new corrective sessions evaluated 16 targeted positive/negative cases. Expected outcomes were
+withheld from the readers and graded by the parent. All 54 expected decisions matched, including two cases whose correct verdict was Not verified;
+no cases remain ungraded. Eight additional source-review findings were fixed despite the
+initial scenarios passing. Six detached Markdown checklist sections were independently detected and repaired.
+
+The [discipline evidence archive](AuditInstructions/Tools/discipline_review_replay_results_2026-10-26.json)
+contains frozen source text/hashes, inputs, response JSON, expected decisions, parent grades and finding
+fixes. Initial cases remain attached to the initial sources; corrective results use a separate snapshot.
+
+| Check | Result | Evidence / limit |
+|---|---|---|
+| Initial behavioral decisions | Passed | 38 cases across three fresh sessions, including every new lens and existing-discipline false-positive risks |
+| Corrective behavioral decisions | Passed | 16 cases across two new fresh sessions; valid and defective examples for all eight reader findings |
+| Checklist rendering regression | Passed | Local validator first rejected six detached row sections; after repair all topic Markdown checks pass, plus five positive/negative parser tests |
+| Full repository and required .NET gates | Passed | `python3 -B -u AuditInstructions/Tools/validate_all.py --require-dotnet` with host access: 84 Markdown files, 538 local links/anchors, 75 unique GUIDs, seven topic validators, 14 workflow tests, 22 CI fixture projects, installation/four negative probes and real .NET style gates |
+| Real Roslyn naming intersections | Passed | `python3 -B -u AgentsInstructions/CodeStyleGuide/Tools~/check_naming.py` with SDK 10.0.302: good fixture 0 diagnostics; bad fixture six expected IDE1006 diagnostics |
+| Replay archive integrity and source freshness | Passed | 54 unique case IDs, complete input/response/grade sets, false project-write authorization, both snapshots hash-verified; corrected snapshot matches current guide/tool sources |
+| Final whitespace | Passed | `git diff --check` after recording results |
+| Unity/runtime/device/network behavior | Not verified | Fictional decision evidence only; no target Editor, Unity tests, player, device or network-simulation run |
+
+These are five fresh grouped sessions, not 54 independent fresh sessions. Expectations were excluded
+by instruction, not filesystem isolation; ambient repository instructions/tools remain available.
+The archive preserves response JSON rather than full tool transcripts. Results establish the observed
+decisions, not exhaustive technical correctness or statistical agent reliability. Concurrent work
+advanced HEAD during the task; hashes identify the reviewed source rather than attributing these
+results to a clean commit. No commits, resets or stashes were performed by this task.
+
 ## Audit discipline research and pressure test — 2026-10-26
 
 Researched every existing review discipline against primary sources and maintained the guides under

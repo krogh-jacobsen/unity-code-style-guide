@@ -97,3 +97,17 @@ integration, backend/economy/IAP security, custom AI and third-party authoring s
 coverage beyond stated rows. Full review means selected applicable lenses, not exhaustive certification
 of a game. No target Unity project, live scene, player, network simulation or device was exercised.
 [Validation.md](Validation.md) records the actual repository checks separately.
+
+## Fresh-agent follow-up — 26 October 2026
+
+Five fresh sessions tested 38 initial and 16 corrective fictional cases without expected outcomes.
+All 54 decisions matched the parent-reviewed expectations. Separately, the readers identified eight
+instruction defects; fixes qualify audio slider units/range, finite query completeness, unverified
+collider shapes, additive scene placement, initialization readiness, measured uGUI rebuild cost and
+static versus Editor-assisted integrity checks. Six detached checklist sections were also rejoined,
+and a local parser now catches that Markdown failure with five regression fixtures.
+
+The [evidence archive](AuditInstructions/Tools/discipline_review_replay_results_2026-10-26.json)
+retains fixture inputs, expected outcomes, full response JSON, grading notes and frozen source text/hashes.
+Each fresh session handled several cases; this is not 54 isolated fresh sessions, actual Unity tests,
+or proof of universal agent compliance. See Validation.md for full repository gates.

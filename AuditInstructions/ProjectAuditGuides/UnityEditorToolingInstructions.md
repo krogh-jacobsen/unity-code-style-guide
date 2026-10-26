@@ -11,8 +11,8 @@ metadata-touching change. Load [Tool authoring](#tool-authoring) only when the p
 ## Integrity pass
 
 Always on for a whole-project audit and for any change that touches `.meta` files, serialized assets, or
-renamed fields. Skip it for a change that touches none of those. It is static and read-only: read metadata
-and serialized references as evidence, never hand-edit them. Account for ignored paths, packages,
+renamed fields. Skip it for a change that touches none of those. It is read-only, combining static metadata checks with Editor-assisted reference/type checks.
+Read metadata and serialized references as evidence, never hand-edit them. Account for ignored paths, packages,
 deliberate optional references, and import state before calling something broken. List every affected
 asset pair for a duplicate GUID, including vendor metadata when it participates in the same database.
 

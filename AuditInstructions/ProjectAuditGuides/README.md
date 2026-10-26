@@ -100,4 +100,5 @@ The [research record](../../AuditResearch.md) maps every existing discipline to 
 verdict, sources and verification limits. It is maintenance evidence, not another checklist to load.
 New lenses are read-only router references and retain the router's selection/confirmation workflow.
 
-Checklist table structure and parser fixtures are checked by the [topic maintenance tools](Tools~/README.md).
+[Local maintenance checks](Tools~/README.md) validate checklist table structure; fresh-agent replay
+results are recorded separately from static validation.

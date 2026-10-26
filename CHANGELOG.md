@@ -1,5 +1,12 @@
 # Change log
 
+## 2026-10-26 — Fresh-agent discipline pressure tests
+
+- Ran five fresh sessions with withheld expected outcomes: 38 initial cases plus 16 corrective cases, all 54 matching independently reviewed decisions. Archived frozen sources, fixture inputs, response JSON and grades separately from Unity execution evidence.
+- Fixed eight reader-identified instruction defects in audio, 3D physics, lifecycle, uGUI and asset integrity: valid configurations no longer fail unit/range, finite-buffer, readiness, placement or cost checks without the relevant broken contract.
+- Rejoined six detached checklist sections. Added the topic-local table validator and five parser regressions; repository discovery runs it automatically.
+- Full repository and real Roslyn naming verification are recorded in Validation.md; no Unity target or imported assets were changed.
+
 ## 2026-10-26 — Discipline research and best-practice pressure test
 
 - Added a source-linked research record covering every existing audit discipline, explicit keep/revise/add verdicts, inspected source versions and specialist limits.
