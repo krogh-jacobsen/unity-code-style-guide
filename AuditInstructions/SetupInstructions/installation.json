@@ -7,6 +7,7 @@
     "CLAUDE.md",
     "CHANGELOG.md",
     "Validation.md",
+    "AuditResearch.md",
     "AgentsInstructions",
     "AuditInstructions",
     ".github/workflows/repository-checks.yml",

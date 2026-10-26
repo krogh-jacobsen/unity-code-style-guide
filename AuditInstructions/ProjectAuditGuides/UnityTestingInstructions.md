@@ -22,7 +22,7 @@ Run the agreed suite; an exit code or "runner started" message alone is insuffic
 | Real behavior boundary | Public command, production wiring, assertions | Tests exercise a helper while the broken command path bypasses it |
 | Independent expectations | Expected values and fixtures | An assertion's expected value is computed by the production function under test, or a test body contains no assertion (`Assert.*`, `Is.*`, `LogAssert.*`) and calls no helper that throws on failure |
 | Failure-sensitive tests | Original bug/rejected operation and asserted consequence | Reverting or breaking the behavior under test leaves the test green. A test with no `Assert` text may assert through a helper: read the helper and confirm it throws on failure before reporting a missing assertion |
-| High-value cases | Public commands, state transitions, saves, and lifecycle paths in the reviewed scope | A public command in scope lacks a success test, a rejection test, or a repeat test (or the equivalent for a transition, save, or cancel); mark **Not verified** when the scope cannot be enumerated |
+| High-value cases | Public commands, state transitions, saves, and lifecycle paths in the reviewed scope | An important supported scenario or prior regression has no failure-sensitive coverage; propose the smallest useful success/rejection/repeat cases where those semantics apply, rather than requiring three tests for every public method |
 | Fixture isolation | Objects, scenes, statics, assets, delegates, clocks, randomness | The result changes when the suspect tests run alone, in reverse order, or shuffled (state leaks); list the tests explicitly when the runner has no ordering option |
 | Unexpected errors | Console/log handling and allowed messages | Broad suppression hides failures or expected errors are never asserted specifically |
 | Asynchronous completion | Timeouts, cancellation, polling conditions, cleanup | A hang is unbounded or success is inferred from a fixed sleep |
@@ -34,10 +34,11 @@ Use EditMode for rules, math, parsers, serialization, and Editor validation when
 a player loop. Use PlayMode for real lifecycle, input integration, scene flow, physics, or runtime UI
 wiring. Saved Inspector references and UI command wiring can be valuable integration checks.
 
-Per the Unity manual, EditMode tests run in the `EditorApplication.update` callback loop and cannot
-run coroutines. Use `[UnityTest]` in EditMode only to yield Editor instructions; use `[Test]`
-otherwise. A PlayMode `[UnityTest]` runs as a coroutine, so it can skip frames or wait. Check the
-installed Test Framework for the async signatures and yield instructions it supports.
+EditMode `[UnityTest]` methods advance through `EditorApplication.update`; they can yield `null`
+to advance an Editor frame and supported Editor instructions. They do not provide the full PlayMode
+coroutine environment. Use `[Test]` for synchronous checks and `[UnityTest]` when yielding is needed.
+PlayMode `[UnityTest]` runs as a coroutine. Check the installed Test Framework for supported async
+signatures and yield instructions; see the [UnityTest API](https://docs.unity3d.com/Packages/com.unity.test-framework@latest/index.html?subfolder=/api/UnityEngine.TestTools.UnityTestAttribute.html).
 
 ## Fixtures and coverage
 

@@ -1,6 +1,7 @@
 # Unity rendering-correctness audit
 
-Load for owned renderer features/passes, custom shaders, or configured camera stacks. Apply the
+Load for owned rendered content: features/passes, shaders, cameras, lighting, LOD/occlusion,
+skinned meshes, particles, or VFX Graph. Apply only rows relevant to the selected scene/pipeline. Apply the
 [shared evidence standard](ProjectReview.md#evidence-standard). Establish the installed pipeline and
 version first; the Render Graph rows apply only to the active Render Graph path. Compatibility-mode,
 Built-in, and HDRP code need their own installed documentation rather than a forced URP migration.
@@ -31,6 +32,11 @@ its final output. Inspect saved settings separately from transient runtime state
 | Target compatibility | Texture descriptors, dimensions, MSAA/depth/format, shader pass and API requirements | The configured target or shader is unsupported by the selected pipeline/API, or resizing/quality switching produces invalid attachments or wrong pixels; use installed support rules and device/build evidence |
 | Camera stacking | Saved base/overlay stack, renderer support, ordering, clear/output policy | The intended overlay is absent, clears required content, or composites in the wrong order; confirm supported stacking in this pipeline/version and the resulting image |
 | Shader/material compatibility | Actual material/shader assignment, compile log, required variants in a release player | A supported scene renders an error/missing effect due to a pipeline mismatch, compile failure, or missing required variant. Variant/shipping ownership: [Assets](UnityAssetsAndMemoryInstructions.md) |
+| Lighting data/probes | Intended realtime/mixed/baked setup, saved lighting data, loaded scene combinations, supported probe system | Missing/stale data or missing intended probe coverage causes wrong supported output on scene/player load; realtime-only lighting and pipeline-specific probe choices are valid |
+| LOD/occlusion | Renderer membership, bounds, thresholds, visibility data, actual quality/camera path | Camera movement hides required visible content or selects incorrect/missing geometry; missing LOD or occlusion alone is a measured-cost proposal |
+| Deformation bounds | Skinned/procedural poses, runtime clips, actual culling bounds | Valid deformation leaves bounds and disappears; larger bounds/offscreen updates trade visibility correctness against work |
+| Effect simulation | Particle/VFX space, clock, bounds/culling, stop/clear, pause/offscreen and pool cycles | Required effects disappear, move in the wrong coordinate frame, retain old particles on reuse, or never complete their owning checkout; inspect VFX dynamic-bounds recomputation in the installed package |
+| Effect capacity/completion | Particle limits, bursts, child/sub-emitter completion and stop/reuse paths | Supported required feedback is dropped at capacity, or checkout completion omits live child effects. Decorative saturation and explicit cancellation can be intentional; judge actual outcome |
 
 ## Interpret with care
 
@@ -53,3 +59,21 @@ Technical references: [Render Graph resources and lifetime](https://docs.unity3d
 [recording dependencies and executing a pass](https://docs.unity3d.com/Manual/urp/render-graph-write-render-pass.html),
 [imported textures](https://docs.unity3d.com/Manual/urp/render-graph-import-a-texture.html), and
 [camera stacking](https://docs.unity3d.com/Manual/urp/camera-stacking.html).
+
+Additional references: [lighting data](https://docs.unity3d.com/Manual/LightmapSnapshot.html),
+[light probes](https://docs.unity3d.com/Manual/LightProbes.html),
+[LOD bounds](https://docs.unity3d.com/Manual/class-LODGroup.html),
+[occlusion tradeoffs](https://docs.unity3d.com/Manual/OcclusionCulling.html),
+[skinned bounds](https://docs.unity3d.com/Manual/class-SkinnedMeshRenderer.html),
+[particle space/time](https://docs.unity3d.com/Manual/PartSysMainModule.html), and
+[VFX bounds/culling](https://docs.unity3d.com/Packages/com.unity.visualeffectgraph@latest/index.html?subfolder=/manual/VisualEffectGraphAsset.html).
+For URP native-pass/XR paths, inspect legacy blit wrappers against
+[URP blit compatibility](https://docs.unity3d.com/Manual/urp/customize/blit-overview.html);
+use supported installed APIs rather than applying a Built-in API ban across pipelines.
+
+Include applicable clean-player lighting loads, probe transitions, LOD camera distances,
+deformation, and offscreen/pause/pool effect cycles in validation. Record missing device/build checks
+Not verified; pipeline package presence alone is not evidence those content paths are used.
+
+Effect references: [VFX capacity](https://docs.unity3d.com/Packages/com.unity.visualeffectgraph@latest/index.html?subfolder=/manual/Context-Initialize.html)
+and [particle child completion](https://docs.unity3d.com/ScriptReference/ParticleSystem.IsAlive.html).

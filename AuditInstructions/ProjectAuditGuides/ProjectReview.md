@@ -126,7 +126,7 @@ which is read-only, and stop after stage 2.
 |---|---|---|
 | **Integrity pass**: [Editor tooling, Part A](UnityEditorToolingInstructions.md) | Always on for a whole-project review and for any change touching `.meta` files, serialized assets, or renamed fields | `unity:unity-cli` |
 | [Performance](UnityPerformanceOptimizationInstructions.md) | Owned runtime C# code | `unity-project-review`, `unity:optimize-web` |
-| [Rendering correctness](UnityRenderingInstructions.md) | Owned `ScriptableRendererFeature`/`ScriptableRenderPass` or Render Graph code, custom `.shader`/`.shadergraph` assets, or a configured camera stack; a pipeline package alone is only Optional | `validate-urp-render-graph-renderer-feature` (URP Render Graph only) |
+| [Rendering correctness](UnityRenderingInstructions.md) | Owned renderer/light/lighting-data, LOD/skinned-mesh, particle/VFX content, custom shaders/features/passes or camera stacks; package alone Optional; apply only relevant rows | `validate-urp-render-graph-renderer-feature` (URP Render Graph only) |
 | [Assets and memory](UnityAssetsAndMemoryInstructions.md) | Imported assets; `com.unity.addressables` for the Addressables rows | `unity:optimize-audio`, `unity:manage-sprite-atlas` |
 | [Scenes and lifecycle](UnityScenesAndLifecycleInstructions.md) | Scenes or MonoBehaviours; async code (`Awaitable`, `Task`, `StartCoroutine`; `IEnumerator` alone is not a signal) | `unity:unity-cli`, `unity-project-review` |
 | [Design](UnityDesignPatternsInstructions.md) | Owned C# with commands, services, or shared state (findings are proposals unless a rejected or repeated operation corrupts state) | `unity-project-review` |
@@ -140,6 +140,13 @@ which is read-only, and stop after stage 2.
 | [Assemblies](UnityAssemblyDefinitionsInstructions.md) | First-party `.asmdef` or `.asmref` files, or test code (for the test-inclusion row); a project that documents relying on the predefined assemblies is Optional | `unity-project-review` |
 | [Testing](UnityTestingInstructions.md) | Test code: `com.unity.test-framework` plus `[Test]`/`[UnityTest]` (not scene or documentation folders named Test); a whole-project review also reports "no tests" as a scope fact | `unity:unity-cli` |
 | [Editor tooling, Part B](UnityEditorToolingInstructions.md#tool-authoring) | Owned `Editor/` code with the attributes `[MenuItem`, `[InitializeOnLoad`, or `[CustomEditor`, or editor base classes, plus migration tools (match the attribute, not the word) | `unity:unity-cli`, `unity:ui-uitk`, `unity:ui-imgui` |
+| [Navigation](UnityNavigationInstructions.md) | Owned NavMeshAgent/NavMesh requests, NavMeshSurface/Link/Obstacle content, or custom pathfinding; package alone Optional | `unity:initialize-ai-navigation` |
+| [Physics2D](UnityPhysics2DInstructions.md) | Owned Rigidbody2D/Collider2D, joints/effectors, Physics2D queries or 2D callbacks | `unity:unity-cli` |
+| [Localization/accessibility](UnityLocalizationAccessibilityInstructions.md) | Player-facing UI/input/audio for accessibility; supported locales, localization code/tables or requested readiness for language rows | `unity:localization`, `unity:optimize-text-mesh-pro` |
+| [Networking](UnityNetworkingInstructions.md) | Owned network objects, RPC/replication/session code; installed networking capability alone Optional | `setup-multiplayer-services` |
+| [Entities](UnityEntitiesInstructions.md) | Owned ISystem/SystemBase/IJobEntity, ECBs, bakers or SubScenes; Entities package alone Optional | Installed package tooling |
+| [Terrain](UnityTerrainInstructions.md) | Owned Terrain/TerrainCollider/TerrainData, height writes or tile streaming | `microverse`, `unity-realistic-terrain` |
+| [Cameras/cinematics](UnityCamerasCinematicsInstructions.md) | Owned camera-follow code, Cinemachine, PlayableDirector or Timeline content; plain Camera alone Optional | Installed camera/Timeline tooling |
 
 ### Detected systems outside lens coverage
 
@@ -150,10 +157,9 @@ installed capability from first-party usage. This inventory does not add or load
 
 | System | Detection evidence | Review limit |
 |---|---|---|
-| Navigation | AI Navigation package, NavMesh data/surfaces, `NavMeshAgent` or `NavMesh` usage | No dedicated pathfinding/bake/link correctness lens |
-| Networking | Netcode, transport or other networking packages plus owned RPC/session/replication code | No authority, replication, transport, or multiplayer security lens |
-| Physics2D | `Rigidbody2D`, `Collider2D`, `Physics2D`, or 2D callback usage | The Physics lens covers 3D PhysX only |
-| DOTS | Entities/Unity Physics packages plus owned ECS/system/job usage | No ECS world/system-order or DOTS Physics lens; generic ownership/cost checks cover only their stated rows |
+| DOTS Physics | Unity Physics/Havok packages plus owned physics-world, collision-event or solver code | Entities covers generic ECS ordering/ECB safety; no DOTS contact/solver lens |
+| Netcode for Entities | Ghosts, prediction/rollback, Netcode for Entities packages and owned systems | Networking covers stated authority/lifetime checks; no prediction/ghost-baking correctness lens |
+| Specialist services/content | Backend/economy/IAP, XR, custom AI, procedural generators or third-party systems beyond stated rows | Name the actual system and specialist security, platform or authoring checks not performed |
 | Other first-party systems | Content/code with no matching lens, found while inventorying the project | Name the system and the absent review; do not infer exhaustive coverage from the menu |
 
 For each detected uncovered system, list the owning files/assets, applicable generic checks, and the
@@ -161,7 +167,8 @@ specific specialist work not performed. Offer a separate scoped review against i
 docs when the user wants it. **Full review** means all selected applicable lenses, not all possible
 subsystem risks. Include this coverage boundary in the menu and final report.
 
-Physics2D and DOTS projects are outside the Physics lens; use their matching official documentation. [Debugging](UnityDebuggingInstructions.md) is not an audit lens. It is the
+Physics2D uses its dedicated lens; DOTS Physics remains outside both classic physics lenses. Use
+matching installed documentation for specialist checks. [Debugging](UnityDebuggingInstructions.md) is not an audit lens. It is the
 [diagnose mode](#diagnose-a-reported-defect) for a user-reported symptom.
 
 **Done:** the user has picked, or confirmed a shortcut for, the reviews to run, and the list is
@@ -283,7 +290,13 @@ regression-test loop. The same read-only and confirm-before-change rules apply.
 ## Evidence standard
 
 A search hit is a candidate. Read the enclosing code, callers, ownership, and applicable settings
-before reporting it. Follow per-frame helper calls; inspect release, cancellation, and failure paths.
+before reporting it. A checklist row names a risk to investigate, not an automatic defect: multiple
+writers, polling, an ignored return value, a shared asset, or an optional optimization can be valid.
+Establish a broken behavior/resource contract, measured budget failure, or binding project-rule
+violation; otherwise label a justified improvement as a proposal with its tradeoff. Official API
+semantics support technical claims; architecture preferences and starting budgets remain project
+choices. Record source/version and the limits of the evidence rather than treating an official
+recommendation as universally optimal. Follow per-frame helper calls; inspect release, cancellation, and failure paths.
 Exclude generated and vendor code from style review unless scoped in. Vendor metadata may still
 matter to a project-wide GUID integrity check.
 

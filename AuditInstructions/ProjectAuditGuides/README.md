@@ -37,7 +37,7 @@ scene lifecycle."*
 |---|---|---|
 | Integrity pass | Duplicate or missing GUIDs, orphaned `.meta` files, unresolved script references | Always, for a whole-project review |
 | [Performance](UnityPerformanceOptimizationInstructions.md) | Allocations, hot-path cost, pooling, jobs | Runtime C# code |
-| [Rendering correctness](UnityRenderingInstructions.md) | Renderer features/passes, Render Graph resources, camera stacks, shader compatibility | Owned custom rendering or a configured camera stack |
+| [Rendering correctness](UnityRenderingInstructions.md) | Lighting/probes, LOD/occlusion, skinned/effect bounds, passes/Render Graph and shader compatibility | Owned rendered scene content or custom rendering |
 | [Assets and memory](UnityAssetsAndMemoryInstructions.md) | Load and release ownership, import cost, Addressables | Imported assets |
 | [Scenes and lifecycle](UnityScenesAndLifecycleInstructions.md) | Startup, scene flow, async lifetime, repeated Play, destroyed objects | Scenes or MonoBehaviours |
 | [Design](UnityDesignPatternsInstructions.md) | Command ownership, dependencies, state transitions (proposals unless state is corrupted) | Owned C# with shared state |
@@ -51,6 +51,13 @@ scene lifecycle."*
 | [Assemblies](UnityAssemblyDefinitionsInstructions.md) | Compile boundaries, test isolation, build content | Asmdefs or tests |
 | [Testing](UnityTestingInstructions.md) | Whether tests would catch a regression, fixtures, result evidence | Tests, or none |
 | [Editor tooling](UnityEditorToolingInstructions.md) | Integrity pass, plus Undo and saved results for Editor tools | Owned `Editor/` code |
+| [Navigation](UnityNavigationInstructions.md) | Path results, reachability, movement authority, links and surfaces | Owned NavMeshAgent/NavMesh requests, NavMeshSurface/Link/Obstacle content, or custom pathfinding; package alone Optional |
+| [Physics2D](UnityPhysics2DInstructions.md) | 2D body/contact rules, query semantics, stepping and effectors | Owned Rigidbody2D/Collider2D, joints/effectors, Physics2D queries or 2D callbacks |
+| [Localization/accessibility](UnityLocalizationAccessibilityInstructions.md) | Locale/format/glyph coverage, perceptible information, operable controls and comfort | Player-facing UI/input/audio for accessibility; supported locales, localization code/tables or requested readiness for language rows |
+| [Networking](UnityNetworkingInstructions.md) | Authority, late joins, delivery, session and connection trust | Owned network objects, RPC/replication/session code; installed networking capability alone Optional |
+| [Entities](UnityEntitiesInstructions.md) | World/group order, jobs, ECB playback, baked/player state | Owned ISystem/SystemBase/IJobEntity, ECBs, bakers or SubScenes; Entities package alone Optional |
+| [Terrain](UnityTerrainInstructions.md) | Tile borders, height/collision synchronization, streaming and content | Owned Terrain/TerrainCollider/TerrainData, height writes or tile streaming |
+| [Cameras/cinematics](UnityCamerasCinematicsInstructions.md) | Follow timing, output selection, bindings and interruption handoff | Owned camera-follow code, Cinemachine, PlayableDirector or Timeline content; plain Camera alone Optional |
 
 ## Good to know
 
@@ -69,8 +76,8 @@ scene lifecycle."*
   with that owner until handed over.
 - **Incidental observations stay visible.** Material observations outside your selected lenses appear
   separately; investigating them further is a scope choice, and their lens is not counted as reviewed.
-- **Coverage is explicit.** Navigation, networking, Physics2D, DOTS, and other detected systems without
-  a lens are listed as **Outside coverage**, with evidence and the specialist checks not performed.
+- **Coverage is explicit.** DOTS Physics, Netcode for Entities prediction, backend services, and other detected systems beyond
+  the lenses' stated rows are listed as **Outside coverage**, with evidence and the specialist checks not performed.
   Full review covers selected lenses; it does not certify every subsystem. A separate scoped review
   can use version-matched official documentation. One-time setup belongs to
   [SetupInstructions](../SetupInstructions/README.md). C# naming and formatting live in the
@@ -81,3 +88,16 @@ scene lifecycle."*
 [UnityDebuggingInstructions.md](UnityDebuggingInstructions.md) is not a review. Hand it a symptom, and
 the agent captures the failing context, routes the symptom to the owning lens, and works through
 reproduce, hypothesize, probe, fix, and regression test.
+
+## Why these checks
+
+Ownership and evidence remain the foundation. The October 2026 research added missing disciplines
+and tightened checks that could mistake a valid configuration for a defect. A suspicious API or
+component combination starts an investigation; broken contracts, measured costs, and project rules
+support findings. Optional architecture and optimization choices remain proposals with tradeoffs.
+
+The [research record](../../AuditResearch.md) maps every existing discipline to its keep/revise/add
+verdict, sources and verification limits. It is maintenance evidence, not another checklist to load.
+New lenses are read-only router references and retain the router's selection/confirmation workflow.
+
+Checklist table structure and parser fixtures are checked by the [topic maintenance tools](Tools~/README.md).

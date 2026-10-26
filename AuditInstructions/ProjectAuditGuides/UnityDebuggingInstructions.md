@@ -34,13 +34,19 @@ A probe must distinguish the proposed cause from alternatives; observing an exce
 | Null/missing Unity reference | SerializedProperty, required/optional contract, prefab overrides, runtime assignments, destroyed-object check | [Scenes](UnityScenesAndLifecycleInstructions.md) (destroyed objects), [Editor tooling](UnityEditorToolingInstructions.md) (saved references) |
 | Second Play/re-enable breaks | Reload settings, mutable statics, subscriptions, registries, pending requests | [Scenes](UnityScenesAndLifecycleInstructions.md) |
 | Input/UI misfires | Actual action instance/phases, update mode, live tree, focus/picking, propagation, domain entry point | [Input](UnityInputSystemInstructions.md), [UI Toolkit](UnityUIToolkitInstructions.md) |
-| Contact/query wrong | Actual collider/body pair, layers, query count/capacity, physics synchronization | [Physics](UnityPhysicsInstructions.md) |
+| Contact/query wrong | Actual collider/body pair, layers, query count/capacity, physics synchronization | [3D Physics](UnityPhysicsInstructions.md) or [Physics2D](UnityPhysics2DInstructions.md) |
 | Action/effect late or doubled | Animator state/parameters, interruption, event receiver, gameplay effect owner | [Animation](UnityAnimationInstructions.md) |
 | Silent/misrouted audio | Source/listener state, group/parameter identity, playback/voice owner | [Audio](UnityAudioInstructions.md) |
 | Missing/wrong rendering effect | Effective renderer, camera/pass order, graph resources, shader output | [Rendering](UnityRenderingInstructions.md) |
 | Cost or memory grows | Comparable player captures, allocation stacks, retained references, repeated-cycle baseline | [Performance](UnityPerformanceOptimizationInstructions.md), [Assets](UnityAssetsAndMemoryInstructions.md) |
 | Editor works; build fails | Platform defines, stripping/AOT, included content, effective assembly, initialization path | [Assemblies](UnityAssemblyDefinitionsInstructions.md) |
 | Save/load diverges | Schema/version, real capture/load path, prior fixtures, reconstructed identity | [Persistence](UnityPersistenceInstructions.md) |
+| Route/arrival wrong | Pending/partial/invalid path, loaded data, destination floor, actor movement authority | [Navigation](UnityNavigationInstructions.md) |
+| Locale or access barrier | Actual supported language/input, fallback, glyph/layout, essential cue and option behavior | [Localization/accessibility](UnityLocalizationAccessibilityInstructions.md) |
+| Remote state diverges | Topology, sender authority, durable state, spawn and delivery order | [Networking](UnityNetworkingInstructions.md) |
+| ECS state races or disappears | World/group ordering, job dependency, ECB scope/playback and baked content | [Entities](UnityEntitiesInstructions.md) |
+| Terrain seam/contact differs | Tile neighbors, authored edges, collider data and height synchronization | [Terrain](UnityTerrainInstructions.md) |
+| Camera/cinematic control sticks | Target clock, selected output, saved bindings and interrupted ownership handoff | [Cameras/cinematics](UnityCamerasCinematicsInstructions.md) |
 
 ## Traps to keep in view
 

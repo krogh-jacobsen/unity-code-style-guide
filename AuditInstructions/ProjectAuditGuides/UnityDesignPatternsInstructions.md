@@ -5,7 +5,7 @@ Load for responsibility, dependency, state-machine, or command-boundary review. 
 pitfall review when it is available; this guide stands alone and adds questions about actual ownership.
 
 ⚠️ Design findings are **proposals**, not defects, unless a rejected or repeated operation produces
-wrong state. Report those two kinds separately: a confirmed defect carries the reproduced wrong state;
+wrong state. Report those two kinds separately: a confirmed defect carries an inspected invalid-state path or reproduced wrong state;
 a proposal carries the countable trigger below plus its tradeoff.
 
 ## Establish the design
@@ -21,11 +21,11 @@ required setup and ordering, rather than by file size or interface count.
 |---|---|---|
 | One policy owner | The same rule in UI, simulation, preview, and save/load | Two implementations of the rule return different results for the same input, or one fix must be repeated in 2+ callers |
 | Complete command | Validation, mutation, resource charging, registration, and events | A rejected operation leaves partial state, charges twice, or publishes success before commit |
-| Valid state | Collection exposure and every mutation entry point | A public mutable collection or field is written outside its owner, or 3+ setters must run in a fixed order for the owner to be valid |
+| Valid state | Collection exposure and every mutation entry point | External mutation bypasses an invariant, or required setter ordering permits invalid observable state; public mutability alone is a proposal under the project policy |
 | State transitions | Allowed transitions, entry/exit effects, pending work | Re-entry, repeated requests, or interruption produces stale effects or an impossible state |
-| Explicit dependencies | Constructors, serialized wiring, bootstrap, discovery calls | A consumer calls `Find*`, a static `Instance`, or `new` for a collaborator it does not own, or an initialization call skipped by a caller leaves the object throwing or half-working |
+| Explicit dependencies | Constructors, serialized wiring, bootstrap, discovery calls | A hidden dependency or required initialization order causes an inspected failure, violates a binding dependency policy, or makes a scoped test require unrelated global setup; discovery/static access alone is a design candidate |
 | Dependency direction | `.asmdef` reference lists, `using` directives, and serialized asset references of reusable (Core) code | A reusable assembly or namespace references game-specific content or presentation (count the references; each one is a candidate) |
-| Useful abstractions | Callers and actual implementations | An interface or wrapper has one implementation, forwards every member one-to-one, and no second implementation, test double, or volatile boundary exists in the repository |
+| Useful abstractions | Callers and actual implementations | A forwarding abstraction adds demonstrated caller/setup or maintenance cost without hiding a volatile boundary; one implementation alone is not evidence that an interface is unnecessary |
 | Observable contracts | Return results, units, valid inputs, failure meanings | An operation returns `void` or a bare `bool` and N call sites read a field, catch an exception, or re-query state to learn whether it succeeded |
 
 For a command that spends a resource and changes world state, trace the real entry point: a rejected

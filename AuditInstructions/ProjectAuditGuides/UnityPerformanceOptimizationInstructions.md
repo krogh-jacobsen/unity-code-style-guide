@@ -19,15 +19,16 @@ Separate a project rule violation from a measured bottleneck and from an unmeasu
 
 | Check | Evidence to inspect | Finding when |
 |---|---|---|
-| Avoidable hot work | Call frequency, object count, searches, queries, repeated calculations | A capture shows a per-frame callback or helper recomputing a value whose inputs did not change, or a `Find*`/`GetComponent*`/scene search sits inside a per-frame path (grep, then read the caller) |
+| Avoidable hot work | Call frequency, object count, searches, queries, repeated calculations | Measured repeated work breaks the workload budget, or a binding hot-path rule is violated. Search/GetComponent frequency alone identifies a candidate; include scale and caching invalidation cost |
 | Managed allocation | GC.Alloc stacks, strings, boxing, closures, LINQ, collection growth | A profiler GC.Alloc sample, or a reached `new` of a reference type/closure/LINQ call, sits on a frequent path and breaks the stated budget or project rule |
 | Cache validity | Invalidation and replacement paths | A dirty flag, cached camera/component, or derived value is read after the state it derives from changed without the cache being invalidated (trace each write to the cached source) |
-| Query cost | Query volume, masks, ranges, hit needs | A query uses a default/all-layers mask where the target layer is known, or collects all hits (`RaycastAll`, `OverlapSphere`) when the caller uses one |
-| Collection use | Capacity, clearing, iteration, ordering assumptions | A capture or grep shows linear lookups (`Contains`, `IndexOf`, `Remove`, `Insert(0, ...)`) inside a per-frame loop over the project's stated scale, or a collection recreated or regrown every frame instead of cleared |
+| Query cost | Query volume, masks, ranges, hit needs | Measured unnecessary query scope/result collection breaks a budget or project rule; all-layer masks and collecting multiple hits can be intentional even when one result is ultimately chosen |
+| Collection use | Capacity, clearing, iteration, ordering assumptions | Lookup/growth/recreation cost is material at the measured scale or violates a binding rule; a linear scan over a small collection is not automatically an optimization finding |
 | Pool cost | Creation bursts, retained objects, reset and active counts | Reuse fails (a new instance per `Get`), retained inactive count grows past `maxSize` expectations, or required concurrency exceeds an explicit cap |
 | Rendering | Captures, batching/instancing, overdraw, camera/pass count | A Profiler or Frame Debugger capture (live run required) shows a draw/submission/fill cost with a verified cause |
 | Jobs/native containers | Dependencies, completion, allocator lifetime, disposal | A `Complete()` call stalls the main thread longer than the work it offloads (capture), or a container is disposed while a scheduled job still uses it |
 | Frame pacing | Platform's vSync/frame-cap behavior and frame-time distribution | A device capture shows frame time above the target (1000 / target fps ms) in the representative scene, or `Application.targetFrameRate` and `QualitySettings.vSyncCount` are set so the cap cannot reach the target |
+| Bottleneck attribution | CPU active versus waiting time, render thread, GPU timing, loading and frame caps | A performance conclusion attributes a wait/present marker to CPU overload without establishing the limiting work, or measured active work exceeds the target budget |
 
 ## High-value interpretation checks
 
@@ -69,3 +70,5 @@ Measure subsystem cost here, then read the subsystem lens for its correctness ch
 [Animation](UnityAnimationInstructions.md), and [Audio](UnityAudioInstructions.md).
 
 Technical reference: [ObjectPool constructor semantics](https://docs.unity3d.com/ScriptReference/Pool.ObjectPool_1-ctor.html).
+
+Bottleneck reference: [Highlights Profiler](https://docs.unity3d.com/Manual/ProfilerHighlights.html).

@@ -12,13 +12,14 @@ gameplay-correctness checks. Animation cost is owned by
 | Check | Evidence to inspect | Finding when |
 |---|---|---|
 | Parameter contract | Controller parameter names/types from a controller dump or its saved asset; every `Set*`/`Get*` call and cached hash in code | A code-set parameter name or type does not exist in the controller, or code assumes an override controller adds parameters |
-| State ownership | Writers per parameter and layer (search the `Set*` calls); reads of Animator state in gameplay rules | Two or more code paths write one parameter in the same update, or a gameplay outcome (damage, reward, win) is decided by reading Animator state |
-| Transition semantics | Controller dump: Has Exit Time, duration, interruption source for each input-driven transition | An input-driven transition has Has Exit Time enabled with no documented reason, or its duration exceeds the project's stated response budget (confirm the player-visible delay with a live run) |
+| State ownership | Writers per parameter and layer (search the `Set*` calls); reads of Animator state in gameplay rules | Conflicting writers produce wrong state/effects, or Animator-driven gameplay violates a binding domain rule. State queries and intentionally ordered writers alone are valid; architectural separation is otherwise a proposal |
+| Transition semantics | Controller dump: Has Exit Time, duration, interruption source for each input-driven transition | The configured exit/interruption/duration behavior breaks an intended action/cancel response. Interpret Fixed Duration in seconds and other durations relative to source-state length/speed; confirm player-visible delay live |
 | Pending triggers | Every `SetTrigger` writer against the transitions that consume it, plus cancel/interrupt/disable paths | A trigger has writers but no transition in any layer consumes it, or a canceled/disabled action fires later after re-enable (live run) |
 | Event safety | Clip events: function names, receiving components, clip reuse across states | An event names a function absent from every component on the same object, or required cleanup runs only from an event on a clip that can be interrupted or looped |
 | Root-motion writer | `applyRootMotion`, any `OnAnimatorMove`, and the physics/controller writers on the same object | Root motion and another writer conflict on the same pose, or a runtime `applyRootMotion` toggle re-initializes the Animator and causes an unintended state change (confirm live). `OnAnimatorMove` takes control of root motion; an ignored `applyRootMotion` flag alone is no finding |
-| Controller/override lifetime | Search `runtimeAnimatorController` assignments and `new AnimatorOverrideController` | One override instance is mutated while assigned to several Animators, or a runtime swap has no check of the resulting state |
+| Controller/override lifetime | Search `runtimeAnimatorController` assignments and `new AnimatorOverrideController` | A shared mutable override leaks actor-specific mappings, or a controller swap loses required state; shared mappings and a swap alone are valid |
 | Culling correctness | `cullingMode` per Animator against gameplay that reads its events, root motion, or bone transforms | The configured culling mode suppresses a required event, root-motion result, or bone update and changes gameplay offscreen (confirm the specific behavior live); mode plus dependency alone is a candidate |
+| Clock alignment | `updateMode`, scaled/unscaled time, pause policy, physics and root-motion timing | The selected clock freezes required animation or disagrees with intended collider/movement timing (confirm live); choose mode per actor/use case |
 
 ## Interpret with care
 
@@ -52,3 +53,7 @@ Persisted controller/clip edits must use Unity's Editor APIs; see
 Technical references: [Animator.applyRootMotion](https://docs.unity3d.com/ScriptReference/Animator-applyRootMotion.html),
 [AnimatorCullingMode](https://docs.unity3d.com/ScriptReference/AnimatorCullingMode.html), and
 [Animator.runtimeAnimatorController](https://docs.unity3d.com/ScriptReference/Animator-runtimeAnimatorController.html).
+
+Additional references: [transition duration/interruption](https://docs.unity3d.com/Manual/class-Transition.html),
+[update clocks](https://docs.unity3d.com/ScriptReference/AnimatorUpdateMode.html). Skinned deformation
+and visibility bounds are checked in [Rendering](UnityRenderingInstructions.md).

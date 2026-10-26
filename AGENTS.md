@@ -77,6 +77,13 @@ Use Editor APIs for ProjectSettings while the Editor is open. Commit `Assets` wi
 | Stack/API compatibility | [Project configuration](AgentsInstructions/UnityTechStack/UnityTechStack.md); installed source/version-matched docs |
 | Audit, guide-conformance, or change/subsystem review | [Project review workflow](AuditInstructions/ProjectAuditGuides/ProjectReview.md) detects, offers, and loads only the lenses the user picks; human overview in its [readme](AuditInstructions/ProjectAuditGuides/README.md) |
 | Review rendering correctness (renderer features, Render Graph, cameras, shaders) | [Rendering lens](AuditInstructions/ProjectAuditGuides/UnityRenderingInstructions.md), selected through the project-review workflow |
+| Review navigation correctness | [Navigation lens](AuditInstructions/ProjectAuditGuides/UnityNavigationInstructions.md), selected through the project-review workflow |
+| Review 2D physics correctness | [Physics2D lens](AuditInstructions/ProjectAuditGuides/UnityPhysics2DInstructions.md), selected through the project-review workflow |
+| Review localization/accessibility correctness | [Localization/accessibility lens](AuditInstructions/ProjectAuditGuides/UnityLocalizationAccessibilityInstructions.md), selected through the project-review workflow |
+| Review networking correctness | [Networking lens](AuditInstructions/ProjectAuditGuides/UnityNetworkingInstructions.md), selected through the project-review workflow |
+| Review entities correctness | [Entities lens](AuditInstructions/ProjectAuditGuides/UnityEntitiesInstructions.md), selected through the project-review workflow |
+| Review terrain correctness | [Terrain lens](AuditInstructions/ProjectAuditGuides/UnityTerrainInstructions.md), selected through the project-review workflow |
+| Review cameras/cinematics correctness | [Cameras/cinematics lens](AuditInstructions/ProjectAuditGuides/UnityCamerasCinematicsInstructions.md), selected through the project-review workflow |
 | Prepare a project for the experimental CoreCLR migration | [CoreCLR migration](AuditInstructions/CoreCLRmigration/CoreCLRUpgrade.md) |
 | Relevant implementation example | [CLI script and tests example](AuditInstructions/UnityCLI/CliScriptAndTests/README.md) |
 

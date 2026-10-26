@@ -1,5 +1,13 @@
 # Change log
 
+## 2026-10-26 — Discipline research and best-practice pressure test
+
+- Added a source-linked research record covering every existing audit discipline, explicit keep/revise/add verdicts, inspected source versions and specialist limits.
+- Added conditional Navigation, Physics2D, Localization/accessibility, Networking, Entities, Terrain and Cameras/cinematics lenses; updated review/detection, diagnosis, human and AGENTS routing. DOTS Physics, prediction/ghost workflows and other specialist boundaries remain explicit.
+- Expanded animation, 3D physics, audio, rendering/effects, asset readiness and profiling checks. Added managed-reference and serialization callback safety. Corrected EditMode yielding guidance, contradictory audio ownership and overly broad pattern-based findings across design, persistence, input, UI and lifecycle.
+- Included the research record in reference snapshots so its links survive installation. Validation evidence and runtime/source limitations are recorded in Validation.md.
+- Repaired six detached checklist-table boundaries and added the topic-local table validator with five parser fixtures. Historical replay/publication status is labeled explicitly, with exact independent commit checks recorded in Validation.md.
+
 ## 2026-10-26 — Fresh-agent project review decision replay
 
 - Executed all 94 new decision cases with fresh agents. Baseline found two failures; an initial correction exposed seven approval regressions before being stopped. After refinement, the full rerun passed 94 cases and all 207 expected outcomes; another 10 cases / 22 outcomes passed after concurrent CI/folder-guide edits.

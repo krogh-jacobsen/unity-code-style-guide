@@ -5,8 +5,9 @@ apply only when `com.unity.addressables` is installed; bundle and atlas rows app
 project uses Addressables, AssetBundles, or SpriteAtlas. Apply the
 [shared evidence standard](ProjectReview.md#evidence-standard). Import recipes belong to skills such as
 `unity:optimize-audio` and `unity:manage-sprite-atlas` when available, or to
-[project presets](../Presets/README.md). Audio import and memory choices go to `unity:optimize-audio`
-or [Audio](UnityAudioInstructions.md), not here.
+[project presets](../Presets/README.md). This lens owns audio import/residency and streaming-readiness findings; `unity:optimize-audio`
+owns implementation recipes, [Audio](UnityAudioInstructions.md) owns playback correctness, and
+[Performance](UnityPerformanceOptimizationInstructions.md) owns measured CPU/DSP cost.
 **Last verified: October 2026.**
 
 ## Establish ownership
@@ -23,10 +24,11 @@ from leaks. Follow serialized references transitively; a small configuration ass
 | Failure/cancellation | Completion and cleanup after disable/destroy/request replacement | A failed load leaves its handle unreleased, or a late result is consumed with no owner to release it (async lifetime is checked in [Scenes](UnityScenesAndLifecycleInstructions.md)) |
 | Instantiation (Addressables only) | Addressables creation path, clones, instance release | An instance is released through a different path than the installed package requires, or a dependency is released while an instance still uses it |
 | Runtime resources | Materials, textures, render targets, meshes, SO clones | `Renderer.material`/`MeshRenderer.material`, `new Material`, `new Texture2D`, `new Mesh`, or a `RenderTexture` is created in code with no `Destroy`/`Release` on a matching teardown path (grep, then trace) |
-| Shared configuration | Runtime writes and nested referenced assets | Code assigns a field of a ScriptableObject or prefab asset referenced by more than one consumer, or `git diff` shows the asset changed after exiting Play |
+| Shared configuration | Runtime writes and nested referenced assets | Runtime writes leak consumer-specific/session state into shared configuration or saved authoring data; intentionally shared mutable state with an explicit lifetime/reset contract is valid |
 | Import residency | Actual platform format, size, Read/Write need, mips, audio role | An importer's platform size, Read/Write, or mip setting exceeds the project's stated budget or its [presets](../Presets/README.md) with no runtime need; with no stated budget, report sizes and record "no budget" |
-| Bundle/atlas dependencies | Build layout, duplicate dependencies, content grouping | The build layout or build report shows one asset in more than one group/bundle, or a group whose members are never used together |
+| Bundle/atlas dependencies | Build layout, duplicate dependencies, content grouping | Build layout and representative load/release cycles show avoidable duplication or churn that violates a budget/content lifetime. Intentional small duplication or independently used bundle members can be a valid coupling tradeoff |
 | Shipping content | Build report, Resources, stripping/preservation, platform overrides | The build report lists content with no reference path, or a type used by reflection or serialization is missing from a stripped build (needs a build to confirm) |
+| Audio readiness | Load type, preload/background loading, clip load state, target memory/CPU/I/O and first-use latency | Required playback is delayed by unloaded data, or the import strategy breaks a measured target budget; evaluate streaming/decompression by role and platform, with no universal clip-duration cutoff |
 
 ## Ownership cases to verify
 
@@ -62,3 +64,7 @@ GUID/serialized migrations in [Editor tooling](UnityEditorToolingInstructions.md
 Technical reference: [Addressables package documentation](https://docs.unity3d.com/Packages/com.unity.addressables@latest),
 and its asynchronous operation handles page. Use the project's installed package for exact release
 and platform behavior.
+
+Additional references: [audio import tradeoffs](https://docs.unity3d.com/Manual/class-AudioClip.html),
+[duplication tradeoffs](https://docs.unity3d.com/Manual/assets-avoid-duplication.html), and
+[runtime asset management choices](https://docs.unity3d.com/Manual/assets-managing-introduction.html).

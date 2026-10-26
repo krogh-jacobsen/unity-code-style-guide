@@ -114,7 +114,12 @@ class ReviewContractTests(unittest.TestCase):
         router = (ROOT / "AuditInstructions/ProjectAuditGuides/ProjectReview.md").read_text()
         self.assertIn("UnityRenderingInstructions.md", router)
         self.assertIn("Outside coverage", router)
-        for system in ("Navigation", "Networking", "Physics2D", "DOTS"):
+        for lens in ("Navigation", "Networking", "Physics2D", "Entities", "Terrain",
+                     "CamerasCinematics", "LocalizationAccessibility"):
+            filename = "Unity" + lens + "Instructions.md"
+            self.assertIn(filename, router)
+            self.assertTrue((ROOT / "AuditInstructions/ProjectAuditGuides" / filename).is_file())
+        for system in ("DOTS Physics", "Netcode for Entities", "Specialist services/content"):
             self.assertIn("| " + system + " |", router)
 
 

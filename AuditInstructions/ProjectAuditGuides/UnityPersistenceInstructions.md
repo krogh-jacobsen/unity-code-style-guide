@@ -17,7 +17,7 @@ Detection and sampling count first-party runtime code, not Editor tools.
 
 | Check | Evidence to inspect | Finding when |
 |---|---|---|
-| Complete snapshot | Saved fields versus player-visible authoritative state | Any field the load path or player-visible UI reads is missing from the snapshot, or transient UI/cache state is treated as authoritative |
+| Complete snapshot | Saved fields versus player-visible authoritative state | Authoritative state required to reconstruct supported behavior is absent, or transient UI/cache state is treated as authoritative; values recomputed correctly on load need not be stored |
 | Stable identity | Entity/content references and reconstruction maps | Runtime instance IDs, list positions, names, or cached hashes silently point at different content later |
 | Schema evolution | Version dispatch, prior fixtures, unknown/missing fields | Old data is misread, silently overwritten, or accepted with invalid semantics |
 | Write failure | Temporary write, replacement strategy, backup and error handling | Partial I/O can destroy the only good save or report success before durable completion |
@@ -26,7 +26,7 @@ Detection and sampling count first-party runtime code, not Editor tools.
 | Missing content | Removed IDs, absent DLC/mods, corrupt/truncated input | Load crashes or silently assigns unrelated defaults without the agreed recovery behavior |
 | Platform lifecycle | Pause/focus/quit policy and storage access, for the project's actual targets | On a target that suspends instead of quitting, the only save trigger is graceful quit. Unity documents that `OnApplicationQuit` may not be called on mobile (iOS suspends instead of quitting) and points suspension handling to `OnApplicationPause` and saving to `OnApplicationFocus`; verify other platforms in the installed version. A desktop-only project may rely on quit or explicit-save paths, so record this row Not applicable per target rather than flagging it |
 | Settings | The store holding in-game options (settings file, `PlayerPrefs`, or cloud profile), its read path, and each option's runtime owner | After a fresh start an option value is read from its store but never applied to its runtime owner (a mixer parameter, quality level, or binding), or is shown in the UI without being saved |
-| `PlayerPrefs` use | `PlayerPrefs.Set*` call sites and the keys they write | Progress/snapshot data or credentials and tokens are stored in `PlayerPrefs`, or a Web build stores more than 1 MB there |
+| `PlayerPrefs` use | `PlayerPrefs.Set*` call sites and the keys they write | Credentials/tokens or other sensitive data are stored unencrypted there, a Web build exceeds its documented 1 MB limit, or the chosen usage violates a demonstrated save/recovery contract. Small non-sensitive progress values alone are a design choice |
 
 Use a platform-supported safe replacement strategy; renaming a temporary file is not a universal
 cross-platform guarantee of atomic or durable writes. Retain the prior good save until the agreed
@@ -34,8 +34,8 @@ write/recovery contract succeeds. Report I/O failures with a useful outcome rath
 
 ℹ️ Unity describes `PlayerPrefs` as storage for player preferences between sessions. It is stored
 without encryption, Unity says not to use it for sensitive data, and Web builds keep up to 1 MB in the
-browser's IndexedDB. Other platforms list no size limit, so treat large data there as a design
-proposal rather than a defect.
+browser's IndexedDB. The reference states no general size limit for other platforms; this is not a guarantee of unlimited
+storage. Judge progress storage by integrity, recovery, and platform requirements rather than a blanket ban.
 
 ## Validation
 

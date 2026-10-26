@@ -21,9 +21,9 @@ A bootstrap scene is one valid choice; it is not mandatory for every game.
 | Registration ownership | Registry entries on disable, destroy, scene exit, and replacement | A registry still holds an entry after its owner's disable/destroy (count before and after), or a removal keyed by type/name rather than owner identity can delete a newer owner's entry |
 | Session reset | Mutable statics, static events, caches, SO channels, reload settings | A static field, static event, cache, or SO channel holds state that survives into the next Play and no documented reset policy covers it (see the policy below); confirm with a second Play where a counter or subscriber from the first run is still present |
 | Persistence scope | Persistent roots and scene reload behavior | Reloading a scene creates a second instance of a service marked persistent (`DontDestroyOnLoad` with no duplicate guard), or a persistent object keeps references to objects of an unloaded scene |
-| Scene transitions | Load/activation/unload order, failure and overlapping requests | A second load starts while one is pending with no guard, an old scene unloads before the new scene's activation completes (read the `AsyncOperation` ordering), or an exit path leaves a loading/input-blocked flag set (trace every exit) |
+| Scene transitions | Load/activation/unload order, failure and overlapping requests | An overlapping request or unload/activation ordering loses required scene state, deadlocks a queued operation, or leaves loading/input-block flags set. Unloading first to fit a memory budget is valid with a defined recovery path |
 | Active scene | Instantiation and lighting expectations after additive loads | `Instantiate`/`new GameObject` runs after an additive load without `SceneManager.SetActiveScene` or `MoveGameObjectToScene` while the intended scene is not active, or the active scene's lighting settings differ from the expected scene's (live read) |
-| Async ownership | Every await and operation start, cancellation and error observation | An `await`/operation start has no cancellation or owner check for its lifetime, an exception from a fire-and-forget entry point has no handler, or canceled work leaves a resource unreleased |
+| Async ownership | Every await and operation start, cancellation and error observation | Pending work can outlive its consumer with an unsafe continuation or unreleased result, or an operation error has no observing owner. Bounded or intentionally application-owned work need not accept a cancellation token merely because it awaits |
 
 ## Async cases that basic null checks miss
 
@@ -44,6 +44,13 @@ A bootstrap scene is one valid choice; it is not mandatory for every game.
   un-awaited `Awaitable` surfaces its exception: the Awaitable documentation does not say it does, so
   verify exception behavior in the installed version.
 
+The [continuation manual](https://docs.unity3d.com/Manual/async-awaitable-continuations.html)
+now describes thread switching as local to the current async method, with caller-thread resumption.
+Older Unity manuals describe different Awaitable continuation behavior. Verify the installed engine
+and actual continuation path, especially after explicit thread switches or context suppression;
+require a main-thread switch where needed rather than after every await. Background work also needs
+an application-exit owner when component destruction alone does not end it.
+
 ## Destroyed-object checks
 
 | Check | Evidence to inspect | Finding when |
@@ -53,19 +60,18 @@ A bootstrap scene is one valid choice; it is not mandatory for every game.
 Unity's `Object` reference says `?.` and `??` are not supported with Unity Objects because they cannot
 be overridden to treat detached objects as null, and are safe only when the checked object is
 guaranteed never to be detached. It also says a detached object compares equal to `null` while
-`Object.ReferenceEquals(obj, null)` returns false. The `is null` pattern is not mentioned there; treat
-it the same way and verify in the installed version. Use Unity's `== null` or implicit bool check for
+`Object.ReferenceEquals(obj, null)` returns false. C# [constant null patterns](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/patterns)
+bypass overloaded equality, so `is null` does not invoke Unity's destroyed-object check.
+Use Unity's `== null` or implicit bool check for
 objects that can be destroyed. A hit on an object that cannot be destroyed (a plain C# class, an
 `Object` held only by its owner for its own lifetime) is not a finding.
 
 Triage by lifetime: a `?.`, `??`, or `is null` site is a candidate only when the referenced object's
 lifetime can be shorter than its holder's (a scene object held by a longer-lived owner, a pooled or
-spawned object, an object another system destroys). An owner that lives as long as the scene is not a
-candidate. Treat `GetComponent<T>() ?? AddComponent<T>()` as a candidate to confirm in a live Editor
-run: `??` bypasses Unity's null check, the `GetComponent` reference does not say whether a missing
-component yields a placeholder object, and the `TryGetComponent` reference notes it does not allocate in
-the Editor when the component is missing, which suggests `GetComponent` can. `TryGetComponent` avoids the
-question; verify the Editor behavior in the installed version.
+spawned object, an object another system destroys). Scene membership alone does not prove equal
+lifetime: a component can be destroyed while its holder
+survives. For `GetComponent<T>() ?? AddComponent<T>()`, establish the actual returned reference and
+failure path; an Editor allocation observation alone does not establish a detached-object bug.
 
 ## Interpret with care
 

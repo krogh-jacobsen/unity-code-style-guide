@@ -4,6 +4,30 @@ The intended profile is [Unity 6.7](AgentsInstructions/UnityTechStack/UnityTechS
 that choice from the exact prerelease Editor tested. It is not a guarantee for every 6000.7 patch,
 package upgrade, target platform, or copied project. Date: 2026-10-12.
 
+## Audit discipline research and pressure test — 2026-10-26
+
+Researched every existing review discipline against primary sources and maintained the guides under
+this task's direct authorization. Added seven conditional lenses and expanded existing animation,
+physics, audio, rendering/effects, assets and profiling checks. Tightened overbroad findings, corrected
+EditMode yielding and audio ownership, and recorded source versions/limits in [AuditResearch.md](AuditResearch.md).
+
+| Check | Result | Evidence / limit |
+|---|---|---|
+| Repository static validation | Passed | `PATH=/usr/bin:/bin:/usr/sbin:/sbin /opt/homebrew/bin/python3 -B -u AuditInstructions/Tools/validate_all.py`: 83 Markdown files, 536 local links/anchors, 75 unique GUIDs, six topic validators; .NET deliberately excluded from this documentation-only static run |
+| Workflow regressions | Passed | 14 tests, including updated new-lens routing and remaining specialist coverage boundaries |
+| Reference snapshot installation | Passed | Research record included in installation manifest; temporary snapshot/root links, anchors/case, EditorConfig and four negative probes pass |
+| Lens structure/routing | Passed | All 22 lenses appear in router and human overview; seven new lenses also appear in AGENTS and have dated primary references, validation paths and Not verified limits |
+| Syntax/whitespace | Passed | Updated Python routing test parses/runs; installation manifest parses; `git diff --check` |
+| Primary-source pressure test | Completed within stated scope | Existing-discipline verdict matrix and seven missing-discipline additions; engine/package versions inspected are recorded in AuditResearch.md. API semantics and engineering recommendations are distinguished |
+| .NET style gates | Not verified in this run | Initial default-PATH validator found the missing snapshot source, then remained in topic validation and was interrupted. Corrected static run passed with .NET excluded; no C# or style policy changed |
+| Unity/runtime/device/network behavior | Not verified | No target Unity project or imported assets changed; no Editor, gameplay, player, device or network-simulation run was performed. Exact Timeline binding API not verified; its checks use observable contracts |
+| Fresh-agent behavior replay | Not verified for this change | Structural routing/contract tests do not establish agent behavior on the new or revised checks |
+
+Validation targets the working tree, including concurrent documentation/tool changes, rather than a
+single commit. Existing edits were preserved; no resets, stashes or commits were performed by this task.
+The initial source baseline was saved outside the repository before edits. Concurrent work advanced
+HEAD to `a0fe317` during this task; the counts above identify the observed static run, not that commit.
+
 ## Project review behavioral replay — 2026-10-26
 
 Executed the nine newly added scenario families as 94 independent decision cases: five approval
@@ -733,7 +757,14 @@ independently checks its exact contents. Later edits are preserved outside the f
 |---|---|---|---|
 | 1: project-review replay report (`ef08fff`) | Passed: 75 Markdown files, 477 local links/anchors, 75 unique GUIDs, 6 folder validators; 14 shared tests and required CI style gates | Passed: .NET 10.0.302, Good zero / Bad six expected IDE1006 diagnostics | Historical 94-case decisions; not validation of later lens/preset/template text |
 | 2: completed workflow replay and targeted follow-ups | Passed: 75 Markdown files, 477 local links/anchors, 75 unique GUIDs, 6 folder validators; 14 shared tests and required CI style gates | Passed: .NET 10.0.302, Good zero / Bad six expected IDE1006 diagnostics | Frozen 213-case checkpoint; no live Unity/tool behavior claim |
+| 3: research, expanded lenses and table repairs | Passed: 84 Markdown files, 537 local links/anchors, 75 unique GUIDs, 7 folder validators; 14 shared tests and required CI style gates | Passed: .NET 10.0.302, Good zero / Bad six expected IDE1006 diagnostics | Source review and static checks; fresh-agent use of the revised/new lenses remains Not verified |
 
 No Unity asset bytes or metadata changed. No Editor, gameplay tests, player builds, device tests, or
 new LLM replays were run for publication. Archive integrity checks validate source hashes, identities,
 quotations and aggregate results; they do not turn historical decisions into runtime evidence.
+
+All six original detached-row examples were rejected by the topic parser; all six repaired files pass.
+The new topic validator also passes five positive/negative fixtures. Archive integrity was rechecked:
+45 project-review source hashes, 233 distinct sessions and 94 latest passing cases; the workflow
+archive has 286 distinct executions, 213 observed IDs and 432 latest passing outcomes. All 207
+previously committed workflow attempts remain unchanged in the completed archive.

@@ -1,8 +1,8 @@
 # Unity 3D physics audit
 
 Load for Rigidbody motion, collider contacts/triggers, tunnelling, or physics-query results. This
-is a 3D PhysX lens: for Physics2D or DOTS Physics use the matching official docs and, best-effort,
-`unity:physics-3d-collision`. Apply [the shared evidence standard](ProjectReview.md#evidence-standard).
+is a 3D PhysX lens: use [Physics2D](UnityPhysics2DInstructions.md) for classic 2D; DOTS Physics
+needs its installed package documentation and specialist review. Apply [the shared evidence standard](ProjectReview.md#evidence-standard).
 `unity:physics-3d-collision` (when available) owns detailed collision diagnosis and parameter recipes;
 without it, use the checks below and the official docs.
 **Last verified: October 2026.** Re-read the linked pages against the installed Editor before quoting
@@ -23,15 +23,17 @@ body that raises trigger callbacks still needs Contact eligibility.
 
 | Check | Evidence to inspect | Finding when |
 |---|---|---|
-| Movement ownership | Search for writes to `Rigidbody.position`, `linearVelocity`, `AddForce`, `MovePosition`, and `transform.position`/`Translate` on bodies; add network/teleport paths. List every writer per body. Root motion is owned by [Animation](UnityAnimationInstructions.md) | A body has two or more writers in the same update phase, or a non-kinematic body is moved by a transform write with no stated teleport contract |
+| Movement ownership | Search for writes to `Rigidbody.position`, `linearVelocity`, `AddForce`, `MovePosition`, and `transform.position`/`Translate` on bodies; add network/teleport paths. List every writer per body. Root motion is owned by [Animation](UnityAnimationInstructions.md) | Active writers overwrite or fight the intended pose/velocity, or a transform write bypasses a simulated body’s movement contract; ordered contributions and deliberate teleports can be valid |
 | Force units | `AddForce` mode, and any multiplication by `Time.deltaTime`/`Time.fixedDeltaTime`. One-shot input latching is owned by [Input](UnityInputSystemInstructions.md) | A continuous force mode (`Force`, `Acceleration`) is multiplied by a time step again, or `Impulse`/`VelocityChange` is applied every step where the result should scale with time |
 | Contact eligibility | Saved or live collider/body types, trigger flags, layer matrix, callback signatures; compare the pair with the collision-action matrix in the installed version's manual | The layer matrix excludes the pair, a callback kind does not match the collider's trigger flag, or a callback signature takes the wrong parameter type |
 | Effect identity | Colliders under each body root and the handlers on each | One interaction can reach a handler through more than one collider and no dedupe key exists; confirm by counting invocations for one interaction in a Play run (needs a live run) |
 | Query contract | Mask, radius, `queryTriggerInteraction`, result use | Trigger interaction or mask is left at a default the use case contradicts, or code indexes `RaycastAll`/overlap results as if sorted (Unity documents the order as undefined) |
 | Query completeness | Buffer length, returned count, overflow handling in every `*NonAlloc` call | The returned count equals the buffer length with no overflow policy, or a loop bound uses `buffer.Length` instead of the returned count. Allocation cost is owned by [Performance](UnityPerformanceOptimizationInstructions.md) |
-| State synchronization | Transform writes in `Update`/`LateUpdate` followed by a query in the same frame; `Physics.SyncTransforms` calls | A query that must see a new pose follows a transform change with no sync (confirm live), or `SyncTransforms` is called inside `FixedUpdate` or every frame without a stated need |
-| Fast motion | Max speed, `Time.fixedDeltaTime`, thinnest collider extent on each side, `collisionDetectionMode` per body | Discrete detection where max speed × `fixedDeltaTime` exceeds the thinnest collider extent of either body in the pair (compute from saved values; confirm live) |
+| State synchronization | Transform writes in `Update`/`LateUpdate` followed by a query in the same frame; `Physics.SyncTransforms` calls | A required query observes stale geometry after a pose change, or measured redundant synchronization violates a budget. Inspect actual write/query/simulation order and auto-sync mode; callback name alone is insufficient |
+| Fast motion | Max speed, `Time.fixedDeltaTime`, thinnest collider extent on each side, `collisionDetectionMode` per body | Supported speed/timestep/geometry produces a missed required collision (confirm live). Speed × step versus thickness screens tunnelling risk; that estimate or discrete mode alone does not prove failure |
 | Collider validity | Collider type, convexity, body type, `lossyScale` chain; Editor console or import output | The console/import output reports an unsupported shape/body combination, or a collider under a non-uniformly scaled parent has no verified shape |
+| Query origin | Ray origin versus containing colliders and intended initial-overlap behavior | A ray is expected to detect the collider containing its origin, leaving an inspected interaction/obstruction case wrong; 3D raycasts exclude that collider |
+| Visual interpolation | Interpolation/extrapolation, camera follow, physics versus rendered pose, teleports | Observed jitter, overshoot, or latency breaks the required visual/aim contract; interpolation adds a physics-step delay and extrapolation can overshoot |
 
 ## Interpret with care
 
@@ -52,8 +54,7 @@ body that raises trigger callbacks still needs Contact eligibility.
 - ℹ️ A radius-based overlap has no max-distance argument. Require a meaningful spatial bound, not
   parameters the API cannot accept. Choose Update/fixed/manual timing from the query's purpose.
 - ℹ️ The `Physics.SyncTransforms` reference advises against calling it in `FixedUpdate` (transforms
-  sync before each step), for calling it after `Update`/`LateUpdate` transform changes only when a query
-  follows immediately, and against overuse because it is expensive. Manual physics stepping alone does
+  sync before each step), for synchronizing changed transforms when an immediate query needs them, and against overuse because it is expensive. Manual physics stepping alone does
   not establish cross-platform determinism; verify on the target platforms.
 - ℹ️ Rigidbody API renames (`velocity` to `linearVelocity`, `drag` to `linearDamping`) are tracked in
   [UnityTechStack](../../AgentsInstructions/UnityTechStack/UnityTechStack.md); verify them in the target's 3D and 2D APIs.
@@ -67,3 +68,6 @@ settings survive reopening. Mark unresolved live geometry/contact checks as Not 
 Technical references: [CCD and collisionDetectionMode](https://docs.unity3d.com/ScriptReference/Rigidbody-collisionDetectionMode.html),
 [Time.deltaTime](https://docs.unity3d.com/ScriptReference/Time-deltaTime.html), and
 [Physics.SyncTransforms](https://docs.unity3d.com/ScriptReference/Physics.SyncTransforms.html).
+
+Additional references: [ray origin behavior](https://docs.unity3d.com/ScriptReference/Physics.Raycast.html)
+and [interpolation tradeoffs](https://docs.unity3d.com/Manual/rigidbody-interpolation.html).

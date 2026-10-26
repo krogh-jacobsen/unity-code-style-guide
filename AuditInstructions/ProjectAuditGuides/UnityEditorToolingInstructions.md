@@ -26,6 +26,7 @@ Move-time GUID checks belong to [ReviewFolders](../FolderStructure/ReviewFolders
 | Missing or orphan metadata | For each path under `Assets` and embedded `Packages` (scan only `Assets` and embedded `Packages`; skip folders ending in `~`, hidden folders whose name starts with `.`, and copies such as agent worktrees, `Library`, or build output), check `<path>.meta` exists; for each `.meta`, check its asset exists | An asset has no `.meta` after the Editor has imported the project, or a `.meta` has no asset; files added while the Editor was closed are not findings until it opens |
 | Null or unresolved scripts | Grep saved scenes, prefabs, and assets for `m_Script: {fileID: 0}`; read one saved MonoBehaviour for the exact reference form, then resolve each script GUID against the project's `.meta` files | `m_Script` is `fileID: 0`, or a script GUID resolves to no `.meta` and no deliberate optional-package guard. Unity's built-in resource references (all-zero-prefix GUIDs such as `0000000000000000e000000000000000` and `0000000000000000f000000000000000`, used by built-in shaders, fonts, and materials) are expected and not findings; no official list of them was found, so confirm what a reference points to in the installed Editor before excusing it |
 | Missing references | A `unity:unity-cli` Editor query for missing scripts and missing object references over scenes and prefabs (discover the installed command first) | A count above zero for any asset; each is a finding unless documented as optional. Needs a live Editor: record Not verified otherwise. Static fallback: every `guid:` referenced by first-party scenes, prefabs, and assets resolves to a `.meta` in scope (built-in references excepted); an unresolved GUID is a candidate missing reference |
+| Managed-reference types | Hosts using `[SerializeReference]`; `SerializationUtility.HasManagedReferencesWithMissingTypes` in an Editor query | Required data has an unresolved managed type after namespace/class/assembly changes; preserve recoverable serialized data and diagnose the missing type before proposing a migration |
 | Tracked generated content | `git ls-files Library Temp obj Logs UserSettings` | Any generated folder has tracked files |
 
 ## Tool authoring
@@ -40,9 +41,10 @@ With many tools, sample by risk (tools that act on open scenes or prefab instanc
 | Inspector edits | `SerializedObject` / `SerializedProperty`, `Update`, `ApplyModifiedProperties`, or binding | An Inspector writes `target` fields directly without those calls or without Undo, bypassing multi-object editing, prefab overrides, or Undo |
 | Tool edits | `Undo.*` calls before each change, `SetDirty`, prefab-instance modification recording | A tool that acts on open scenes or prefab instances mutates an object with no `Undo.*` call before the change, or an Undo/Redo run leaves the change in place, or a prefab-instance edit is not recorded. A missing `Undo.` call is only a candidate elsewhere: batch tools that load, change, and save assets do not need it |
 | Asset operations | `System.IO` and `AssetDatabase` calls on `Assets/` paths | A tool moves, copies, or deletes files under `Assets/` with `System.IO` instead of `AssetDatabase`, or a `.meta` pair is broken after it ran |
-| Batch safety | `StartAssetEditing` / `StopAssetEditing` or `AssetDatabase.AssetEditingScope` | A `StartAssetEditing` has no matching `StopAssetEditing` in `finally` (or `try`/`catch`), or an `AssetEditingScope` is created outside a `using` statement without a guaranteed `Dispose` |
-| Migration scope | Target filter, preview or dry-run mode, a second run on a throwaway copy, result log | The filter reaches `Packages/` or vendor folders, there is no preview, a second run changes assets again (diff it), or completion is reported with no per-asset failure list |
-| Editor callbacks | `OnValidate`, `InitializeOnLoad`, `InitializeOnLoadMethod`, reload hooks | `OnValidate` calls `AssetDatabase.*`, `Instantiate`, or `Destroy`; or an `InitializeOnLoad` constructor does file I/O or a `Find*` scan |
+| Batch safety | `StartAssetEditing` / `StopAssetEditing` or `AssetDatabase.AssetEditingScope` | A `StartAssetEditing` has no matching `StopAssetEditing` in a guaranteed `finally`, or an `AssetEditingScope` is created outside a `using` statement without a guaranteed `Dispose` |
+| Migration scope | Target filter, preview or dry-run mode, a second run on a throwaway copy, result log | The filter reaches unselected package or vendor content, there is no preview, a second run changes assets again (diff it), or completion is reported with no per-asset failure list |
+| Editor callbacks | `OnValidate`, `InitializeOnLoad`, `InitializeOnLoadMethod`, reload hooks | `OnValidate` reaches a non-thread-safe operation, or initialization uses imported assets before they are available. File I/O/scans in `InitializeOnLoad` are cost/reload-safety candidates, not automatic defects |
+| Serialization callbacks | `ISerializationCallbackReceiver` implementations and their helper calls | A callback reaches main-thread-only Unity APIs or depends on an undocumented ordering between managed-reference siblings; keep conversion local to owned fields |
 | Saved result | `SetDirty`, `SaveAssets`, read-back after reload, git diff on a throwaway copy | A tool that must ship its change never calls `SetDirty`/`SaveAssets`, or the git diff is empty after the tool ran, or a reopened scene or prefab lacks the change |
 
 ## Cases worth explicit inspection
@@ -76,3 +78,8 @@ Not verified. Editor/player compilation boundaries belong in
 [Assemblies](UnityAssemblyDefinitionsInstructions.md).
 
 Technical reference: [OnValidate](https://docs.unity3d.com/ScriptReference/MonoBehaviour.OnValidate.html).
+
+Serialization references: [missing managed types](https://docs.unity3d.com/ScriptReference/SerializationUtility.HasManagedReferencesWithMissingTypes.html)
+and [callback threading/order](https://docs.unity3d.com/ScriptReference/ISerializationCallbackReceiver.html).
+
+Initialization reference: [InitializeOnLoad asset availability](https://docs.unity3d.com/ScriptReference/InitializeOnLoadAttribute.html).

@@ -15,6 +15,7 @@ EditorConfig, templates, and examples consistent.
 | Find one setup or audit topic | [Topic index](AuditInstructions/README.md) |
 | Update an installed copy | [Kit maintenance](AuditInstructions/KitMaintenance/README.md) |
 | Prepare a release | [Release readiness](AuditInstructions/ReleaseReadiness/README.md) |
+| Understand audit best-practice coverage and tradeoffs | [Research and pressure test](AuditResearch.md) |
 | Check tested compatibility | [Validation record](Validation.md) and [stack profile](AgentsInstructions/UnityTechStack/UnityTechStack.md) |
 
 Skills supply execution mechanics; project choices and resolved package versions govern APIs.
