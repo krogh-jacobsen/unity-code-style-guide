@@ -102,7 +102,7 @@ stage 4, even when the user says "use defaults".
 | Which asset roles do you have: textures (albedo, normal, mask, UI sprite), audio (music, ambience, SFX, UI), static models, animation-only? | Only roles with real content in the project |
 | For apply or register: which owned folders? | None; ask for exact folders |
 | Which audio policy for each kind of clip? | One policy per clip; ask when unclear |
-| Platform texture and audio budgets now? | No; see step 6 |
+| Separate platform texture/audio budget review? | No; optionally recommend the handoff in step 6 |
 
 Select presets from this inventory. Fetch only the selected pairs; do not copy the whole folder.
 
@@ -145,8 +145,8 @@ Rules for choosing:
   user data, bundle labels, external mappings, and platform overrides.
 
 Turn the answers into numbered recommendations (stage 2): one per preset worth installing or updating (only for
-roles with real content), one each for applying to existing assets, registering defaults, and platform
-budgets (step 6). Give each its finding from the audit, why it matters, risk, and a default. The user
+roles with real content), one each for applying to existing assets, registering defaults, and a separate platform-budget
+review handoff (step 6). Give each its finding from the audit, why it matters, risk, and a default. The user
 may pick any subset (stage 3), then confirms the exact list (stage 4).
 
 **Done:** the recommendations were shown, the user picked from them, and the selected presets, the
@@ -279,12 +279,15 @@ checks remain failed/incomplete rather than a completed registration.
 
 ## 6. Platform budgets (separate selection)
 
-The role presets set data meaning and sampling; they do not choose resolution or compression for a
-platform. Platform budgets are texture and audio `Standalone`, `Android`, or `iOS` overrides applied to
-owned assets after the presets. The presets preserve those overrides when re-applied. For starting
-values, use the budgets in the matching build guide:
-[desktop](../BuildSettings/DesktopBuilds.md) or [mobile](../BuildSettings/MobileBuilds.md). Do not
-apply budgets from this step unless the user selected and confirmed them.
+The role presets set data meaning and sampling; they preserve existing resolution, compression, and
+platform overrides. Audit those overrides without choosing new budgets in this standalone workflow.
+When the user wants budget tuning, recommend a separate build-guide handoff:
+[desktop](../BuildSettings/DesktopBuilds.md) or [mobile](../BuildSettings/MobileBuilds.md). That workflow
+owns device requirements, measurements, exact values, and confirmation. Missing sibling guidance
+never blocks preset installation, application, or registration; no budget change is implied here.
+
+**Done:** existing overrides remain preserved and any requested budget tuning is identified as a
+separate recommendation/handoff, rather than an incomplete preset operation.
 
 ## 7. Report
 

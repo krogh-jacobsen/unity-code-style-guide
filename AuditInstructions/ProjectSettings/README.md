@@ -62,9 +62,10 @@ Reloading scripts resets every `static` variable, so it hides bugs but costs sec
   such as IDs that must remain unique across sessions. A gameplay counter that should restart needs
   a reset. On older Editors, use an explicit
   `[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]` reset.
-- **What the agent does.** It reads your current setting, searches your code for mutable statics and
-  static events, and recommends keeping Unity's default while you fix them. If there are many, it can
-  set **Reload Domain and Scene** as a temporary stopgap, and says so in its report.
+- **What the agent does.** It reads the saved policy and audits mutable static state before proposing
+  a change. Existing and older projects keep their observed setting during review; the 6.6+ default
+  is a starting choice for new projects. Unprotected state can justify a separately confirmed
+  **Reload Domain and Scene** stopgap, with the reason recorded.
 - **Leave scene reload on.** Turning it off too means `OnDestroy` is skipped and your code has to
   restore object state itself.
 

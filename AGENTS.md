@@ -108,8 +108,10 @@ orientation belong in the readme. Neither repeats the other.
 
 - **Stand alone.** Inline every fact the task needs. Link outward to official docs with
   unversioned URLs. A relative link to a sibling file is an optional pointer, never a prerequisite.
-  One exception: [ProjectReview.md](AuditInstructions/ProjectAuditGuides/ProjectReview.md) is a router, and its
-  lens files load on demand, so only the lenses the user picks are read.
+  The [setup workflow](AuditInstructions/SetupInstructions/README.md) and
+  [project-review workflow](AuditInstructions/ProjectAuditGuides/ProjectReview.md) are routers:
+  selected topic guides or lenses load on demand from the same source revision. Unavailable
+  delegated material leaves that topic Not verified while independent audit continues.
 - **Open with the hand-off.** A short `> How it works:` blockquote naming the prompt, then a link
   to the folder's readme.
 - **Carry the review contract.** Every document that can change a project has the section below,

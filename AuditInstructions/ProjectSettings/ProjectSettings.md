@@ -20,7 +20,8 @@ not performance claims: keep a setting that already works unless the user select
   hand-edit `ProjectSettings/*.asset` or `.meta` files.
 - Read every value before changing it and read it back after saving. Confirm each API name against
   the installed Editor; those below are the Unity 6 shape.
-- Work from a clean git tree so `git diff ProjectSettings` shows exactly what changed.
+- Continue independent read-only audit with existing edits preserved. Establish an attributable
+  baseline or isolated checkout before confirmed changes; resolve conflicting edits before execution.
 - Preserve occupied layer, tag, and sorting-layer slots, existing quality entries, and assigned
   pipeline assets. Report a policy conflict instead of migrating outside the user's scope.
 - Treat Preferences (Auto Refresh, worker count, script-change behavior) as machine-local; recommend,
@@ -72,7 +73,8 @@ Record (this is the audit input), in one table (setting, current value):
   evidence-based audit, use the "Session reset" check of the
   [Scenes and lifecycle lens](../ProjectAuditGuides/UnityScenesAndLifecycleInstructions.md).
 
-**Done:** the table exists, every row has a current value or "not set", and nothing was changed.
+**Done:** the table exists, every row has a known value, an observed "not set", or Not verified with a reason,
+and nothing was changed.
 
 ## 2. Ask
 
@@ -83,7 +85,7 @@ still goes through stages 2 to 4.
 |---|---|
 | Stop after the recommendations, or choose items to apply? | Stop after the recommendations; the user chooses in stage 3 |
 | Which input system, and which render pipeline? | Input System package and URP, unless the project already uses another |
-| Reload policy (see the next section) | Keep Unity's default and fix static state |
+| Reload policy (see the next section) | Keep the observed setting while auditing; for a new project, consider that Editor's default after reviewing static state |
 | Source control in use? | Git, with visible meta files |
 | Which platforms ship? | Ask; the build guides own platform settings |
 
@@ -92,7 +94,8 @@ still goes through stages 2 to 4.
 ## 3. Review and apply
 
 Apply only the items confirmed in stage 4; every other row is reported. Mark each row **OK**,
-**Differs** (report, and fix only if confirmed), or **Not set**.
+**Differs** (report, and fix only if confirmed), **Not set** (observed absent), or **Not verified**
+(value/evidence unavailable). An unknown value is neither an unset value nor a policy difference.
 
 | Setting | Target | Read / set via | Condition |
 |---|---|---|---|
@@ -136,8 +139,10 @@ must be reset in code.
 
 **The policy**
 
-1. Keep **Reload Scene only**: domain reload off, scene reload on. Leave scene reload on. With scene
-   reload off, `OnDestroy` is skipped and object-state restoration becomes your problem.
+1. For a new project on 6.6+, **Reload Scene only** is the documented starting default: domain
+   reload off, scene reload on. For an existing project or older Unity 6 Editor, retain the observed
+   saved policy during audit; propose a change only after evaluating reset behavior for that version.
+   Scene reload off changes teardown/restoration behavior and requires a deliberate project contract.
 2. Audit mutable statics and static events (step 1, or the lens above for a full audit). In Unity 6.5+ (the attribute is documented from 6.5), mark each with
    `[AutoStaticsCleanup]` (events, delegates, collections of user objects, Unity object references)
    or `[NoAutoStaticsCleanup]` only for intentional cross-session persistence (for example unique-ID
@@ -185,7 +190,7 @@ Offer these as recommendations; apply one only if it is picked and confirmed:
 
 | Item | Status | Detail |
 |---|---|---|
-| Each step 3 row | OK / Differs / Applied / Not set | Old value → new value |
+| Each step 3 row | OK / Differs / Applied / Not set / Not verified | Old value → new value |
 | Reload policy | Kept / Stopgap | Audit result and follow-up |
 | Each unpicked recommendation | Proposal | Finding, proposed change, and risk |
 | Each step 5 check | Passed / Failed / Not verified | Evidence |
@@ -195,10 +200,12 @@ decision" block at the top.
 
 ## References
 
-- [Configuring how Unity enters Play mode](https://docs.unity.com/en-us/engine/6000.7/manual/programming-environment/code-reload-serialization/code-reload/code-reloading-editor/configurable-enter-play-mode)
-- [Enter Play mode without domain reload](https://docs.unity.com/en-us/engine/6000.7/manual/programming-environment/code-reload-serialization/code-reload/code-reloading-editor/domain-reloading)
-- [What's new in Unity 6.6](https://docs.unity.com/en-us/engine/6000.7/manual/whats-new/unity66)
-- [Upgrade to Unity 6.6](https://docs.unity.com/en-us/engine/6000.7/manual/upgrade-guides/upgrade-guide-unity66)
-- [Editor settings reference](https://docs.unity.com/en-us/engine/6000.7/manual/unity-editor/editor-settings-reference)
-- [EditorSettings.enterPlayModeOptions](https://docs.unity.com/en-us/engine/6000.7/script-reference/unityeditor/editorsettings/enterplaymodeoptions)
-- [Input System installation](https://docs.unity3d.com/Packages/com.unity.inputsystem@1.17/manual/Installation.html)
+- [Configuring how Unity enters Play mode](https://docs.unity3d.com/Manual/configurable-enter-play-mode.html)
+- [Enter Play mode without domain reload](https://docs.unity3d.com/Manual/domain-reloading.html)
+- [What's new in Unity 6.6](https://docs.unity3d.com/Manual/WhatsNewUnity66.html)
+- [Upgrade to Unity 6.6](https://docs.unity3d.com/Manual/UpgradeGuideUnity66.html)
+- [Editor settings reference](https://docs.unity3d.com/Manual/class-EditorManager.html)
+- [EditorSettings.enterPlayModeOptions](https://docs.unity3d.com/ScriptReference/EditorSettings-enterPlayModeOptions.html)
+- [Input System installation](https://docs.unity3d.com/Packages/com.unity.inputsystem@latest/index.html?subfolder=/manual/Installation.html)
+
+Links follow current documentation; select the installed Editor/package version before applying an API or default.

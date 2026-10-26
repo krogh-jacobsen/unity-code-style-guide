@@ -18,10 +18,15 @@ instead. **Last verified: October 2026.**
   `AssetDatabase.MoveAsset`) or the Project window. Unity ties references to the GUID in each
   `.meta` file, and moving files outside the Editor risks disconnecting the GUID from the file.
   Treat a non-empty string returned by `MoveAsset` as a failure and stop.
-- Take a checkpoint before every batch (a clean commit, or a stash the user agrees to) so a batch can
-  be undone. If the working tree is dirty with the user's own work, ask before continuing.
+- Checkpoints apply to confirmed move batches, not to read-only audit. Continue independent audit
+  with user edits and unsaved scenes preserved. Before a move batch, agree a reversible checkpoint
+  and resolve edits that overlap its paths; do not stash, commit, or save unrelated work.
 - Leave `Packages/`, `ProjectSettings/`, and vendor content with a required layout where they are.
 - Keep a move log (old path, new path, GUID) in the conversation; it is the rollback record.
+- On resume, recommendation IDs refer to the actual previously presented batch. Recover its
+  old/new paths, owner, checkpoint, and permitted commands before planning moves or commits.
+  Missing scope remains Not verified; preserve unchanged authorization and continue independent
+  read-only inventory rather than inferring a move batch from `R1` or from this guide's examples.
 - Stop at the first error, compile failure, or unexpected change. Report it; never push through.
 - Mark checks you cannot run **Not verified**.
 
@@ -63,7 +68,8 @@ Read the project's own instructions first; they win over this document. Then rec
   command); a review alone can read the files directly.
 - Source-control state, and whether the project compiles cleanly now. Do not start moves on a
   project with compile errors.
-- Test baseline: the project's tests pass, or the failures that already exist, listed.
+- Existing test/compile evidence: record revision, freshness, and known failures. Missing evidence
+  is Not verified; new test or compilation runs belong in the confirmed execution plan.
 - The `Assets` tree to three levels, with file counts and the longest asset path.
 - Template leftovers (`Assets/Settings`, sample scene and assets), vendor folders (Asset Store or
   package-style content with its own layout), and any `Resources`, `StreamingAssets`, `Plugins`,

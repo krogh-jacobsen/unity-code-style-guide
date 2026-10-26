@@ -8,20 +8,27 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 def generate(root=ROOT):
-    cases = json.loads((root / "AuditInstructions/Tools/workflow_scenarios.json").read_text())["cases"]
+    catalog = json.loads((root / "AuditInstructions/Tools/workflow_scenarios.json").read_text())
+    cases = catalog["cases"]
+    baseline = catalog.get("baseline_evidence", {})
+    baseline_text = "\n".join(f"- {key}: {value}" for key, value in baseline.items())
     fixtures = []
     for path in published_entry_points(root):
         relative = path.relative_to(root / "AuditInstructions").as_posix()
         for case in cases:
             if case["entry_points"] != "all" and relative not in case["entry_points"]:
                 continue
-            context = "\n".join(f"- {key}: {value}" for key, value in case["context"].items())
+            context_values = dict(case["context"])
+            context_values.update(case.get("context_by_entry_point", {}).get(relative, {}))
+            context = "\n".join(f"- {key}: {value}" for key, value in context_values.items())
             task = case.get("task", "Audit and recommend. Nothing is selected or confirmed for mutation; stop after recommendations.")
             fixtures.append({
                 "id": f"{relative}:{case['id']}",
                 "document": path.relative_to(root).as_posix(),
+                "baseline_evidence": dict(baseline),
                 "task": task,
-                "prompt": f"Use {path}. Treat the following as fixture evidence. {task}\n" + context,
+                "prompt": f"Use {path}. Treat the following as fixture evidence. {task}\n"
+                          + "BASELINE EVIDENCE\n" + baseline_text + "\nSCENARIO (overrides baseline)\n" + context,
                 "expected": case["expected"],
                 "result": "Not verified",
             })

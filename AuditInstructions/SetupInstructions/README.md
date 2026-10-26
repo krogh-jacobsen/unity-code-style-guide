@@ -9,6 +9,11 @@ outcomes; available `new-unity-project`, `unity-cli`, and `unity-package-managem
 execution. This repository ships no automatic installer. Prefer Unity CLI; the Editor UI is the
 fallback when CLI execution is unavailable.
 
+This is a coordinator workflow: load the selected topic guides from the same source revision during
+audit, then aggregate their recommendations below. If a delegated guide is unavailable, mark that
+topic Not verified and continue independent work; do not claim the complete cross-topic audit ran.
+The selected guides supply their own procedures, rather than duplicating them in this router.
+
 For a single resource task, use its URL/local-file entry point and stop within that scope:
 
 | Task | Entry point |

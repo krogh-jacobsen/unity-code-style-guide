@@ -33,12 +33,15 @@ Tier A never runs the Editor, so **a green run does not mean tests pass**. Say s
 - Do not enable Tier C on a public repository without the user's explicit approval of the risk below.
 - Copy the shipped files unchanged except for the documented edit points. Do not commit or push.
 - Report observed results separately from checks you could not run (**Not verified**).
-
 - Recommendation IDs retain the meaning of the actual prior proposal. The tier IDs below are
   defaults for a new audit, not replacements for an existing approved change list. On resume,
   recover the exact files/settings/commands before planning execution; missing details remain
   Not verified while unchanged authorization is preserved; continue independent read-only preflight
   while recovering that scope. Do not infer Tier A merely from `R1`.
+- Without Unity CLI, continue the saved-file audit. For confirmed execution, run the Python/Git/.NET
+  checks directly when those tools exist; mark only unavailable checks Not verified. Authorized
+  Editor suites can use the Test Runner window instead of `unity test`. No CLI/bridge installation
+  is implied by this workflow.
 
 ## Review, recommend, confirm
 

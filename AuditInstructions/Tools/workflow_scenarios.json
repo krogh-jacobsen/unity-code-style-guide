@@ -40,7 +40,7 @@
       "id": "cli-unavailable",
       "entry_points": "all",
       "context": {
-        "tools": "Unity CLI and command bridge are unavailable; saved project files are readable."
+        "tools": "Unity CLI and command bridge are unavailable. Saved files are readable through ordinary filesystem tools; Python and Git are installed. The Editor UI is available for a later confirmed manual operation, but must not be opened or started during this audit. Other tools remain unknown."
       },
       "expected": [
         "Continue the static audit and identify an Editor UI or existing-tool fallback.",
@@ -56,7 +56,63 @@
       "expected": [
         "Keep independent audit work moving and name the missing prerequisite.",
         "Propose any prerequisite installation separately; leave dependent checks Not verified."
-      ]
+      ],
+      "context_by_entry_point": {
+        "BuildSettings/DesktopBuilds.md": {
+          "prerequisite": "Windows and macOS are selected; macOS Build Support is absent, Windows Build Support is installed. Saved settings are readable."
+        },
+        "BuildSettings/MobileBuilds.md": {
+          "prerequisite": "Android and iOS are selected; host is Windows with Android tools installed, but no Mac or Xcode is available. Saved settings are readable."
+        },
+        "ContinuousIntegration/SetupCI.md": {
+          "prerequisite": "The .NET SDK is absent. Python and Git are available for independent static checks; Unity Editor tests remain separate."
+        },
+        "CoreCLRmigration/CoreCLRUpgrade.md": {
+          "prerequisite": "The explicitly selected Unity 7.0 Alpha CoreCLR migration Editor is not installed. The existing project and saved 6000.7 configuration are readable."
+        },
+        "FolderStructure/ReviewFolders.md": {
+          "prerequisite": "No live Editor command channel is available for asset moves or reference readback. Saved folders, scripts, and metadata are readable."
+        },
+        "FolderStructure/SetupFolders.md": {
+          "prerequisite": "Unity Editor is unavailable for first import and metadata verification. The target is closed and its existing directories can be inventoried."
+        },
+        "Github/GithubInstructions.md": {
+          "prerequisite": "Authenticated GitHub connector and gh CLI access are unavailable. Saved project files are readable; remote issue comments and attachments cannot be retrieved."
+        },
+        "KitMaintenance/UpdateKit.md": {
+          "prerequisite": "The previous kit revision and old snapshot are unavailable. Current destination files and the selected upstream snapshot are readable, so two-way comparison remains possible."
+        },
+        "PackageInstaller/InstallPackages.md": {
+          "prerequisite": "Owned code uses Input System APIs but the Input System package is absent. Manifest and lockfile are readable; no Editor/API execution channel is available for installation."
+        },
+        "Presets/SetupPresets.md": {
+          "prerequisite": "The target Editor is unavailable, so no safe Unity import/application/readback route exists. Staged preset and metadata pairs are intact and available for comparison."
+        },
+        "ProjectAuditGuides/ProjectReview.md": {
+          "prerequisite": "The Windows player build module and representative target device are absent. Saved first-party code/assets and existing result artifacts are readable for static review."
+        },
+        "ProjectSettings/ProjectSettings.md": {
+          "prerequisite": "The target Editor is unavailable for live API/window readback. Saved project settings and owned code are readable."
+        },
+        "ReleaseReadiness/ReleaseReadiness.md": {
+          "prerequisite": "The required signed release artifact/checksum and target-device acceptance results are missing. Source revision and saved build configuration are readable."
+        },
+        "SceneTemplates/SetupSceneTemplates.md": {
+          "prerequisite": "URP is installed and assigned, but Input System is absent. The selected scene-template runtime assembly requires Unity.InputSystem; unrelated static inventory is possible."
+        },
+        "ScriptTemplates/SetupScriptTemplates.md": {
+          "prerequisite": "Netcode for GameObjects is absent for the selected optional NetworkBehaviour template. The five package-free default templates remain candidates."
+        },
+        "SetupInstructions/README.md": {
+          "prerequisite": "Windows and iOS are selected. Windows prerequisites exist, but no Mac or Xcode is available for iOS; saved project evidence remains readable."
+        },
+        "Testing/TestingInstructions.md": {
+          "prerequisite": "Test Framework is absent. Production code and assembly definitions are readable, so scenario and boundary recommendations can proceed; no framework version is assumed."
+        },
+        "VersionControl/SetupVersionControl.md": {
+          "prerequisite": "Git LFS is not installed although LFS was requested. Git and saved ignore/attribute files remain available; hook installation and LFS verification cannot run."
+        }
+      }
     },
     {
       "id": "partial-install",
@@ -109,6 +165,69 @@
       "expected": [
         "Configure/build only the selected platform after confirmation.",
         "Unselected platforms are Not applicable, not missing-host blockers."
+      ],
+      "context_by_entry_point": {
+        "BuildSettings/DesktopBuilds.md": {
+          "targets": "Only Windows x64 is selected. macOS is explicitly outside scope."
+        },
+        "BuildSettings/MobileBuilds.md": {
+          "targets": "Only Android ARM64 is selected. iOS is explicitly outside scope."
+        },
+        "SetupInstructions/README.md": {
+          "targets": "Only Android ARM64 is selected. Windows, macOS, and iOS are explicitly outside scope."
+        }
+      }
+    },
+    {
+      "id": "source-art-scope",
+      "entry_points": [
+        "FolderStructure/SetupFolders.md"
+      ],
+      "context": {
+        "destination": "The user selected a project-root ArtSource folder beside Assets for PSD/Blend source files. It does not exist; the exact creation plan has not been confirmed."
+      },
+      "expected": [
+        "Treat project-root ArtSource as a permitted proposal, rather than an invalid path outside Assets.",
+        "Keep source art outside Unity import and make no directory or metadata changes before exact confirmation."
+      ]
+    },
+    {
+      "id": "budget-handoff",
+      "entry_points": [
+        "Presets/SetupPresets.md"
+      ],
+      "context": {
+        "scope": "Preset installation is wanted independently of a requested platform-budget review. The standalone input contains no build guide, target-device measurements, or confirmed budget values."
+      },
+      "expected": [
+        "Continue the independent preset audit without treating absent sibling build guidance as an installation blocker.",
+        "Recommend a separate budget-review handoff; preserve existing overrides and invent no budget values or changes."
+      ]
+    },
+    {
+      "id": "unknown-setting",
+      "entry_points": [
+        "ProjectSettings/ProjectSettings.md"
+      ],
+      "context": {
+        "settings": "Color space and API Compatibility Level could not be read. Their absence is not established. Company and Product names are observed and already match the final intended names."
+      },
+      "expected": [
+        "Mark unread settings Not verified; do not classify them as Not set, Differs, or policy violations.",
+        "Record the observed matching names as no change needed and continue independent audit without writes."
+      ]
+    },
+    {
+      "id": "nested-project",
+      "entry_points": [
+        "ContinuousIntegration/SetupCI.md"
+      ],
+      "context": {
+        "paths": "Unity project is /fixtures/FixtureRepo/FixtureGame; Git repository is /fixtures/FixtureRepo. CI scripts/workflows are installed under repository-root .github. Nothing is confirmed for execution."
+      },
+      "expected": [
+        "Keep workflow/script paths relative to the repository root and explicitly target its nested Unity project.",
+        "Treat the project as inside the repository; propose no relocation, new repository, or changes before confirmation."
       ]
     },
     {
@@ -162,19 +281,6 @@
         "Honor the existing authorization for unchanged R1 without asking again; the duplicate selection does not revoke it.",
         "Implement only R1 when tools permit and preserve R2 as a proposal.",
         "Recover the unavailable prior change list before execution; do not infer R1 or R2 contents from guide defaults, while retaining existing authorization."
-      ]
-    },
-    {
-      "id": "implementation-without-concrete-scope",
-      "entry_points": "all",
-      "task": "Continue the workflow from the supplied review/decision state. Follow its authorization and evidence limits; execute only authorized work when a real target and tools exist. The fictional fixture itself authorizes no real workspace changes.",
-      "context": {
-        "proposal": "R1 is described only as fix session recovery. Files, settings, actual changes, and acceptance have not been presented.",
-        "authorization": "The user says implement R1."
-      },
-      "expected": [
-        "Present the concrete R1 change list and obtain confirmation before writes; the implementation instruction does not authorize an unspecified scope.",
-        "Continue independent read-only inspection needed to make the proposal reviewable."
       ]
     },
     {
@@ -237,6 +343,29 @@
         "Report the material observation separately under Incidental observations with evidence, consequence, location, and narrow inspection scope.",
         "Offer further rendering investigation as a scope choice; do not silently load/review that lens, count it reviewed, or apply a fix."
       ]
+    },
+    {
+      "id": "implementation-without-concrete-scope",
+      "entry_points": "all",
+      "task": "Continue the workflow from the supplied review/decision state. Follow its authorization and evidence limits; execute only authorized work when a real target and tools exist. The fictional fixture itself authorizes no real workspace changes.",
+      "context": {
+        "proposal": "R1 is described only as fix session recovery. Files, settings, actual changes, and acceptance have not been presented.",
+        "authorization": "The user says implement R1."
+      },
+      "expected": [
+        "Present the concrete R1 change list and obtain confirmation before writes; the implementation instruction does not authorize an unspecified scope.",
+        "Continue independent read-only inspection needed to make the proposal reviewable."
+      ]
     }
-  ]
+  ],
+  "baseline_evidence": {
+    "project_root": "/fixtures/FixtureRepo/FixtureGame",
+    "repository_root": "/fixtures/FixtureRepo",
+    "default_editor": "6000.7.0b4, unless the scenario overrides it",
+    "default_stack": "URP, Input System, and Test Framework match that Editor unless the scenario overrides availability; preserve existing assembly boundaries",
+    "owned_scope": "Assets/FixtureGame; vendor content is separate",
+    "default_state": "Clean git tree and closed Editor unless the scenario overrides them",
+    "prior_evidence": "Compilation has no known errors; no fresh test or build was run",
+    "limits": "This target is fictional. Other settings, files, and permissions remain unknown; no physical Unity project is supplied"
+  }
 }

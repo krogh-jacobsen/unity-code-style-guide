@@ -9,6 +9,7 @@
 | Run contract-discovery and wording regressions | `python3 AuditInstructions/Tools/test_audit_contract.py` |
 | Generate audit and decision replay prompts per applicable scenario | `python3 AuditInstructions/Tools/replay_workflows.py --output /absolute/temp/workflow-fixtures.json` |
 | Review replay contexts and expected decisions | [workflow_scenarios.json](workflow_scenarios.json) |
+| Inspect observed fresh-agent results, frozen sources, and grading evidence | [2026-10-26 replay results](replay_results_2026-10-26.json) |
 
 The canonical review contract remains in root AGENTS.md. The validator discovers entry points from
 published handoff tables independently of a document's opening text, then requires the complete
@@ -34,3 +35,7 @@ or repeat-run rule.
 The Python tests validate fixture generation, discovery, contract corruption, and routing invariants.
 They do not execute an LLM or prove that an agent follows the prose. Generated prompts and expected
 outcomes are a replay suite, not a record of passing agent behavior.
+
+The catalog supplies a canonical nested project/repository baseline and workflow-specific prerequisite
+evidence. Source and case snapshots keep earlier attempts reproducible while later wording changes.
+Observed replay results distinguish decisions from actual Unity or remote-tool execution.

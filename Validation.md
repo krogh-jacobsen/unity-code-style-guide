@@ -4,6 +4,82 @@ The intended profile is [Unity 6.7](AgentsInstructions/UnityTechStack/UnityTechS
 that choice from the exact prerelease Editor tested. It is not a guarantee for every 6000.7 patch,
 package upgrade, target platform, or copied project. Date: 2026-10-12.
 
+## Project review feedback implementation — 2026-10-26
+
+Implemented all six approved refinements: concrete-scope approval without a mandatory literal
+"yes", acceptance conditions and cause assessments, runtime collection context, concurrent-source
+freshness and explicit ownership, separate implementation/acceptance reporting, and incidental
+observations outside selected-lens coverage. The canonical contract and all 18 published copies
+match. Active human summaries and completion criteria use the same approval terminology; historical
+validation entries retain their original wording.
+
+| Check | Result | Evidence / limit |
+|---|---|---|
+| Complete repository validation with required .NET gates | Passed | `python3 -B -u AuditInstructions/Tools/validate_all.py --require-dotnet` with host access: 74 Markdown files, 467 local links/anchors, 75 unique GUIDs, six topic validators, installation staging/four negative probes, 22 CI fixture projects and style gates |
+| Contract and replay regressions | Passed | `python3 -B AuditInstructions/Tools/test_audit_contract.py`: 14 tests; exact contract copies, corruption rejection, and scenario-specific authorization prompts checked |
+| Replay generation and integrity | Passed | 204 unique fixtures generated outside the repository; five new approval scenario families apply to all 18 entry points, plus four review-specific evidence/acceptance/scope scenarios. Default audit prompts remain read-only; decision prompts retain their scenario authorization and prohibit real workspace mutation from fictional evidence |
+| Syntax and whitespace | Passed | AST parsing of the two changed Python modules and `git diff --check` |
+| Concurrent-edit preservation | Passed | Saved the starting text snapshot and diff outside the repository; compared pre-existing added lines. All remain except the old hard-coded replay stop instruction, now preserved as the default task so decision scenarios can continue. No resets, stashes, or whole-file restoration |
+| Fresh-agent behavioral replay | Not verified | New cases and expected decisions were reviewed and generated, but no fresh-agent session or disposable Unity target was executed. Fixture/contract tests establish structure, not agent compliance |
+| Unity gameplay, Editor, and player validation | Not verified | Documentation and maintenance tooling only; no Unity implementation/assets changed and no Editor/test/build run was needed |
+
+The validated source was this dirty working tree, including concurrent workflow changes and the
+review refinements, rather than a single commit. The initial sandboxed full validator did not
+complete promptly and was stopped with its child processes after the host-access run above completed
+successfully, including required .NET gates.
+
+## Fresh-agent workflow replays — 2026-10-26
+
+The original checkpoint and its corrective replays are complete. Each case used a new built-in
+leaf agent with `fork_turns=none`, inherited model/reasoning, and no model override. Expected outcomes
+were withheld from the leaf; a coordinator graded each response and quoted its evidence. The parent
+independently checked source hashes, unique identities, expected arrays, counts, and verbatim quotations.
+
+| Run | Cases | Pass | Fail | Not verified |
+|---|---:|---:|---:|---:|
+| Original frozen snapshot | 106 | 77 | 3 | 26 |
+| Corrected guides and concrete fixture evidence | 55 | 55 | 0 | 0 |
+| Nested-project and ArtSource scope checks | 4 | 4 | 0 | 0 |
+| Latest observed verdict per original/added case ID | 110 | 110 | 0 | 0 |
+
+This is **165 fresh-agent case executions**, retaining the original failures and incomplete verdicts.
+The original three failures were dirty-tree rules pausing independent read-only audit. Eighteen
+incomplete cases lacked the identity of the missing prerequisite; seven omitted a fallback decision;
+one had ambiguous platform evidence. Corrected replays resolve those cases. Additional agent
+compensations exposed unknown-versus-unset status, unconditional platform profiles, ArtSource scope,
+standalone budget handoff, older-project reload policy, and missing delegated-guide reporting.
+
+The [replay evidence archive](AuditInstructions/Tools/replay_results_2026-10-26.json) contains frozen
+source documents, case inputs, full responses, agent identities, hashes, grades, and exact quotations.
+Raw temporary inputs/responses also remain under `/private/tmp/audit-replays-20261026-v1`, `v2`, and
+`v4`; `v3` was prepared but never executed. Data in the archive is the portable evidence source.
+
+**Expanded checkpoint: partial evidence captured for publication.** The fixed checkpoint contains
+213 generated cases, including 103 new case IDs. The archived capture has 42 graded expanded cases:
+38 Pass, two Fail, and two Not verified; 61 selected IDs lack grades in this capture. Later concurrent
+work remains unfinished and is not included in these counts. Together with the earlier checkpoint,
+the archive contains 207 case executions across 152 observed IDs: latest verdicts are 148 Pass,
+two Fail, and two Not verified. These are observed decisions, not physical tool execution.
+
+The two failures concern invented execution scope after duplicate approval in the CI and folder-review
+fixtures. The two Not verified cases concern omission of continued independent inspection when concrete
+scope was missing. Subsequent wording clarifies both boundaries; no corrective replay pass is inferred.
+All grades retain their original source hashes, expected outcomes, response quotations, and limitations.
+Source hashes, grade/fixture identity and expected arrays, quotations, and counts were checked during
+publication. Pending IDs are retained explicitly in the archive's partial-checkpoint integrity record.
+
+**Limits:** these are decision replays against fictional project evidence, not observed Unity, asset,
+build, GitHub, or publication operations. Fresh conversations share ambient repository instructions
+and filesystem access. The canonical confirmation policy changed concurrently; frozen payloads and
+that mismatch are preserved. All original/corrective cases withhold implementation authorization,
+so both contract wordings require the same no-write decision. Positive authorization has only partial observed coverage
+in the expanded checkpoint; its failing and unverified cases remain unresolved. Earlier passing cases were retained while affected branches
+were rerun; no statistical reliability or fully hermetic environment claim is made.
+
+The current static validator (including required .NET gates) and naming check passed after the guide
+fixes: 74 Markdown files, 467 local links/anchors, 75 unique GUIDs, six topic validators, 14 workflow
+regression tests, 22 CI fixtures, and expected naming diagnostics. Final record links will be rechecked.
+
 ## Audit pressure-test implementation — 2026-10-26
 
 Implemented the selected review recommendations R1–R10 and R12. R11 was not selected. Changes are
@@ -19,7 +95,7 @@ Concurrent repository reorganization, installation/maintenance/release guidance,
 | Roslyn naming intersections | Passed | `python3 -u AgentsInstructions/CodeStyleGuide/Tools~/check_naming.py` with SDK 10.0.302: good fixture 0 IDE1006 diagnostics; bad fixture 6 expected diagnostics |
 | Python syntax and whitespace | Passed | AST parsing of six changed/new modules; `git diff --check` |
 | Workflow replay generation | Passed | 106 unique prompts for 18 discovered entry points across eight scenario families, generated outside the repository with result `Not verified` |
-| Fresh-agent workflow replay | Not verified | The catalog and grading protocol are supplied; no LLM behavioral/tool replay was executed. Structural tests do not establish agent compliance |
+| Fresh-agent workflow replay | Completed subsequently | See the fresh-agent replay section above; this original implementation pass supplied the catalog before behavioral replay |
 | Unity runtime, rendering, discovery, and normal-player isolation | Not verified | No Unity project or imported asset implementation changed; no Editor/device run or player build performed |
 | Hosted/self-hosted GitHub execution | Not verified | Workflow syntax, targeting, and safety invariants checked locally; no push or runner dispatch |
 
@@ -554,3 +630,27 @@ before committing. Validation results are recorded below after execution.
 | Replay execution | Not performed | Static fixtures are not observed agent or Unity behavior |
 
 No Unity assets or metadata changed. No Editor imports, gameplay tests, or player builds were run.
+
+
+## Independent publication: workflow corrections and replay evidence — 2026-10-26
+
+Group 3 is validated as its own cumulative publication snapshot, excluding changes assigned to
+later groups and edits arriving after capture. The staged content is checked against this snapshot
+before committing. Validation results are recorded below after execution.
+
+| Check | Result | Scope/limits |
+|---|---|---|
+| Full repository validator with required .NET gates | Passed | Group 3: 75 Markdown files, 475 local links/anchors, 75 unique GUIDs, 6 folder validators; 14 shared regression tests; 22 CI fixtures and required style gates |
+| Roslyn naming intersections | Passed | Group 3: .NET SDK 10.0.302; Good fixture zero IDE1006 diagnostics, Bad fixture six expected diagnostics |
+| Replay execution | Not performed | Static fixtures are not observed agent or Unity behavior |
+
+No Unity assets or metadata changed. No Editor imports, gameplay tests, or player builds were run.
+
+Replay-archive integrity validation passed for all four retained phases: 207 unique fresh-agent
+executions, 152 observed case IDs, verified source hashes/quotations and consistent aggregate verdicts.
+The expanded phase remains partial (42/103 graded); its two failures and two unverified outcomes are
+retained. The local live replay directories are not modified or retired by publication.
+
+The publication catalog generates 204 current prompts. The expanded historical checkpoint generated
+213 from its frozen catalog; its observed results are attributed to those original inputs, not to
+the current catalog or current guide revisions.

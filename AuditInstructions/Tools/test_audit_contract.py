@@ -72,7 +72,6 @@ class ReviewContractTests(unittest.TestCase):
                 self.assertIn("Continue the workflow", fixture["prompt"])
                 self.assertNotIn("Nothing is selected or confirmed for mutation", fixture["prompt"])
                 self.assertIn("fictional fixture itself authorizes no real workspace changes", fixture["prompt"])
-
         for scenario in ("changed-review-evidence", "unverified-acceptance", "runtime-evidence-context", "incidental-unselected-lens"):
             selected = [f for f in fixtures if f["id"].endswith(":" + scenario)]
             self.assertEqual(["AuditInstructions/ProjectAuditGuides/ProjectReview.md"], [f["document"] for f in selected])
@@ -92,7 +91,24 @@ class ReviewContractTests(unittest.TestCase):
         self.assertIn("../BuildSettings/MobileBuilds.md", setup)
         self.assertIn("../PackageInstaller/InstallPackages.md", setup)
 
+    def test_missing_prerequisites_are_specific_to_each_workflow(self):
+        fixtures = [f for f in generate() if f["id"].endswith(":missing-prerequisite")]
+        self.assertEqual(len(published_entry_points(ROOT)), len(fixtures))
+        self.assertEqual(len(fixtures), len({f["prompt"] for f in fixtures}))
+        for fixture in fixtures:
+            with self.subTest(fixture=fixture["id"]):
+                self.assertNotIn("A capability required by one requested item is absent", fixture["prompt"])
+                self.assertIn("prerequisite:", fixture["prompt"])
 
+    def test_replay_baseline_keeps_project_inside_repository(self):
+        for fixture in generate():
+            baseline = fixture["baseline_evidence"]
+            project = Path(baseline["project_root"])
+            repository = Path(baseline["repository_root"])
+            self.assertNotEqual(project, repository)
+            self.assertTrue(project.is_relative_to(repository))
+            self.assertIn(str(project), fixture["prompt"])
+            self.assertIn(str(repository), fixture["prompt"])
 
     def test_rendering_and_uncovered_systems_are_routed(self):
         router = (ROOT / "AuditInstructions/ProjectAuditGuides/ProjectReview.md").read_text()

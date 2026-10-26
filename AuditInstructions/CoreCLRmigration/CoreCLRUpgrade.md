@@ -26,8 +26,9 @@ writing migration code. Availability of an API in a roadmap does not establish p
 
 ## Operating rules
 
-- Work on an isolated copy or git branch, never on the user's working tree. If the tree is dirty,
-  say so and ask before continuing.
+- Audit saved project evidence read-only, including on a dirty tree, with existing work preserved.
+  Perform confirmed migration execution in an isolated copy or checkout; a branch alone does not
+  isolate files from an active Editor. Resolve isolation before execution, without blocking independent audit.
 - Use `unity-cli` for compilation, repeated Play, tests, and builds. Resolve packages through
   CLI-invoked Package Manager Client operations. Leave ProjectSettings YAML and `.meta` files untouched.
 - Preserve unsaved scenes and the user's other edits. Keep experimental results separate from the
@@ -78,10 +79,12 @@ This step is the audit input and changes nothing. Read the project, then summari
 - Every package in `Packages/manifest.json` and `Packages/packages-lock.json`, plus native plugins and
   precompiled assemblies (`.dll`) under `Assets`.
 - Assembly definitions, so each finding in step 3 maps to an owning assembly.
-- Baseline: compile result, EditMode and PlayMode test results, and one normal player build on the
-  current Editor. Without a baseline, later failures cannot be attributed.
+- Baseline evidence already available: compile result, EditMode and PlayMode test results, and one
+  normal player build on the current Editor, with their revision/freshness. Do not launch these during
+  read-only preflight. Missing results are Not verified; propose fresh baseline runs in the confirmation
+  list. Without comparable results, later failures cannot be attributed.
 
-**Done:** the table exists, every row has a value or "not set", the baseline results are recorded
+**Done:** the table exists, every row has a known value, observed absence, or Not verified reason; baseline results are recorded
 or marked Not verified with the reason, and the audit was shown to the user.
 
 ## 2. Ask the migration contract
@@ -93,7 +96,7 @@ Ask all questions in one batch; the project cannot answer them. Apply the defaul
 |---|---|
 | Which exact migration Editor (Unity 7.0 Alpha CoreCLR Editor, or a 6.7 experimental player)? | No default; ask, and record the version |
 | Which platforms and scripting backends must be tested? | The Editor plus one normal player build on the host platform |
-| Isolated branch or copy ready? | Create a branch; stop if the user declines |
+| Isolated checkout or copy ready? | Propose a separate checkout or copy; defer migration execution if declined, while completing independent read-only audit |
 | Which dependencies are third-party, and who owns each? | Every non-Unity entry in `packages-lock.json` and every `.dll` |
 | Which saved-data fixtures exist (old saves, serialized ScriptableObjects)? | None: persistence checks become Not verified |
 

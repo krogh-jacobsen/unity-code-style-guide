@@ -15,9 +15,13 @@ selects the change, and treat every budget as a proposal until measured on a dev
 - Change settings through Editor APIs or Unity CLI (`PlayerSettings`, `QualitySettings`,
   `EditorUserBuildSettings`, Build Profile assets). Leave ProjectSettings YAML and `.meta` files
   untouched; hand edits corrupt asset identity.
-- Start from a clean git tree, so `git diff ProjectSettings` shows exactly what the run changed.
-  If the tree is dirty, tell the user and ask before continuing.
+- Continue read-only auditing on a dirty tree while preserving existing edits and unsaved scenes.
+  Before confirmed changes, establish an attributable before/after baseline or an isolated checkout.
+  Ask before execution only when existing work conflicts with it; a dirty tree alone does not gate the audit.
 - Preserve unsaved scenes and the user's other edits.
+- Without CLI/bridge access, inspect saved files read-only and mark unavailable live checks Not verified.
+  After confirmation, use the Editor's Player Settings, Quality, and Build Profiles windows and
+  importer Inspectors as the manual route; install no bridge merely to complete this guide.
 - Confirm each API signature against the installed Editor version before calling it; the names
   below are the Unity 6 shape and move between releases.
 - Record a check as **Not verified** when its module, host OS, or device is missing. A build that
@@ -65,7 +69,8 @@ Read (this is the audit), then summarise in one table (setting, current value):
   [Windows requirements](https://docs.unity3d.com/Manual/windows-requirements-and-compatibility.html);
   a Mac IL2CPP build needs Xcode.
 
-**Done:** the table exists, every step 3 row has a current value or "not set", and nothing was changed.
+**Done:** the table exists, every step 3 row has a known value, an observed "not set", or Not verified with a reason,
+and nothing was changed.
 
 ## 2. Ask the support contract
 
@@ -146,8 +151,8 @@ re-reading the settings through the Editor API returns the target values.
 
 ## 4. Build profiles and CLI
 
-Only the items confirmed in stage 4. Create Windows Development, Windows Release, Mac Development, and Mac Release profiles through the
-Editor or CLI. Not every setting is isolated per profile in every Editor version, so inspect shared
+Only the items confirmed in stage 4. Create Development and Release profiles only for the selected
+platforms (Windows and/or Mac) through the Editor or CLI. Unselected platforms need no profiles or hosts. Not every setting is isolated per profile in every Editor version, so inspect shared
 Player Settings after saving.
 
 | Choice | Development | Release |

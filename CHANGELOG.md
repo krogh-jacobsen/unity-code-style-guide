@@ -1,5 +1,13 @@
 # Change log
 
+## 2026-10-26 — Fresh-agent workflow replay fixes
+
+- Executed the original 106 decision-replay cases in separate fresh agents with expected outcomes withheld. The baseline exposed dirty-tree rules that paused independent read-only audit, plus incomplete fixture evidence and several contradictions agents worked around. Final rerun counts and evidence are recorded in `Validation.md`.
+- Scoped clean-tree/checkpoint requirements to confirmed execution, clarified CoreCLR checkout isolation and existing-baseline inspection, and made unavailable values/report statuses explicitly Not verified. Existing and older projects retain the observed reload policy during audit; settings reference links now follow unversioned official routes.
+- Made desktop/mobile profile creation follow selected platforms, documented CLI-free execution routes, aligned the optional project-root ArtSource completion criterion, and made preset budget tuning a separate handoff. The setup coordinator now reports unavailable delegated topics without claiming a complete cross-topic audit; AGENTS documents both coordinator exceptions.
+- Added concrete prerequisite evidence per workflow, explicit CLI-free tool availability and single-platform selection, and three focused fixtures for ArtSource, budget handoff, and unknown settings. The catalog now generates 109 cases; tests check that no published workflow falls back to an unnamed missing-prerequisite case.
+- Refreshed the expanded replay from saved evidence: a frozen partial checkpoint of 42/103 graded cases (38 Pass, two Fail, two Not verified) is archived with hashes, responses, grading, and 61 pending IDs. Unfinished concurrent work and later observations remain separate; no full expanded pass is claimed.
+
 ## 2026-10-26 — Strengthen review evidence and acceptance
 
 - Added runtime activity/source context, diagnostic cause assessments, checkable acceptance conditions, source freshness and concurrent ownership, and separate implementation/acceptance outcomes to project review and diagnosis guidance.

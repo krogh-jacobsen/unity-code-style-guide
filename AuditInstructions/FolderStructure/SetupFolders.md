@@ -89,7 +89,8 @@ become recommendations that still go through stages 3 and 4, even when the user 
 | Reusable code to share across projects? | No. A local package is a separate task, not part of folder scaffolding |
 | Sample content from the template? | Leave it in place and report it |
 
-**Done:** every proposed directory has a stated purpose and a concrete path under the target `Assets`.
+**Done:** every proposed directory has a stated purpose and a concrete path under the target `Assets`,
+or is the explicitly selected project-root `ArtSource` beside `Assets`.
 
 ## 3. Choose the layout
 
@@ -163,16 +164,20 @@ changing anything:
 - Reuse an existing directory with matching name and casing. A file at a requested directory path,
   or metadata for a missing directory, is a conflict to resolve before creating anything.
 
-Choose the route by Editor state:
+Choose the route by destination, scope, and Editor state:
 
-- **Editor closed:** create only the selected missing directories with ordinary filesystem
-  operations. Unity generates their metadata on import.
-- **Editor open:** use Editor access you already have (for example an `AssetDatabase` folder API),
-  checking for each folder before creating it, and target the project explicitly. When no such
-  access exists, ask the user to close that project's Editor. Never install a bridge or close an
-  Editor with unsaved work.
-- **Established project with its own structure:** stop. This document does not review or move
-  existing content; hand the user [ReviewFolders.md](ReviewFolders.md) instead.
+- **Project-root ArtSource only:** after exact confirmation, create the selected missing directory
+  with ordinary filesystem operations. It stays outside Unity import regardless of Editor state.
+- **New-project Assets scaffolding, Editor closed:** create only the selected missing directories
+  with ordinary filesystem operations. Unity generates their metadata on import.
+- **Editor open:** use existing Editor access (for example an `AssetDatabase` folder API) for selected
+  imported folders, checking each path first and targeting the project explicitly. If unavailable,
+  defer creation or ask for a safe closed-Editor route for new-project scaffolding. Never install a
+  bridge or close an Editor with unsaved work.
+- **Established project Assets changes:** continue read-only inventory, then route imported-folder
+  additions or reorganization to [ReviewFolders.md](ReviewFolders.md) for an Editor-owned plan.
+  An existing owned root alone does not imply reorganization, and does not block a specifically
+  selected project-root ArtSource proposal. This workflow never moves existing content.
 
 If a failure interrupts creation, report the paths already created. A rerun must reuse them and
 create only the remaining selected directories.

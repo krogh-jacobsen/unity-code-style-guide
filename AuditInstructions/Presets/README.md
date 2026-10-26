@@ -79,7 +79,8 @@ texture needs an explicit choice between Single (one icon) and Multiple (a sheet
 **Presets set meaning, not budgets.** They choose color space and sampling per role. Resolution and
 compression per platform are separate settings, and the build guides carry the starting values:
 [desktop](../BuildSettings/DesktopBuilds.md) or [mobile](../BuildSettings/MobileBuilds.md). Presets
-preserve those platform overrides when applied.
+preserve those platform overrides when applied. Budget tuning is a separate handoff; it does not
+block a standalone preset installation.
 
 **Defaults only affect new imports.** Registering a preset in Preset Manager never reconfigures an
 asset that already exists. Apply it to existing assets as a separate step.
