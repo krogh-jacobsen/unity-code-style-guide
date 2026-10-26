@@ -60,7 +60,15 @@ scene lifecycle."*
   and honor your project's documented choices before it reports anything.
 - **Static review has limits.** Without the Editor, a device, or a build, runtime and saved-scene
   checks are reported **Not verified**; a clean static result never claims they passed.
-- **Reviews are read-only.** Fixes happen only for recommendations you pick and confirm.
+- **Reviews are read-only.** Fixes happen only for recommendations you pick and confirm. Approval
+  follows the concrete scope, so unchanged authorized work does not require repeated confirmation.
+- **Implemented and verified are separate.** A compiled fix can still await its gameplay acceptance
+  check. The handoff shows both outcomes and keeps unverified acceptance open.
+- **Evidence has context.** Runtime observations identify the activity and source state; concurrent
+  changes trigger reassessment of affected findings. Explicitly owned work in another chat stays
+  with that owner until handed over.
+- **Incidental observations stay visible.** Material observations outside your selected lenses appear
+  separately; investigating them further is a scope choice, and their lens is not counted as reviewed.
 - **Coverage is explicit.** Navigation, networking, Physics2D, DOTS, and other detected systems without
   a lens are listed as **Outside coverage**, with evidence and the specialist checks not performed.
   Full review covers selected lenses; it does not certify every subsystem. A separate scoped review

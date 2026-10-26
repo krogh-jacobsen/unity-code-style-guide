@@ -73,6 +73,10 @@ class ReviewContractTests(unittest.TestCase):
                 self.assertNotIn("Nothing is selected or confirmed for mutation", fixture["prompt"])
                 self.assertIn("fictional fixture itself authorizes no real workspace changes", fixture["prompt"])
 
+        for scenario in ("changed-review-evidence", "unverified-acceptance", "runtime-evidence-context", "incidental-unselected-lens"):
+            selected = [f for f in fixtures if f["id"].endswith(":" + scenario)]
+            self.assertEqual(["AuditInstructions/ProjectAuditGuides/ProjectReview.md"], [f["document"] for f in selected])
+
     def test_contract_retains_approval_boundaries(self):
         for clause in ('literal word "yes"', 'Selection alone', 'unchanged', 'materially ambiguous',
                        'Changed scope needs confirmation', 'authorization is absent',

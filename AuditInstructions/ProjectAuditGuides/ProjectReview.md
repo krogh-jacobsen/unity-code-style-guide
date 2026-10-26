@@ -77,8 +77,9 @@ structure-and-settings base check. Missing sources leave the affected conformanc
 verified; continue independent review rather than substituting remembered rules.
 
 Record the scope (the user's folder, change, or whole project; if unspecified, state the first-party
-scope and the exclusions), the base revision for a change review, working-tree state, engine and
-package versions, platform, and selected stack. First-party means everything under `Assets` except
+scope and the exclusions), the base revision for a change review, starting branch/commit, and an
+inventory of staged, unstaged, and untracked files (or the available non-Git source identity). Record
+engine and package versions, platform, and selected stack. First-party means everything under `Assets` except
 vendor, sample, and generated folders (include project folders such as `Assets/Settings` and
 `Editor`), plus embedded packages the team owns; read the folder names and `AGENTS.md` to decide, and
 state the result. Check whether an Editor has the project open (`Temp/UnityLockfile`) and say so,
@@ -208,10 +209,19 @@ and continue static work. In a static-only run, state each lens's live-only rows
 verified (live)** with the checks to run later, instead of repeating it row by row. Parse fresh test
 results and logs, and distinguish failures, exclusions, and not-run tests.
 
+For each runtime evidence collection, record scene/content identity, Play state, compilation/reload
+state, activity (gameplay, script recompilation, preview, or test fixture), log cursor or timestamp
+range, and source revision plus relevant dirty-file state. Record shared context once and differences
+per finding. Retain supplied or measured context as known; mark only unavailable fields Not verified.
+An exception establishes what occurred in that
+context; check whether it was expected by a test or preview before calling it a product defect.
+Its cause remains a hypothesis until supporting evidence distinguishes alternatives.
+
 - ❌ Do not call an unopened prefab correct from source alone.
 - ❌ Do not claim a live repair is saved.
 
-**Done:** each live or test check ran with fresh evidence, or is listed Not verified with its reason.
+**Done:** each live or test check has fresh evidence and its collection context, or is listed Not
+verified with its reason and any unavailable context.
 
 ## 5. Report and recommend
 
@@ -220,23 +230,48 @@ meets the [evidence standard](#evidence-standard). Group one repeated cause with
 representative locations, and list every affected duplicate-GUID pair. Record conflicts and limits,
 including inspected samples, systems Outside coverage, and whether the live, test, and build checks ran.
 
+Put material observations encountered outside selected lenses in **Incidental observations**, with
+location, evidence, consequence, and the narrow inspection performed. Inspect only enough to explain
+the observation; offer further investigation as a separate scope choice. An incidental observation
+does not mark that lens reviewed or authorize a fix.
+
 Then turn the findings into the numbered recommendations of stage 2: for each, the smallest useful
 fix, intended outcome, checkable acceptance condition, validation method and known constraints, why
 it matters, its risk, and a default of do or skip. Let the user pick any subset (stage 3), then apply
 the shared confirmation rules to its exact changes (stage 4). Ask whether
 to save the report as a file and where; saving is itself a change and waits for stage 4.
 
-**Done:** the report and the recommendation list were shown, nothing was written, and the user was
-asked which recommendations to carry over.
+**Done:** the report distinguishes selected-lens findings from incidental observations, every
+recommendation has an acceptance condition and validation method, and the user's selection and
+confirmation status are explicit; nothing was written before authorization.
 
 ## 6. Apply confirmed fixes
 
-Only the items confirmed in stage 4. Selected fixes preserve serialized identity, follow the matching
-implementation skill or project workflow, and run the relevant validation before closure. Mark a plan
-implemented only when its actual work and the required validation are complete.
+Apply only the items confirmed in stage 4. Before editing each item's target files, re-read them and
+check that its supporting evidence and approved scope still apply. Recheck affected source before
+validation and record the state actually validated. A branch/commit change or relevant dirty edit
+requires reassessment of affected findings; unrelated edits do not restart the audit. Mark explicitly
+assigned work in another chat **Externally owned** and exclude it from edits unless handed over;
+a dirty file alone does not establish ownership. Preserve concurrent changes and re-confirm changed
+scope under the shared contract.
 
-**Done:** every applied fix has validation evidence, and every unpicked recommendation is listed as a
-proposal.
+Selected fixes preserve serialized identity and follow the matching implementation skill or project
+workflow. Report each selected item with separate implementation and acceptance results:
+
+| Item | Implemented change | Acceptance result | Remaining validation |
+|---|---|---|---|
+| R1 | Missing-session guard added | Not verified | Recompile during Play and exercise callbacks |
+
+Run relevant validation against the agreed acceptance condition. Compilation establishes compatibility,
+not gameplay recovery. An item can be implemented while its behavior remains Not verified; close it
+as resolved only when its acceptance conditions pass. Name missing checks and their tooling,
+authorization, or environment constraints. Attribute results to the actual source state; mixed-revision
+validation cannot establish that a single commit passed.
+
+**Done:** every selected item records its implementation state, acceptance evidence or Not verified
+with the missing check and constraint, and validated source state where applicable; externally owned
+items are identified, and every unpicked recommendation remains a proposal. Unverified acceptance
+keeps the item open even when the implementation work is done.
 
 ## Diagnose a reported defect
 
@@ -260,9 +295,17 @@ saved scene and prefab wiring.
 
 A finding needs:
 - **Location** and **trigger**
-- **Observed evidence** and **consequence**
+- **Observed evidence** and **consequence**; runtime observations carry the collection context from step 4
+- **Cause assessment**, for diagnostic findings: established, suspected, or unknown, with supporting evidence
 - **Governing source**: a project rule or a technical source
-- **Smallest useful fix** and **validation**
+- **Smallest useful fix**, **intended outcome**, and **checkable acceptance condition**
+- **Validation method** and **known constraints**
+
+A reproduced runtime failure is not required for an inspected static defect, convention drift, or
+design proposal; label the finding's evidence and category accurately. For diagnostic fixes,
+distinguish containment from recovery: suppressing an invalid callback and restoring a running game
+after recompilation have different acceptance conditions. A symptom disappearing alone does not
+establish the proposed cause.
 
 Rank confirmed corruption, data loss, bugs, and leaks ahead of measured performance problems; label
 convention drift and design proposals separately. Combine repeated instances of one cause while

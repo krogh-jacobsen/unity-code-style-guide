@@ -1,5 +1,10 @@
 # Change log
 
+## 2026-10-26 — Strengthen review evidence and acceptance
+
+- Added runtime activity/source context, diagnostic cause assessments, checkable acceptance conditions, source freshness and concurrent ownership, and separate implementation/acceptance outcomes to project review and diagnosis guidance.
+- Material observations outside selected lenses remain visible without claiming those lenses reviewed. Added four review-specific decision scenarios and routing coverage. Independent publication validation is recorded in Validation.md.
+
 ## 2026-10-26 — Clarify authorization across audit workflows
 
 - Updated the canonical review contract and all 18 published copies: explicit implementation instructions authorize already-presented concrete changes, selection alone does not, and unchanged authorization survives duplicate replies. Recover missing previously approved scope; confirm changes that were never concretely presented.

@@ -176,6 +176,67 @@
         "Present the concrete R1 change list and obtain confirmation before writes; the implementation instruction does not authorize an unspecified scope.",
         "Continue independent read-only inspection needed to make the proposal reviewable."
       ]
+    },
+    {
+      "id": "changed-review-evidence",
+      "entry_points": [
+        "ProjectAuditGuides/ProjectReview.md"
+      ],
+      "task": "Continue the workflow from the supplied review/decision state. Follow its authorization and evidence limits; execute only authorized work when a real target and tools exist. The fictional fixture itself authorizes no real workspace changes.",
+      "context": {
+        "source": "Review began at commit A with dirty SessionCallbacks.cs. Before implementation the branch moves to commit B and that file changes again; unrelated dirty files also exist. No source snapshot was preserved for old compilation results.",
+        "ownership": "Another chat explicitly owns R2. R3 touches a dirty file with no assigned owner.",
+        "authorization": "R1 has unchanged approved intent, but its target and supporting evidence must be reassessed."
+      },
+      "expected": [
+        "Re-read R1 targets and reassess evidence and scope before editing; recheck affected source before validation and record the actual source state.",
+        "Do not attribute old or mixed-source results to commit B; unrelated edits do not restart the whole audit.",
+        "Exclude externally owned R2 until handed over; do not infer ownership of R3 merely from dirtiness."
+      ]
+    },
+    {
+      "id": "unverified-acceptance",
+      "entry_points": [
+        "ProjectAuditGuides/ProjectReview.md"
+      ],
+      "task": "Continue the workflow from the supplied review/decision state. Follow its authorization and evidence limits; execute only authorized work when a real target and tools exist. The fictional fixture itself authorizes no real workspace changes.",
+      "context": {
+        "implementation": "An authorized missing-session guard is implemented and compilation passes.",
+        "acceptance": "The agreed outcome is gameplay recovery after recompilation during Play. That scenario was not exercised; the Editor is unavailable."
+      },
+      "expected": [
+        "Report the guard as implemented and compatibility compilation as passed, but gameplay recovery as Not verified.",
+        "Keep the item open; name the missing scenario and unavailable Editor, and distinguish containment from recovery."
+      ]
+    },
+    {
+      "id": "runtime-evidence-context",
+      "entry_points": [
+        "ProjectAuditGuides/ProjectReview.md"
+      ],
+      "task": "Continue the workflow from the supplied review/decision state. Follow its authorization and evidence limits; execute only authorized work when a real target and tools exist. The fictional fixture itself authorizes no real workspace changes.",
+      "context": {
+        "evidence": "A missing-reference exception appears while script compilation, Play, and a preview/test fixture are active. The Console timestamp is available but the originating scene and exact source snapshot are unknown."
+      },
+      "expected": [
+        "Record known activity, Play/compilation state, log boundary, and source context once per collection; mark unavailable fields Not verified.",
+        "Treat the exception as observed failure with uncertain origin/cause, not proof of ordinary-gameplay failure or of the proposed cause."
+      ]
+    },
+    {
+      "id": "incidental-unselected-lens",
+      "entry_points": [
+        "ProjectAuditGuides/ProjectReview.md"
+      ],
+      "task": "Continue the workflow from the supplied review/decision state. Follow its authorization and evidence limits; execute only authorized work when a real target and tools exist. The fictional fixture itself authorizes no real workspace changes.",
+      "context": {
+        "scope": "Quick health check selected. Rendering correctness was not selected.",
+        "observation": "While reading lifecycle code, an owned renderer feature contains a material rendering risk supported by the nearby code."
+      },
+      "expected": [
+        "Report the material observation separately under Incidental observations with evidence, consequence, location, and narrow inspection scope.",
+        "Offer further rendering investigation as a scope choice; do not silently load/review that lens, count it reviewed, or apply a fix."
+      ]
     }
   ]
 }

@@ -16,7 +16,16 @@ alternative, **fix** the cause, then add a **regression test** that failed befor
 Record expected versus actual behavior, exact trigger, first relevant error/stack, engine/package
 version, platform/backend, scene/prefab, and recent changes. Distinguish saved authoring state from
 live runtime state and the component, scene, action, or request identity involved. Confirm logs
-belong to this reproduction rather than a previous compilation/Play session.
+belong to this reproduction rather than a previous compilation/Play session. Record Play state,
+compilation/reload state, activity (gameplay, recompilation, preview, or test fixture), log cursor or
+timestamp range, and source revision plus relevant dirty-file state per collection. Reuse shared
+context and record differences per finding. Retain supplied or measured context as known; mark only
+unavailable fields Not verified.
+
+Before implementation, state the observed failure, cause assessment (established, suspected, or
+unknown), intended outcome, and checkable acceptance condition. Separate containment from recovery:
+a guard preventing invalid callbacks does not establish that gameplay recovers after recompilation.
+A probe must distinguish the proposed cause from alternatives; observing an exception alone cannot.
 
 ## Route the symptom
 
