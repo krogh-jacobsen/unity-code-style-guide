@@ -4,6 +4,64 @@ The intended profile is [Unity 6.7](AgentsInstructions/UnityTechStack/UnityTechS
 that choice from the exact prerelease Editor tested. It is not a guarantee for every 6000.7 patch,
 package upgrade, target platform, or copied project. Date: 2026-10-12.
 
+## Project review behavioral replay — 2026-10-26
+
+Executed the nine newly added scenario families as 94 independent decision cases: five approval
+families across all 18 published workflows, plus four ProjectReview evidence/acceptance/scope cases.
+This supersedes the behavioral Not verified status in the earlier implementation handoff; it does
+not establish Unity execution or real file-mutation behavior.
+
+| Round | Cases passed | Cases failed | Expected outcomes passed / failed | Result |
+|---|---|---|---|---|
+| Baseline | 92 | 2 | 187 / 2 | Found scope invention and inconsistent known Play state |
+| First correction, stopped early | 28 | 7 | 70 / 7 | Missing-record exception wrongly accepted never-presented scope; 35 of 94 cases completed |
+| Refined correction, full rerun | 94 | 0 | 207 / 0 | All nine scenario families pass |
+| Concurrent-edit freshness followup | 10 | 0 | 22 / 0 | Rechecked the two guides edited after the full-run freeze |
+
+Two initial failures and the intermediate regression produced these concrete changes:
+
+- **Missing approved scope:** the CI duplicate-approval response invented R1 as Tier A files and R2
+  as the PR template. The shared contract now resolves IDs against the actual presented list. An
+  unavailable record is retrieved without repeat approval only when evidence establishes prior
+  concrete presentation and authorization. Scope never presented must first be presented and confirmed.
+- **Known runtime context:** a response recorded Play active, then later marked it Not verified.
+  ProjectReview and diagnosis now retain supplied/measured fields as known and mark only unavailable
+  fields Not verified.
+- The missing-record clarification initially overgeneralized authorization in seven workflows.
+  That run was stopped after 35 successful sessions, the condition was tightened in the canonical
+  contract and all 18 copies, and the full 94-case suite was rerun with fresh sessions. Concurrent CI
+  and folder-review changes were then preserved and their 10 affected cases rerun against the newer source.
+
+[Per-case inputs, source snapshots, responses, expected outcomes, grades, and excerpts](AuditInstructions/Tools/project_review_replay_results_2026-10-26.json)
+are saved as durable evidence. All 233 completed cases have distinct session IDs. The latest
+observation of each of the 94 unique cases passes, with all 207 expected outcomes passing. The
+intermediate run also terminated in-flight sessions; cancelled/unexecuted cases are not counted as completed passes.
+
+Environment: Codex CLI 0.162.1, OpenAI `gpt-6.1-sol`, default reasoning effort `none`, ephemeral fresh
+sessions, read-only sandbox, approval mode `never`, and three sessions at a time. User config was
+ignored; default Codex instructions and global personal communication/GitHub preferences remained.
+Each prompt contained only its named entry document, fictional fixture evidence, and a neutral
+decision-only wrapper; expected outcomes and other cases were withheld. Two grading agents split
+each full round 47/47; one graded the interrupted 35 and freshness 10 cases, with parent review of
+material failures. Every expected outcome has a grade,
+response excerpt, and rationale. Four full-rerun sessions recovered from transient WebSocket 403
+transport errors; three explicitly reported HTTPS fallback. All completed successfully. Infrastructure
+errors are retained separately from tool actions. No tool actions were observed; baseline case 001
+has plain-text rather than JSONL tracing. These are single observations per case/model/round, not a reliability estimate.
+
+| Check | Result | Evidence / limit |
+|---|---|---|
+| Fresh-agent decisions | Passed | Latest observations cover 94 cases / 207 outcomes; the additional 10 freshness cases / 22 outcomes pass against concurrent CI/folder-guide edits |
+| Contract and replay regressions | Passed | `python3 -B AuditInstructions/Tools/test_audit_contract.py`: 14 tests; shared-contract wording checks cover both missing approved scope and never-presented scope |
+| Complete repository validation | Passed | `python3 -B -u AuditInstructions/Tools/validate_all.py --require-dotnet`: 75 Markdown files, 477 local links/anchors, 75 unique GUIDs, six topic validators, 14 workflow regressions, installation/four negative probes, 22 CI projects and required .NET style gates |
+| Transcript and input integrity | Passed | Distinct session IDs; prompt/document SHA-256 hashes checked; grade expectation lists match frozen fixtures; response excerpts checked against actual responses |
+| Concurrent edits | Preserved | No resets, stashes, or checkout restoration. Source snapshots identify the actual dirty inputs; concurrent preset edits were preserved and included before final freeze. An unrelated concurrent replay report remains separate |
+| Unity/tool execution and saved state | Not verified | No real Unity project, file mutation, Editor/test/build run, or device check; the harness prohibited tools and real workspace changes |
+
+The source is the recorded dirty-tree snapshot, not HEAD alone. Final tested document hashes were
+compared with the checkout before handoff; missing approval records remain an execution prerequisite,
+not a reason to invent scope or ask again for already-established unchanged authorization.
+
 ## Project review feedback implementation — 2026-10-26
 
 Implemented all six approved refinements: concrete-scope approval without a mandatory literal

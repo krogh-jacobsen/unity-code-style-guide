@@ -1,5 +1,11 @@
 # Change log
 
+## 2026-10-26 — Fresh-agent project review decision replay
+
+- Executed all 94 new decision cases with fresh agents. Baseline found two failures; an initial correction exposed seven approval regressions before being stopped. After refinement, the full rerun passed 94 cases and all 207 expected outcomes; another 10 cases / 22 outcomes passed after concurrent CI/folder-guide edits.
+- Clarified the shared contract and all 18 copies: recover a missing approved change list only when concrete scope was previously presented and authorized; scope never presented must first be presented and confirmed. Guide defaults cannot reconstruct the approved scope.
+- Preserved known runtime evidence fields in project review and diagnosis, strengthened duplicate-approval replay expectations and contract regressions, and saved source snapshots, responses, grading evidence, environment, and limitations in the replay report linked from Validation.md.
+
 ## 2026-10-26 — Fresh-agent workflow replay fixes
 
 - Executed the original 106 decision-replay cases in separate fresh agents with expected outcomes withheld. The baseline exposed dirty-tree rules that paused independent read-only audit, plus incomplete fixture evidence and several contradictions agents worked around. Final rerun counts and evidence are recorded in `Validation.md`.
