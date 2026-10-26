@@ -19,7 +19,8 @@ scene lifecycle."*
 3. **Review.** It runs the lenses you picked and reports confirmed defects, measured costs, convention
    drift, and design proposals separately, each with evidence.
 4. **Recommend and confirm.** Findings become numbered recommended fixes. You pick any subset, and the
-   agent restates the exact changes and waits for an explicit yes before it touches the project.
+   agent presents the exact changes, intended outcome, and acceptance check. Explicit implementation
+   instructions can select and authorize already-presented changes; choosing IDs alone selects scope.
 
 ## Pick your review
 

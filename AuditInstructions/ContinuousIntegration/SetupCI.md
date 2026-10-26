@@ -34,10 +34,16 @@ Tier A never runs the Editor, so **a green run does not mean tests pass**. Say s
 - Copy the shipped files unchanged except for the documented edit points. Do not commit or push.
 - Report observed results separately from checks you could not run (**Not verified**).
 
+- Recommendation IDs retain the meaning of the actual prior proposal. The tier IDs below are
+  defaults for a new audit, not replacements for an existing approved change list. On resume,
+  recover the exact files/settings/commands before planning execution; missing details remain
+  Not verified while unchanged authorization is preserved; continue independent read-only preflight
+  while recovering that scope. Do not infer Tier A merely from `R1`.
+
 ## Review, recommend, confirm
 
 This document always runs in four stages. Nothing is written to the project until stage 4 ends in an
-explicit yes.
+explicit user confirmation.
 
 1. **Audit.** Read the project and report what already matches this document, what differs, and what
    could not be checked. Read-only.
@@ -47,9 +53,19 @@ explicit yes.
    this document does not mention.
 3. **Choose.** The user picks any subset of IDs, "all recommended", or none. Carry over only the
    picked items; unpicked items stay proposals in the report.
-4. **Confirm.** Restate the exact changes for the picked subset (files, settings, values, commands)
-   and wait for an explicit yes. Make no change before it, including saving the report. In a
-   non-interactive session, or when no answer arrives, stop after stage 2 and change nothing.
+4. **Confirm.** Present the exact changes for the picked subset (files, settings, values, commands)
+   and obtain explicit user authorization before making them, including saving the report.
+   Confirmation need not contain the literal word "yes": after the concrete scope is presented,
+   "implement R1 and R3" can both select and confirm those items. Selection alone ("R1 and R3")
+   chooses scope without authorizing implementation. Honor existing authorization for unchanged
+   scope without asking again; clarify a delayed reply only when its scope is materially ambiguous.
+   Resolve IDs against the presented change list rather than guide defaults. If evidence establishes
+   that exact scope was previously presented and authorized but its record is now unavailable,
+   retrieve that record before execution; recovered unchanged scope needs no repeat confirmation.
+   If concrete changes were never presented, an instruction to implement an ID leaves scope
+   unconfirmed: first present the exact changes and obtain confirmation before execution.
+   Changed scope needs confirmation for the changed items. In a non-interactive session, or when
+   authorization is absent, stop after stage 2 and change nothing.
 
 Steps below that apply, install, or build run only after stage 4, and only for confirmed items. A new
 finding during those steps becomes a new recommendation and returns to stage 3.
@@ -90,7 +106,7 @@ the default when the user says "use defaults".
 Add your own recommendations from the audit, such as a missing `.editorconfig` or a conflicting workflow.
 
 **Done:** the audit and recommendation list were shown, the user's picks are recorded, and an explicit
-yes to the exact file list was received before any change.
+user authorization for the exact file list was received before any change.
 
 ## 3. Install
 

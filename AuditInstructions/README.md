@@ -18,7 +18,7 @@ Every agent document follows the same four stages, so you stay in control whiche
 1. **Audit.** The agent reads your project and reports what already matches, what differs, and what it could not check. It writes nothing.
 2. **Recommend.** Each difference becomes a numbered recommendation with the reason, the risk, and a default. The agent adds its own suggestions too.
 3. **Choose.** You pick any subset, "all recommended", or none. You can carry over one element of a guide without the rest.
-4. **Confirm.** The agent restates the exact changes for your picks and waits for an explicit yes. Nothing changes before it.
+4. **Confirm.** The agent restates the exact changes for your picks and waits for explicit user confirmation. Nothing changes before it.
 
 Only then does it apply, verify, and report, including the recommendations you skipped. In a
 non-interactive session the agent stops after the recommendations and changes nothing.

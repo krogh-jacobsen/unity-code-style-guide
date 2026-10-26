@@ -25,8 +25,8 @@ Example prompts:
    project in an Editor.
 2. **Recommendations.** Each missing package gets the evidence for it, a risk, and a default.
 3. **You pick.** Any subset, "all recommended", or none.
-4. **You confirm.** The agent restates the package ids and how each is versioned, and waits for an
-   explicit yes.
+4. **You confirm.** The agent restates the package ids and how each is versioned, and waits for
+   explicit user confirmation.
 5. **It installs and verifies.** Through the Package Manager API, then checks the lockfile.
 
 ## Why versions work differently per package

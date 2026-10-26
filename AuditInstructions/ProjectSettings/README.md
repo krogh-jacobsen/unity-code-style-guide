@@ -25,7 +25,7 @@ Example prompts:
 1. **Audit.** The agent reads your settings and writes nothing.
 2. **Recommendations.** Each difference becomes a numbered item with the reason, the risk, and a default.
 3. **You pick.** Take any subset, "all recommended", or none; for example, only the domain-reload fix.
-4. **You confirm.** The agent restates the exact changes and waits for an explicit yes.
+4. **You confirm.** The agent restates the exact changes and waits for explicit user confirmation.
 5. **Apply and verify.** It changes only what you confirmed and reports the recommendations you skipped.
 
 ## What it covers

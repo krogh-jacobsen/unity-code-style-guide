@@ -20,7 +20,7 @@ Example prompt: *"Implement the build settings from this document in my Unity pr
 1. **Audit.** The agent reads your current settings and writes nothing.
 2. **Recommendations.** Each difference becomes a numbered item with the reason, the risk, and a default.
 3. **You pick.** Take any subset, "all recommended", or none; you can adopt the quality tiers and skip the rest.
-4. **You confirm.** The agent restates the exact changes and waits for an explicit yes.
+4. **You confirm.** The agent restates the exact changes and waits for explicit user confirmation.
 5. **Apply and verify.** It changes only what you confirmed, then reports what it applied, the
    recommendations you skipped, and what it could not verify.
 

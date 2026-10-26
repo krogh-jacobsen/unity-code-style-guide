@@ -31,7 +31,7 @@ Example prompts:
 2. **Recommendations.** You get a numbered list: which presets fit the asset roles you have, and
    whether to apply or register them, each with the reason, the risk, and a default.
 3. **You pick.** Any subset, "all recommended", or none. Take one preset and leave the rest.
-4. **You confirm.** The agent restates the exact files and targets and waits for an explicit yes.
+4. **You confirm.** The agent restates the exact files and targets and waits for explicit user confirmation.
 5. **It applies and verifies.** Only the confirmed items run, and the report lists what you skipped.
 
 ## Three separate steps

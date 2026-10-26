@@ -14,7 +14,7 @@ not performance claims: keep a setting that already works unless the user select
 ## Operating rules
 
 - Start in **review** mode (stages 1 and 2 below): read and report only. Apply nothing until stage 4
-  ends in an explicit yes.
+  ends in explicit user confirmation.
 - Change settings through Editor APIs or Unity CLI (`EditorSettings`, `PlayerSettings`,
   `QualitySettings`, `GraphicsSettings`, `SerializedObject`) or the Project Settings window. Never
   hand-edit `ProjectSettings/*.asset` or `.meta` files.
@@ -30,7 +30,7 @@ not performance claims: keep a setting that already works unless the user select
 ## Review, recommend, confirm
 
 This document always runs in four stages. Nothing is written to the project until stage 4 ends in an
-explicit yes.
+explicit user confirmation.
 
 1. **Audit.** Read the project and report what already matches this document, what differs, and what
    could not be checked. Read-only.
@@ -40,9 +40,19 @@ explicit yes.
    this document does not mention.
 3. **Choose.** The user picks any subset of IDs, "all recommended", or none. Carry over only the
    picked items; unpicked items stay proposals in the report.
-4. **Confirm.** Restate the exact changes for the picked subset (files, settings, values, commands)
-   and wait for an explicit yes. Make no change before it, including saving the report. In a
-   non-interactive session, or when no answer arrives, stop after stage 2 and change nothing.
+4. **Confirm.** Present the exact changes for the picked subset (files, settings, values, commands)
+   and obtain explicit user authorization before making them, including saving the report.
+   Confirmation need not contain the literal word "yes": after the concrete scope is presented,
+   "implement R1 and R3" can both select and confirm those items. Selection alone ("R1 and R3")
+   chooses scope without authorizing implementation. Honor existing authorization for unchanged
+   scope without asking again; clarify a delayed reply only when its scope is materially ambiguous.
+   Resolve IDs against the presented change list rather than guide defaults. If evidence establishes
+   that exact scope was previously presented and authorized but its record is now unavailable,
+   retrieve that record before execution; recovered unchanged scope needs no repeat confirmation.
+   If concrete changes were never presented, an instruction to implement an ID leaves scope
+   unconfirmed: first present the exact changes and obtain confirmation before execution.
+   Changed scope needs confirmation for the changed items. In a non-interactive session, or when
+   authorization is absent, stop after stage 2 and change nothing.
 
 Steps below that apply, install, or build run only after stage 4, and only for confirmed items. A new
 finding during those steps becomes a new recommendation and returns to stage 3.
@@ -146,7 +156,7 @@ must be reset in code.
 **Verify.** Press Play twice with a static counter and a static event subscriber: the second run
 starts from the initial state, with no duplicate handler calls.
 
-**Done:** the audit and numbered recommendations were shown and the user's explicit yes was received
+**Done:** the audit and numbered recommendations were shown and the user's explicit confirmation was received
 before any change; every row has a status, the reload policy is recorded with the audit result, and
 re-reading the settings returns the target values.
 

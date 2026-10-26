@@ -7,7 +7,7 @@
 |---|---|
 | Check repository links, GUIDs, review contracts, and topic validators | `python3 AuditInstructions/Tools/validate_all.py` |
 | Run contract-discovery and wording regressions | `python3 AuditInstructions/Tools/test_audit_contract.py` |
-| Generate one replay prompt per entry point and applicable scenario | `python3 AuditInstructions/Tools/replay_workflows.py --output /absolute/temp/workflow-fixtures.json` |
+| Generate audit and decision replay prompts per applicable scenario | `python3 AuditInstructions/Tools/replay_workflows.py --output /absolute/temp/workflow-fixtures.json` |
 | Review replay contexts and expected decisions | [workflow_scenarios.json](workflow_scenarios.json) |
 
 The canonical review contract remains in root AGENTS.md. The validator discovers entry points from
@@ -17,7 +17,11 @@ contract verbatim. Read-only lenses remain behind the project-review router.
 ## Behavioral replay protocol
 
 Generate the fixtures outside the repository, then give each prompt to a fresh agent session with
-only the named entry document and the fixture's target project/evidence. For an actual tool replay,
+only the named entry document and the fixture's target project/evidence. Use its `prompt` without
+`expected` outcomes, then grade against those outcomes separately. Default cases stop after
+recommendations; decision cases carry scenario-specific selection, approval, evidence freshness, or
+acceptance state instead. Fictional authorization applies only inside the fixture, never to a real
+workspace. For an actual tool replay,
 prepare an isolated disposable target with the stated state and record its before/after files,
 metadata identities, settings, and commands. Never use a working game for destructive negative cases.
 

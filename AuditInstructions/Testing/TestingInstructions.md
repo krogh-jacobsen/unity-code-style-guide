@@ -22,7 +22,7 @@ Test Framework before choosing assembly configuration or runner options.
 ## Review, recommend, confirm
 
 This document always runs in four stages. Nothing is written to the project until stage 4 ends in an
-explicit yes.
+explicit user confirmation.
 
 1. **Audit.** Read the project and report what already matches this document, what differs, and what
    could not be checked. Read-only.
@@ -32,9 +32,19 @@ explicit yes.
    this document does not mention.
 3. **Choose.** The user picks any subset of IDs, "all recommended", or none. Carry over only the
    picked items; unpicked items stay proposals in the report.
-4. **Confirm.** Restate the exact changes for the picked subset (files, settings, values, commands)
-   and wait for an explicit yes. Make no change before it, including saving the report. In a
-   non-interactive session, or when no answer arrives, stop after stage 2 and change nothing.
+4. **Confirm.** Present the exact changes for the picked subset (files, settings, values, commands)
+   and obtain explicit user authorization before making them, including saving the report.
+   Confirmation need not contain the literal word "yes": after the concrete scope is presented,
+   "implement R1 and R3" can both select and confirm those items. Selection alone ("R1 and R3")
+   chooses scope without authorizing implementation. Honor existing authorization for unchanged
+   scope without asking again; clarify a delayed reply only when its scope is materially ambiguous.
+   Resolve IDs against the presented change list rather than guide defaults. If evidence establishes
+   that exact scope was previously presented and authorized but its record is now unavailable,
+   retrieve that record before execution; recovered unchanged scope needs no repeat confirmation.
+   If concrete changes were never presented, an instruction to implement an ID leaves scope
+   unconfirmed: first present the exact changes and obtain confirmation before execution.
+   Changed scope needs confirmation for the changed items. In a non-interactive session, or when
+   authorization is absent, stop after stage 2 and change nothing.
 
 Steps below that apply, install, or build run only after stage 4, and only for confirmed items. A new
 finding during those steps becomes a new recommendation and returns to stage 3.
@@ -67,7 +77,7 @@ A missing framework is not permission to install a remembered version. Resolve a
 registry package for the actual Editor, confirm its id and resolution rule, and use the Package
 Manager Client API. The [package guide](../PackageInstaller/InstallPackages.md) is an optional fuller workflow.
 For every selected item restate the files, assembly references/platform constraints, package operation,
-test scenarios, runner actions, temporary outputs, and cleanup, then obtain the explicit yes.
+test scenarios, runner actions, temporary outputs, and cleanup, then obtain explicit user confirmation.
 
 **Done:** recommendations and no-change items were shown; selected items and their exact actions are
 confirmed, or the run ends with proposals only.

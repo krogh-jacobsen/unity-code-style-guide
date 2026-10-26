@@ -15,7 +15,7 @@ follow [Maintaining this repository](#maintaining-this-repository); a target pro
   user's scope and update its configuration reference.
 - Run every [AuditInstructions](AuditInstructions/README.md) document audit-first: report what is in
   place, recommend changes, let the user pick which to carry over, and change nothing before an
-  explicit yes to the exact change list. Unpicked recommendations stay proposals.
+  explicit user authorization for the exact change list. Unpicked recommendations stay proposals.
 - Prefer available Unity CLI skills for Editor control, project creation, testing, and builds.
   Discover installed CLI help and the connected Editor's command catalog; target the project
   explicitly. Use the Package Manager Client API for package changes through the Editor.
@@ -128,7 +128,7 @@ orientation belong in the readme. Neither repeats the other.
 ## Review, recommend, confirm
 
 This document always runs in four stages. Nothing is written to the project until stage 4 ends in an
-explicit yes.
+explicit user confirmation.
 
 1. **Audit.** Read the project and report what already matches this document, what differs, and what
    could not be checked. Read-only.
@@ -138,9 +138,19 @@ explicit yes.
    this document does not mention.
 3. **Choose.** The user picks any subset of IDs, "all recommended", or none. Carry over only the
    picked items; unpicked items stay proposals in the report.
-4. **Confirm.** Restate the exact changes for the picked subset (files, settings, values, commands)
-   and wait for an explicit yes. Make no change before it, including saving the report. In a
-   non-interactive session, or when no answer arrives, stop after stage 2 and change nothing.
+4. **Confirm.** Present the exact changes for the picked subset (files, settings, values, commands)
+   and obtain explicit user authorization before making them, including saving the report.
+   Confirmation need not contain the literal word "yes": after the concrete scope is presented,
+   "implement R1 and R3" can both select and confirm those items. Selection alone ("R1 and R3")
+   chooses scope without authorizing implementation. Honor existing authorization for unchanged
+   scope without asking again; clarify a delayed reply only when its scope is materially ambiguous.
+   Resolve IDs against the presented change list rather than guide defaults. If evidence establishes
+   that exact scope was previously presented and authorized but its record is now unavailable,
+   retrieve that record before execution; recovered unchanged scope needs no repeat confirmation.
+   If concrete changes were never presented, an instruction to implement an ID leaves scope
+   unconfirmed: first present the exact changes and obtain confirmation before execution.
+   Changed scope needs confirmation for the changed items. In a non-interactive session, or when
+   authorization is absent, stop after stage 2 and change nothing.
 
 Steps below that apply, install, or build run only after stage 4, and only for confirmed items. A new
 finding during those steps becomes a new recommendation and returns to stage 3.

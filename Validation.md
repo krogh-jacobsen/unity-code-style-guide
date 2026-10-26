@@ -524,3 +524,18 @@ and [SetDefaultPresetsForType signature and example](https://docs.unity3d.com/Sc
 The setter page still mentions the older getter in prose; use installed signatures rather than that
 stale name. No universal targeted-save API or tested identity-preserving update implementation is
 asserted by these documentation changes; the guide requires target-version discovery and validation.
+
+
+## Independent publication: authorization contract — 2026-10-26
+
+Group 1 is validated as its own cumulative publication snapshot, excluding changes assigned to
+later groups and edits arriving after capture. The staged content is checked against this snapshot
+before committing. Validation results follow.
+
+| Check | Result | Scope/limits |
+|---|---|---|
+| Full repository validator with required .NET gates | Passed | Group 1: 75 Markdown files, 472 local links/anchors, 75 unique GUIDs, 6 folder validators; 12 shared regression tests; 22 CI fixtures and required style gates |
+| Roslyn naming intersections | Passed | Group 1: .NET SDK 10.0.302; Good fixture zero IDE1006 diagnostics, Bad fixture six expected diagnostics |
+| Replay execution | Not performed | Static fixtures are not observed agent or Unity behavior |
+
+No Unity assets or metadata changed. No Editor imports, gameplay tests, or player builds were run.

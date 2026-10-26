@@ -1,5 +1,11 @@
 # Change log
 
+## 2026-10-26 — Clarify authorization across audit workflows
+
+- Updated the canonical review contract and all 18 published copies: explicit implementation instructions authorize already-presented concrete changes, selection alone does not, and unchanged authorization survives duplicate replies. Recover missing previously approved scope; confirm changes that were never concretely presented.
+- Aligned human summaries/completion wording and CI recommendation-ID handling. Added five approval scenario families, decision-prompt support, and contract/authorization regressions. Independent publication validation is recorded in Validation.md.
+
+
 ## 2026-10-26 — Preset installation and registration pressure-test refinements
 
 - Expanded preset discovery to active installations, package/reference copies, registrations, and helpers; existing paths are reused. Added baseline/local/upstream update comparison, explicit unknown-baseline handling, effective-policy review, recovery, and tested Editor updates preserving GUIDs and metadata.

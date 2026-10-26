@@ -25,7 +25,7 @@ Example prompts:
 2. **Recommendations.** The ignore block, the attributes block, ThirdPartyAssets exclusion, LFS, and
    merge setup are each a numbered recommendation with the trade-off.
 3. **You pick.** Take any subset, "all recommended", or none; for example, the ignore file without LFS.
-4. **You confirm.** The agent restates the exact files and commands and waits for a yes. Nothing is
+4. **You confirm.** The agent restates the exact files and commands and waits for explicit user confirmation. Nothing is
    written before it.
 5. **Apply and verify.** It installs the confirmed blocks and checks them with Git. Skipped items
    come back in the report as proposals.

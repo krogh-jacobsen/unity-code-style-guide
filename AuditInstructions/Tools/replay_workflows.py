@@ -1,4 +1,4 @@
-"""Generate review-only workflow replay prompts; never executes an agent or edits a target project."""
+"""Generate workflow decision replay prompts; never executes an agent or edits a target project."""
 import argparse
 import json
 from pathlib import Path
@@ -16,11 +16,12 @@ def generate(root=ROOT):
             if case["entry_points"] != "all" and relative not in case["entry_points"]:
                 continue
             context = "\n".join(f"- {key}: {value}" for key, value in case["context"].items())
+            task = case.get("task", "Audit and recommend. Nothing is selected or confirmed for mutation; stop after recommendations.")
             fixtures.append({
                 "id": f"{relative}:{case['id']}",
                 "document": path.relative_to(root).as_posix(),
-                "prompt": f"Audit and recommend using {path}. Treat the following as fixture evidence. "
-                          "Nothing is selected or confirmed for mutation; stop after recommendations.\n" + context,
+                "task": task,
+                "prompt": f"Use {path}. Treat the following as fixture evidence. {task}\n" + context,
                 "expected": case["expected"],
                 "result": "Not verified",
             })

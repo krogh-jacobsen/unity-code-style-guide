@@ -23,7 +23,7 @@ the agent creates plain directories and Unity adds their metadata the next time 
 1. **Audit.** The agent reads your project: existing folders, template leftovers, path length.
 2. **Recommendations.** Each folder that fits becomes a numbered recommendation with its purpose.
 3. **You pick.** Take any subset, "all recommended", or none; a single folder is fine.
-4. **You confirm.** The agent restates the exact paths and waits for a yes. Nothing is created before it.
+4. **You confirm.** The agent restates the exact paths and waits for explicit user confirmation. Nothing is created before it.
 5. **Apply and verify.** It creates the confirmed folders, repeats the check, and reports what you
    skipped as proposals.
 

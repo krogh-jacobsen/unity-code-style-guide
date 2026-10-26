@@ -26,7 +26,7 @@ Example prompts:
 2. **Recommendations.** You get a numbered list: each scene, the destination folder, the
    verification level, and any missing prerequisite, with a reason, risk, and default.
 3. **You pick.** Any subset, "all recommended", or none. One scene is a valid choice.
-4. **You confirm.** The agent restates the exact files and destination and waits for an explicit yes.
+4. **You confirm.** The agent restates the exact files and destination and waits for explicit user confirmation.
 5. **It applies and verifies.** Only the confirmed scenes are installed, and the report lists what
    you skipped.
 

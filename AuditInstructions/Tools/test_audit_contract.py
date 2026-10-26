@@ -21,7 +21,7 @@ class ReviewContractTests(unittest.TestCase):
         self.assertTrue(contract_errors(self.valid.replace("Read-only.", ""), self.contract))
 
     def test_changed_confirmation(self):
-        self.assertTrue(contract_errors(self.valid.replace("wait for an explicit yes", "proceed by default"), self.contract))
+        self.assertTrue(contract_errors(self.valid.replace("obtain explicit user authorization", "proceed by default"), self.contract))
 
     def test_duplicate_contract(self):
         self.assertTrue(contract_errors(self.valid + self.contract, self.contract))
@@ -55,14 +55,40 @@ class ReviewContractTests(unittest.TestCase):
             for fixture in selected:
                 self.assertTrue(fixture["expected"])
                 self.assertEqual("Not verified", fixture["result"])
-                self.assertIn("stop after recommendations", fixture["prompt"])
+                self.assertIn(fixture["task"], fixture["prompt"])
+                self.assertNotIn("expected", fixture["prompt"])
+                if "Continue the workflow" not in fixture["task"]:
+                    self.assertIn("stop after recommendations", fixture["prompt"])
         for scenario in ("partial-install", "repeat-run", "single-platform"):
             self.assertTrue(any(f["id"].endswith(":" + scenario) for f in fixtures))
+
+    def test_decision_replays_preserve_authorization_context(self):
+        fixtures = generate()
+        for scenario in ("explicit-implementation-approval", "selection-only", "stale-approval", "duplicate-approval",
+                         "implementation-without-concrete-scope"):
+            selected = [f for f in fixtures if f["id"].endswith(":" + scenario)]
+            self.assertEqual(len(published_entry_points(ROOT)), len(selected))
+            for fixture in selected:
+                self.assertIn("Continue the workflow", fixture["prompt"])
+                self.assertNotIn("Nothing is selected or confirmed for mutation", fixture["prompt"])
+                self.assertIn("fictional fixture itself authorizes no real workspace changes", fixture["prompt"])
+
+    def test_contract_retains_approval_boundaries(self):
+        for clause in ('literal word "yes"', 'Selection alone', 'unchanged', 'materially ambiguous',
+                       'Changed scope needs confirmation', 'authorization is absent',
+                       'rather than guide defaults', 'previously presented and authorized',
+                       'If concrete changes were never presented', 'obtain confirmation before execution'):
+            with self.subTest(clause=clause):
+                self.assertIn(clause, self.contract)
+        for clause in ('Selection alone', 'Changed scope needs confirmation'):
+            self.assertTrue(contract_errors(self.valid.replace(clause, ""), self.contract))
 
     def test_setup_routes_mobile_and_packages(self):
         setup = (ROOT / "AuditInstructions/SetupInstructions/README.md").read_text()
         self.assertIn("../BuildSettings/MobileBuilds.md", setup)
         self.assertIn("../PackageInstaller/InstallPackages.md", setup)
+
+
 
     def test_rendering_and_uncovered_systems_are_routed(self):
         router = (ROOT / "AuditInstructions/ProjectAuditGuides/ProjectReview.md").read_text()

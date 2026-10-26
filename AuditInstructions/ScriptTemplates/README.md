@@ -25,7 +25,7 @@ Example prompts:
 2. **Recommendations.** You get a numbered list of templates worth installing, deferred ones whose
    prerequisites are missing, and the optional compile check, each with a reason, risk, and default.
 3. **You pick.** Any subset, "all recommended", or none. One template is a valid choice.
-4. **You confirm.** The agent restates the exact files and waits for an explicit yes.
+4. **You confirm.** The agent restates the exact files and waits for explicit user confirmation.
 5. **It applies and verifies.** Only the confirmed templates are copied, and the report lists what
    you skipped.
 
