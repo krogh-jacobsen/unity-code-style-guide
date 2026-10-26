@@ -1,0 +1,8 @@
+is_global = true
+build_property.RootNamespace = Lint
+build_property.ProjectDir = /Users/thomaskr/Github/UnityProjects/unity-code-style-guide/AuditInstructions/ContinuousIntegration/Scripts/
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.CsWinRTUseWindowsUIXamlProjections = false
+build_property.EffectiveAnalysisLevelStyle = 
+build_property.EnableCodeStyleSeverity = 

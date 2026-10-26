@@ -1,132 +1,98 @@
-# A Unity C# Style Guide for LLMs
+# Unity starter conventions and audits
 
-While there's no single "correct" way to format Unity C# code, agreeing on a consistent style makes it much easier to build a clean, readable, and scalable codebase as a team. It's about removing the guesswork and deciding on a standard that works best for your needs. It also helps your favorite LLMs  provide specific context on your preferences so they can match it.
+A selectable kit of Unity C# conventions, project setup and review instructions, script templates,
+import presets, and strategy scene templates. This repository contains documentation and resources;
+it is not a Unity project. Adapt stylistic preferences to your team and keep the policy,
+EditorConfig, templates, and examples consistent.
 
-That said, a style guide is only valuable if it's actually put into practice. This repo is my attempt at making that easy and LLM friendly too. It's a set of instruction files you can drop into a new Unity project so your assistant follows your conventions from the first script.
+## Start here
 
-### The repo has since expanded
-
-What started as "just" some C# guidelines mostly for users has since evolved to be optimized for LLM usage and so the repo now also contains a number of additional LLM instructions and resources I find helpful when starting a new project. With the current and latest update you will notfice some signicant changes from earlier versions
-
-The basic idea is that you just pick and choose what works for you.  Many of the rules  are stylistic preferences, not industry consensus. Change them freely as
-long as you change them everywhere.
-
-### How to "install"
-
-Simply copy files you are interested in into your Unity project.  It is ready to use as-is and as long as you include the agent.md file the LLM will pickup on the rest.
-
-
-However, feel free to adapt agent.md  and everything else as you want to your specific needs.
-
-
-## How this repo is organised
-
-| Area | Role | Adaptation |
-|---|---|---|
-| [AGENTS.md](AGENTS.md) | Default project conventions, guardrails, and on-demand pointers | Set the project's stack and decisions |
-| [CodeStyleGuide](CodeStyleGuide/UnityStyleGuide.md) | Naming and formatting preferences, with examples | Adapt taste and keep `.editorconfig` aligned |
-| [AuditGuides](AuditGuides/README.md) | Focused review lenses: risks, evidence, and validation | Load only the applicable subsystems |
-| [SetupInstructions](SetupInstructions/README.md) | One-time stack, settings, structure, and import configuration | Tailor to the actual project |
-| [EditorConfig](EditorConfig/README.md) | The shipped `.editorconfig` and its explanation | Copy `.editorconfig` to the target root |
-| [Base audit workflow](Skills/unity-guide-audit/UnityProjectReview.md) | Checks documented project conformance | Reference from the project's audit workflow |
-
-[AuditGuides](AuditGuides/README.md) complement installed Unity skills. Skills own implementation,
-diagnosis, and tool execution; the guides identify what evidence a review needs and the recurring
-failure cases to verify. They do not require a particular plugin and are not loaded wholesale for
-a small change. Project choices take precedence over generic skill defaults.
-
-## Using it with your assistant
-
-| Tool | Instruction entry point |
+| Situation | Entry point |
 |---|---|
-| **Claude Code** | `CLAUDE.md`, pointing to `AGENTS.md` |
-| **OpenAI Codex** | `AGENTS.md` in the repo root |
-| **GitHub Copilot** | `.github/copilot-instructions.md` |
-| **Cursor** | `.cursorrules` or a file under `.cursor/rules/` |
-| **JetBrains AI / Junie** | `.junie/guidelines.md` |
+| Understand the conventions | [Agent instructions](AGENTS.md) and [style guide](AgentsInstructions/CodeStyleGuide/UnityStyleGuide.md) |
+| Set up a project | [Setup workflow](AuditInstructions/SetupInstructions/README.md) |
+| Audit an existing project | [Review router](AuditInstructions/ProjectAuditGuides/ProjectReview.md); select applicable lenses |
+| Find one setup or audit topic | [Topic index](AuditInstructions/README.md) |
+| Update an installed copy | [Kit maintenance](AuditInstructions/KitMaintenance/README.md) |
+| Prepare a release | [Release readiness](AuditInstructions/ReleaseReadiness/README.md) |
+| Check tested compatibility | [Validation record](Validation.md) and [stack profile](AgentsInstructions/UnityTechStack/UnityTechStack.md) |
 
-Copy the folders you need and put `AGENTS.md` at your project's instruction entry point. Keep copied
-references together or update their paths. `CLAUDE.md` points back to the canonical `AGENTS.md`.
-Adapt the Project Setup block and [tech-stack template](SetupInstructions/UnityTechStack.md) to the
-same actual engine/packages and systems before using them in a Unity project.
+Skills supply execution mechanics; project choices and resolved package versions govern APIs.
+Examples illustrate specific behavior and do not prescribe an architecture.
 
-For an audit, `AGENTS.md` points to [the audit index](AuditGuides/README.md), which selects the
-relevant subsystem lenses. The [base workflow](Skills/unity-guide-audit/UnityProjectReview.md) adds
-conformance to your style and setup rules; a broader project-audit skill can add architecture,
-behavioral coverage, documentation drift, and unfinished-plan reconciliation.
+## How to install
 
-## What goes in agents.md
+First audit the destination and confirm the selected changes through the
+[setup workflow](AuditInstructions/SetupInstructions/README.md). Use one source commit for the whole
+selection. There is no automatic installer.
 
-The rule of thumb is that AGENTS.md should only hold what's true in every session, such as the non-negotiable rules, universal code style, and pointers. Anything that's true only when working on one subsystem, running one workflow, or investigating one historical question belongs in the complementary files.
+Keep a **reference snapshot** at `Documentation/UnityStarterKit/` outside `Assets`, preserving the
+source hierarchy. Include the files and directories listed in
+[installation.json](AuditInstructions/SetupInstructions/installation.json). This snapshot contains
+resource sources and maintenance tools as reference material; Unity resources are installed only
+when selected and copied separately into `Assets`. Exclude checkout internals, caches, and generated
+outputs. The manifest is the authoritative snapshot list; this table explains its destinations.
 
-Copy the agent.md  file into your own repo and edit the
-**Project Setup** block below — everything else is ready to use as-is.
-
-Rules marked `[opinion]` are stylistic preferences, not industry consensus. Change them freely as
-long as you change them everywhere. Other guidance includes technical guardrails and defaults; apply it to the actual
-project and validate version-sensitive behavior.
-
-Unity starter kit
-
-A selectable starter kit for Unity 6.7 projects: compact agent conventions, setup contracts,
-on-demand review guides, reusable import presets and script templates, and a small UI Toolkit example.
-This repository is documentation/resources, not a Unity project. Your project's actual version
-and resolved packages govern implementation; see [the profile](SetupInstructions/UnityTechStack.md)
-and [tested compatibility](Validation.md).
-
-## Installation
-
-Start with [SetupInstructions](SetupInstructions/README.md). Prefer Unity CLI for Editor discovery,
-project creation, imported-asset changes, tests, and builds. Available Unity skills supply execution
-mechanics; manual Editor steps remain a fallback. Copy only selected material. Preview destination
-conflicts and merge existing configuration; do not overwrite a project's settings, conventions, or
-asset identities silently. Preserve existing `.meta` files when installing/updating reusable assets.
-
-| Source here | Destination in a target project | Selection |
+| Source here | Destination relative to the Unity project root | Action |
 |---|---|---|
-| README.md, LICENSE | Project root (merge README; retain kit license attribution) | Installation index and resource license |
-| AGENTS.md | Project root/AGENTS.md | Merge essential conventions and routing |
-| CLAUDE.md | Project root/CLAUDE.md | Optional compatibility pointer |
-| CodeStyleGuide/ | Project root/CodeStyleGuide/ | Owned C# conventions |
-| SetupInstructions/**/*.md | Project root/SetupInstructions/ matching paths | Setup contract and all small resource indexes |
-| AuditGuides/ | Project root/AuditGuides/ | On-demand review references |
-| EditorConfig/.editorconfig | Project root/.editorconfig | Merge rules; do not overwrite existing config |
-| EditorConfig/Unity.gitattributes | Project root/.gitattributes | Optional; configure tools first |
-| EditorConfig/README.md | Project root/EditorConfig/README.md | Config rationale and prerequisites |
-| SetupInstructions/ScriptTemplates/*.cs.txt + matching .meta | Assets/ScriptTemplates/ | Five default templates |
-| SetupInstructions/OptionalScriptTemplates/ | Selected files only into Assets/ScriptTemplates/ | Prerequisites listed in template index |
-| SetupInstructions/Presets/{Textures,Audio,Models,Animations}/ | Assets/Settings/Presets/ matching subfolders | Selected preset categories, preserve metadata |
-| ExampleCode/UIToolkitMVP/ except Markdown | Assets/Examples/UIToolkitMVP/ | Optional runnable assets and isolated tests |
-| ExampleCode/**/*.md | Project root/ExampleCode/ matching paths | Small example index and setup documentation |
-| Validation.md, CHANGELOG.md | Project root or retained kit checkout | Compatibility and update evidence |
+| Manifest `snapshot_sources`, with their existing paths | `Documentation/UnityStarterKit/` | Retain complete reference hierarchy; merge or choose another location if occupied |
+| AGENTS.md | AGENTS.md | Merge conventions and routing; prefix file links with `Documentation/UnityStarterKit/`; retain local anchors; remove the repository-maintenance section |
+| CLAUDE.md | CLAUDE.md | Optional pointer to the target's root AGENTS.md; preserve existing instructions |
+| AgentsInstructions/CodeStyleGuide/EditorConfig/.editorconfig | .editorconfig | Merge selected rules; the reference copy is not the active configuration |
+| AuditInstructions/VersionControl/Unity.gitignore | .gitignore | Install the selected managed block |
+| AuditInstructions/VersionControl/Unity.gitattributes | Repository root .gitattributes | Install selected attributes and optional LFS rules |
+| AuditInstructions/ScriptTemplates/ selected template and .meta pairs | Assets/ScriptTemplates/ | Follow the template guide, including optional prerequisites |
+| AuditInstructions/Presets/ selected category contents | Assets/Settings/Presets/ matching categories | Follow the preset guide; preserve identities |
+| AuditInstructions/SceneTemplates/ selected groups and shared dependencies | Assets/{ProjectName}/SceneTemplates/ or established content root | Follow the scene-template guide's selection and clone/reference rules |
+| AuditInstructions/UnityCLI/CliScriptAndTests/ selected example assets | Assets/Examples/CliScriptAndTests/ | Optional example; follow its README and isolate tests |
+| LICENSE | ThirdPartyNotices/UnityCodeStyleGuide-LICENSE.txt | Retain attribution for reused resources; preserve unrelated notices |
 
-The instruction installation includes the linked documentation/indexes even when asset resources
-are not selected. Keep Markdown outside Assets. Root `.editorconfig` is the installed config. When changing the copy layout, adapt links in AGENTS
-and indexes.
-Import asset resources into the target through the Editor, driven by CLI; imported moves use
-AssetDatabase. Installing the example preserves its internal relative stylesheet and GUID references.
+The root README belongs to the game; keep this kit's README in the snapshot. Adapt the snapshot's
+stack profile to the target and record that adaptation for future merges. Existing project choices
+win over starter defaults. Other instruction-entry tools can point to the target's root AGENTS.md.
+
+Inspect all conflicts before copying. Preserve existing metadata; use Editor APIs for existing
+imported assets. First installation of selected intact asset/metadata pairs with the Editor closed
+uses the [resource protocol](AuditInstructions/SetupInstructions/InstallResources.md). Keep `Tools~/`
+and documentation out of the imported selection.
+
+The repository's installation check stages this layout in a temporary fake destination and checks
+local links, anchors, case, root instruction rebasing, and the active EditorConfig copy:
+
+```sh
+python3 AuditInstructions/Tools/check_installation.py
+```
+
+It does not install into your game. If you choose another layout or merge existing instructions,
+check the resulting target's links separately. Record source revision, selected groups, destination
+paths, and local adaptations in `Documentation/UnityStarterKit-installation.json` after confirmation;
+the [update workflow](AuditInstructions/KitMaintenance/UpdateKit.md) defines that record.
 
 ## Loading model
 
-| Material | When loaded |
+| Material | Load when |
 |---|---|
-| AGENTS.md | Every session: essentials and routing |
-| CodeStyleGuide | First relevant task authoring/reviewing owned C# |
-| SetupInstructions | New project/configuration work |
-| AuditGuides | Requested project/change/subsystem review |
-| ExampleCode | Implementation relevant to a selected demonstration |
-| Unity skills | Matching execution task; obey target project/user choices |
-
-Examples demonstrate specific failure cases, not a required architecture. Keep a small verified
-library; see [example index](ExampleCode/README.md). Audit guides describe risks/evidence rather
-than copying Unity skill tutorials.
+| Root AGENTS.md | Every coding session: essential rules and routing |
+| Style guide | First owned C# authoring or style-review task |
+| Setup instructions | Selected setup/configuration task |
+| Audit lenses | Selected project/change/subsystem review |
+| Examples and Unity skills | Relevant implementation or execution task |
 
 ## Maintenance
 
-Run `python3 Tools/validate_starter.py` for local references, anchors, inventory, template tokens,
-GUID uniqueness, and policy drift. Run `python3 Tools/check_naming.py` for actual naming
-analyzer intersections. Neither substitutes for Unity import/runtime validation. Follow
-[Validation.md](Validation.md) when changing assets, templates, or the example; update the short
-[change log](CHANGELOG.md) and record exact tested versions. Keep setup optional and rerunnable.
+```sh
+python3 AuditInstructions/Tools/validate_all.py
+python3 AgentsInstructions/CodeStyleGuide/Tools~/check_naming.py
+```
+
+The first command checks repository links, anchors, GUIDs, instruction contracts, installation staging,
+and each topic validator. The second proves naming-rule intersections with actual Roslyn diagnostics.
+Use `--require-dotnet` on the first command to fail when its .NET style checks cannot run.
+[Repository CI](.github/workflows/repository-checks.yml) runs both commands on pull requests, pushes
+to main, and manual dispatch. It validates this kit; it does not run Unity tests or build a game.
+Target-project CI templates remain a separate optional installation.
+
+Follow [AGENTS.md](AGENTS.md) when maintaining the kit. Record changes in
+[CHANGELOG.md](CHANGELOG.md) and actual evidence and limits in [Validation.md](Validation.md).
 
 License: [MIT](LICENSE).

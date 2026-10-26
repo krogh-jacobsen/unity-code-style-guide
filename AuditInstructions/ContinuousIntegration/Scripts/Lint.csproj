@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Lets `dotnet format` read Unity's C# without the Editor. It never compiles the game: UnityEngine
+       references stay unresolved, which does not affect the whitespace and naming checks. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <UnityProject Condition="'$(UNITY_PROJECT_PATH)' != ''">$(UNITY_PROJECT_PATH)</UnityProject>
+    <UnityProject Condition="'$(UNITY_PROJECT_PATH)' == ''">$(MSBuildThisFileDirectory)../..</UnityProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Your own code only. Vendor and sample code is excluded; add folders you do not own. -->
+    <Compile Include="$(UnityProject)/Assets/**/*.cs"
+             Exclude="$(UnityProject)/Assets/ThirdPartyAssets/**;$(UnityProject)/Assets/Plugins/**;$(UnityProject)/Assets/Samples/**;$(UnityProject)/Assets/TextMesh Pro/**;$(UnityProject)/Assets/TutorialInfo/**" />
+  </ItemGroup>
+</Project>

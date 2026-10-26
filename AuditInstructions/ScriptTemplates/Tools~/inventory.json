@@ -1,0 +1,20 @@
+{
+  "1-Scripting__MonoBehaviour Script-NewMonoBehaviourScript.cs.txt": "c46dbac4eeff44229cf74fd90b8afdcc",
+  "2-Scripting__ScriptableObject Script-NewConfigDataSO.cs.txt": "674e6d0417244fa6b22c8465a67e4633",
+  "3-Scripting__Empty C# Script-NewEmptyCSharpScript.cs.txt": "9c336b9cefce4fbb90440f55ab1b63b5",
+  "4-Scripting__UI Toolkit View-NewUIToolkitViewScript.cs.txt": "4bf5568eb6d74dc2a45ead460b09044e",
+  "5-Scripting__Interface-INewInterface.cs.txt": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6",
+  "OptionalScriptTemplates/10-Scripting__Unit Test PlayMode-NewPlayModeTest.cs.txt": "f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1",
+  "OptionalScriptTemplates/11-Scripting__Static Event-NewStaticEvent.cs.txt": "a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2",
+  "OptionalScriptTemplates/12-Scripting__Object Pool Handler-NewObjectPoolHandler.cs.txt": "b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3",
+  "OptionalScriptTemplates/14-Scripting__NetworkBehaviour-NewNetworkBehaviour.cs.txt": "c9a4204bb6b834fbcb54e64df11762ef",
+  "OptionalScriptTemplates/15-Scripting__UI Toolkit Custom Editor-NewUIToolkitEditor.cs.txt": "fa761b9db816d440abab41024553c89b",
+  "OptionalScriptTemplates/16-Scripting__UI Toolkit Editor Window-NewUIToolkitWindow.cs.txt": "6a9841d6af62642e1a5366591f611729",
+  "OptionalScriptTemplates/17-Scripting__UI Toolkit Property Drawer-NewUIToolkitDrawer.cs.txt": "adcf1d46ad9e54b5ea5836c18000a892",
+  "OptionalScriptTemplates/6-Scripting__Custom Editor-NewCustomEditor.cs.txt": "b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7",
+  "OptionalScriptTemplates/7-Scripting__Editor Window-NewEditorWindow.cs.txt": "c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8",
+  "OptionalScriptTemplates/8-Scripting__Property Drawer-NewPropertyDrawer.cs.txt": "d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9",
+  "OptionalScriptTemplates/9-Scripting__Unit Test EditMode-NewEditModeTest.cs.txt": "e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0",
+  "OptionalScriptTemplates/ReferenceOnly/13-Scripting__State-NewState.cs.txt": "1ed98430f030245d7ada9b9d6121427f",
+  "OptionalScriptTemplates/18-Scripting__Awaitable Operation-NewAwaitableOperation.cs.txt": "406ed49d3c7214eb1a541e7cb061acb1"
+}

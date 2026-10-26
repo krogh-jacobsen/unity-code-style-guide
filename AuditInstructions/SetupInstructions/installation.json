@@ -1,0 +1,16 @@
+{
+  "snapshot_destination": "Documentation/UnityStarterKit",
+  "snapshot_sources": [
+    "README.md",
+    "LICENSE",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "CHANGELOG.md",
+    "Validation.md",
+    "AgentsInstructions",
+    "AuditInstructions",
+    ".github/workflows/repository-checks.yml",
+    ".gitignore"
+  ],
+  "root_editorconfig_source": "AgentsInstructions/CodeStyleGuide/EditorConfig/.editorconfig"
+}

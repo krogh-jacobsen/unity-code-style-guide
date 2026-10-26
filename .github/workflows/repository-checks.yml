@@ -1,0 +1,48 @@
+# Action versions/inputs verified against upstream action.yml files: October 2026.
+# Checks this documentation/resource repository. No Unity Editor, licence, or game build.
+name: Repository checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: repository-checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      DOTNET_NOLOGO: '1'
+      DOTNET_CLI_UI_LANGUAGE: en-US
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          lfs: false
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.x'
+      - name: Repository, installation, and topic validators
+        run: python3 -u AuditInstructions/Tools/validate_all.py --require-dotnet
+      - name: Roslyn naming intersections
+        run: python3 -u AgentsInstructions/CodeStyleGuide/Tools~/check_naming.py
+      - name: Validation scope
+        if: always()
+        run: |
+          {
+            echo '## Repository validation'
+            echo 'Checks cover documentation, staged installation, resource inventories, and .NET style fixtures.'
+            echo 'Unity import, EditMode/PlayMode tests, player builds, and device acceptance were not run.'
+          } >> "$GITHUB_STEP_SUMMARY"

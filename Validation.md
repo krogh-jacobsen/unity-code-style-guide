@@ -1,8 +1,38 @@
 # Compatibility and validation
 
-The intended profile is [Unity 6.7](LLMInstructions/SetupInstructions/UnityTechStack.md). This record distinguishes
+The intended profile is [Unity 6.7](AgentsInstructions/UnityTechStack/UnityTechStack.md). This record distinguishes
 that choice from the exact prerelease Editor tested. It is not a guarantee for every 6000.7 patch,
 package upgrade, target platform, or copied project. Date: 2026-10-12.
+
+## Audit pressure-test implementation — 2026-10-26
+
+Implemented the selected review recommendations R1–R10 and R12. R11 was not selected. Changes are
+documentation and static maintenance tooling; existing imported resources and metadata were preserved.
+Concurrent repository reorganization, installation/maintenance/release guidance, and CI work remain intact.
+
+| Check | Result | Evidence / limit |
+|---|---|---|
+| Complete repository validation | Passed | `python3 -u AuditInstructions/Tools/validate_all.py --require-dotnet` with authorized host access: 74 Markdown files, 466 local links/anchors, 75 unique GUIDs, six topic validators, installation staging/four negative probes, workflow regressions, and required .NET gates. The earlier static-only invocation also passed |
+| Workflow contract/routing regressions | Passed | `python3 -B AuditInstructions/Tools/test_audit_contract.py`: 10 tests, including a published guide missing its preamble, altered/truncated/duplicated/misplaced contracts, setup routes, and rendering/coverage routing |
+| CI project fixtures and YAML/workflow checks | Passed | 22 disposable projects: metadata failures, named/GUID asmrefs, embedded packages, predefined/explicit Editor isolation, runtime boundaries, constraint-only/NUnit-only negatives, framework GUID availability, and a nested project path containing spaces |
+| .NET whitespace/naming gates | Passed | `python3 -u AuditInstructions/ContinuousIntegration/Tools~/validate_ci.py` outside the sandbox with SDK 10.0.302: clean fixtures pass, bad whitespace/naming fixtures fail, vendor code remains excluded |
+| Roslyn naming intersections | Passed | `python3 -u AgentsInstructions/CodeStyleGuide/Tools~/check_naming.py` with SDK 10.0.302: good fixture 0 IDE1006 diagnostics; bad fixture 6 expected diagnostics |
+| Python syntax and whitespace | Passed | AST parsing of six changed/new modules; `git diff --check` |
+| Workflow replay generation | Passed | 106 unique prompts for 18 discovered entry points across eight scenario families, generated outside the repository with result `Not verified` |
+| Fresh-agent workflow replay | Not verified | The catalog and grading protocol are supplied; no LLM behavioral/tool replay was executed. Structural tests do not establish agent compliance |
+| Unity runtime, rendering, discovery, and normal-player isolation | Not verified | No Unity project or imported asset implementation changed; no Editor/device run or player build performed |
+| Hosted/self-hosted GitHub execution | Not verified | Workflow syntax, targeting, and safety invariants checked locally; no push or runner dispatch |
+
+Technical claims were checked against official Unity documentation for static cleanup (including the
+6000.5 API and 6000.7 manual), Android/iOS frame-rate control, root-motion ownership, uGUI layout,
+and URP Render Graph recording/resources and camera stacking. Source links live with the affected
+guides. The 6.5 API check is documentation evidence, not a new compile/runtime compatibility claim.
+Other historical store deadlines and roadmap claims were not comprehensively revalidated in this pass.
+
+The initial sandboxed `--require-dotnet` run failed because Roslyn could not bind its build-host
+named pipe (`SocketException (13): Permission denied`). Re-running the CI validator with authorized
+host access passed, followed by the complete `--require-dotnet` validator and naming regression
+check; that environment failure is separate from fixture or repository failures.
 
 ## Tested environment
 
@@ -67,13 +97,13 @@ require no compiler/import errors. Preserve user settings when adapting an exist
 
 Generate all default/selected optional templates using the Editor's actual namespace substitutions
 under empty and populated namespaces. Isolate test and Editor scripts in their correct assemblies.
-Run `python3 Tools/validate_starter.py` and `python3 Tools/check_naming.py` from the kit checkout.
+Run `python3 AuditInstructions/Tools/validate_all.py` and `python3 CodeStyleGuide/Tools~/check_naming.py` from the kit checkout.
 
 For presets, create representative source PNG, WAV, and animated FBX fixtures through source tools.
 Configure sprite slices/borders, user metadata, bundle labels, platform overrides, and an external
 FBX material remap before applying. On the tested beta, import first and apply textures explicitly;
 select Single/Multiple for a new unconfigured UI sprite. Use Preset.ApplyTo + SaveAndReimport through CLI-driven Editor
-APIs, then read back intended and preserved values. Compare GUIDs with resource-inventory.json.
+APIs, then read back intended and preserved values. Compare GUIDs with `LLMInstructions/Presets/Tools~/inventory.json`.
 
 Run `unity test /absolute/project --mode EditMode --output /absolute/fresh-editmode.xml` and a
 separate PlayMode run. Parse counts, ignored placeholders, failures, and logs. Test re-enable and
@@ -90,7 +120,7 @@ through Unity APIs; source resource GUIDs were retained. Existing repository res
 
 ## Optional example expansion — 2026-10-12
 
-The [example index](LLMInstructions/ExampleCode/README.md) now includes screen cancellation, pooled notification
+The [example index](AuditInstructions/UnityCLI/CliScriptAndTests/README.md) now includes screen cancellation, pooled notification
 leases, and a custom CLI script-generation/test workflow. Validation reused the disposable
 6000.7.0b4 project and CLI/Pipeline/Test Framework versions above; no working game was changed.
 
@@ -159,7 +189,7 @@ The pool's changes are tooltips/braces only; its original behavior token stream 
 Nonblocking logs include missing normals in the minimal OBJ fixture, retained disposable test assets,
 and a licensing handshake fallback that completed successfully.
 
-Reproduce resource validation with `python3 Tools/validate_starter.py --resources-only`; run without
+Reproduce resource validation with `python3 AuditInstructions/Tools/validate_all.py --resources-only`; run without
 that flag for the full documentation scan. For Unity validation, import the selected resources into
 a disposable project, expand each changed/new template under both namespace configurations, isolate
 Editor/tests, and exercise the preservation cases above through Unity CLI. The UI templates remain
@@ -173,7 +203,7 @@ These temporary files are local evidence and are not shipped starter resources.
 
 ## Strategy scene templates — 2026-10-17
 
-Added the optional [scene-template group](LLMInstructions/SetupInstructions/SceneTemplates.md):
+Added the optional [scene-template group](AuditInstructions/SceneTemplates/README.md):
 Strategy Sandbox, UI Preview, and Asset LookDev. Map Authoring remains deferred. Railroad Tycoon's
 camera reuse contract and asset-lookdev scenes informed the design; its project was read only.
 The delivered camera is a compact independent implementation, and no railroad scripts, vendor art,
@@ -216,12 +246,233 @@ recorded limitations rather than a claim of warning-free logs or compatibility w
 release. New Scene discovery was checked through the asset validity/default-listing contract and
 actual template instantiation, not a native mouse walkthrough of the dialog.
 
-Reproduction sources are in [Tools/SceneTemplates](Tools/SceneTemplates/README.md), outside the
+Reproduction sources are in [SceneTemplates/Tools~](AuditInstructions/SceneTemplates/Tools~/README.md), outside the
 installable asset group. Evidence is local under `/private/tmp/unity-scene-templates-20261017/`:
 `authoring.log`, `refine-source.log`, `preview-authoring.log`, `editmode-results.xml`/`editmode.log`,
 `playmode-results.xml`/`playmode.log`, `final-player-build.log`, `final-player-acceptance.log`,
 `final-delivery-import.log`, and `FinalCaptures/`. The final consumer dependency/readback report
 and build summary are in `Consumer/ValidationResults/`. Temporary capture probes and disposable
 projects are not included in normal installation. Run the resource check with
-`python3 Tools/validate_starter.py --resources-only`; repeat `--markdown-path` for selected
+`python3 AuditInstructions/Tools/validate_all.py --resources-only`; repeat `--markdown-path` for selected
 repository-relative documentation files, or omit it for the whole-checkout scan.
+
+## Script template pressure test — 2026-10-21
+
+Re-expanded the selectable script templates through Unity's own engine
+(`ProjectWindowUtil.CreateScriptAssetFromTemplate`, via reflection) in a disposable project on
+**Unity 6000.7.0b4**, with Enter Play Mode set to skip domain reload. Harness and steps:
+[ScriptTemplates/Tools~](AuditInstructions/ScriptTemplates/Tools~/README.md).
+
+| Check | Result | Scope/limits |
+|---|---|---|
+| Expansion and compile | Passed | 14 templates × empty and `Sample.Game` namespaces = 28 scripts, zero errors and zero warnings (after the Awaitable template's `CS4014` was fixed with a discard) |
+| Awaitable Operation behavior | Passed (partial) | PlayMode test: restart, disable, re-enable, double cancel, destroy mid-run logged no errors. The fault-logging path was not asserted |
+| Statics analyzer | Finding, fixed | The old Static Event template produced `UAL0010` and `UAL0013` in both namespace configurations. The `[AutoStaticsCleanup]` version compiled with no diagnostics on 6000.7.0b4 and 6000.6.2f1 |
+| Static Event reset across Plays | Not verified | Compile only; two consecutive Plays were not run |
+| Test and NetworkBehaviour templates | Not re-run | They need Test Framework and Netcode; last validated earlier (Netcode 3.1.0) |
+| Editors before 6.6 | Not verified | The attribute does not exist there; the guide supplies the manual-reset fallback |
+
+## Scene templates re-verification — 2026-10-21
+
+Re-ran the delivery harness from [Tools~](AuditInstructions/SceneTemplates/Tools~/README.md) against the
+current shipped files, in fresh `com.unity.template.urp-blank` projects, importing at
+`Assets/StrategyStarter/SceneTemplates` (not the authoring path):
+
+| Editor | URP | Input System | Test Framework | Scenes generated and reopened | EditMode | PlayMode |
+|---|---|---|---|---|---|---|
+| 6000.7.0b4 | 17.7.0 | 6.7.0 | 1.9.0 | 6 of 6 | 6 of 6 | 2 of 2 |
+| 6000.6.2f1 | 17.6.0 | 1.20.0 | 1.8.0 | 6 of 6 | 6 of 6 | 2 of 2 |
+
+No compiler, import, or missing-reference diagnostics were logged in either project (the only
+errors were local Unity licensing handshake messages). The runtime scripts hold no static state, so
+Enter Play Mode without domain reload needs no handling.
+
+Not verified: the New Scene dialog itself (batch runs use `SceneTemplateService.Instantiate`), the
+player build and graphical capture steps, other GPUs and Windows, device feel, Editors before 6.6, and a
+Built-in or HDRP project (documented as unsupported, not tested).
+
+## Version control rules — 2026-10-21
+
+The starter [ignore and attribute files](AuditInstructions/VersionControl/README.md) were checked in
+throwaway Git repositories (Git 2.54, Git LFS 3.8.0) and in a Unity 6000.7.0b4 URP project with Unity CLI
+1.0.0-beta.13:
+
+- `Tools/validate_all.py` builds a repository, installs both files, and asserts with `git check-ignore`
+  and `git check-attr`: 38 generated or excluded paths ignored, 17 required paths tracked (all `.meta`
+  files, `ProjectSettings`, `Packages/manifest.json`, `packages-lock.json`, and folders that merely
+  resemble excluded ones), 7 paths routed to LFS, and `eol=lf` for text types. Removing the optional
+  ThirdPartyAssets or LFS section leaves a working file.
+- `unity vcs doctor` (19 checks, 18 after excluding `META_FILES_IGNORED`) found nothing on the installed
+  files with LFS hooks present. The excluded check is the deliberate ThirdPartyAssets exclusion: doctor
+  flags any ignored `.meta`. The previous root `.gitignore` produced `GITIGNORE_STALE` (16 missing rules).
+- `unity vcs merge-setup` wrote its managed attributes block and driver beside these files, and its
+  test merge passed.
+
+Not verified: an existing large repository, LFS against a real remote, Windows line endings, merge setup
+without the CLI, and a clean-clone import of a project with ThirdPartyAssets excluded.
+
+## Continuous integration without a licence — 2026-10-21
+
+The [CI starter files](AuditInstructions/ContinuousIntegration/README.md) were exercised locally, in an empty
+home directory with no Unity sign-in or licence, against a fresh clone of a Unity 6000.7.0b4 URP project
+(Unity CLI 1.0.0-beta.13, .NET SDK 10.0.302, Git 2.54):
+
+- `check_unity_project.py` passed the project (87 assets paired with `.meta` files, 8 tests in 2 files) and,
+  in `Tools/validate_all.py`, passes one clean and fails seven broken fixture projects.
+- `unity vcs doctor` ran licence-free and exited 4 on a genuine finding, 0 when clean.
+- `dotnet format whitespace` and `dotnet format style --diagnostics IDE1006` passed on the shipped sample
+  scripts and failed on injected violations, using only the shipped `.editorconfig`.
+
+Not verified: any run on a GitHub-hosted or self-hosted runner, `unity ci init` end to end, Windows and
+macOS runners, and `git lfs install --local` behavior on a hosted checkout.
+
+## CoreCLR migration guide — 2026-10-26
+
+[CoreCLRUpgrade.md](AuditInstructions/CoreCLRmigration/CoreCLRUpgrade.md) was restructured and checked statically only:
+relative links and the "Last verified" date through `Tools/validate_all.py`. No Unity Editor, CoreCLR build, or
+project was used, and the API names, forum claims, and workflow were not re-checked against current sources
+(see [recheck.md](AuditInstructions/CoreCLRmigration/Tools~/recheck.md)).
+
+Not verified: the workflow end to end, attribute availability on a Unity 7.0 Alpha Editor, and any 6.7 experimental player.
+
+## Review contract rollout — 2026-10-26
+
+Checked statically only. A script confirmed the `AGENTS.md` block appears byte-for-byte in 12 covered agent
+documents, `Tools/validate_all.py` enforces the heading, the phrase "explicit yes" and the placement before step 1,
+and every folder validator (CI, presets, scene templates, script templates, version control, CLI example) passes.
+
+Not verified: that an LLM given one of these URLs actually stops at the confirmation gate, picks a subset correctly, or
+behaves in a non-interactive session. Run each document once against a disposable project and record the transcript.
+The overall validator still prints 16 missing-link errors for `Testing/IntroductionToTesting.md`, which pre-date this
+work and are the only remaining errors.
+
+## GitHub collaboration workflow — 2026-10-26
+
+Expanded [GithubInstructions.md](AuditInstructions/Github/GithubInstructions.md) and added its
+[human overview](AuditInstructions/Github/README.md), with AGENTS/topic-index routing. Sources reviewed:
+UnityTycoonManager's GitHubIssues, PRCompletion and WorktreeRecovery guides, relevant project rules,
+ticket-capture and scoped-commit skills, and the "Review and complete open PRs" session's branch/art
+preservation outcomes. Reusable guidance keeps target-specific permissions, IDs and recovery internals
+out of the starter. Included the current repository's verbatim review/selection/confirmation contract.
+
+- Confirmed rendered REST bodies, closing-keyword timing, and merge-method behavior against linked
+  official GitHub documentation. No GitHub issues, PRs, boards or branches were changed.
+- Passed scoped `Tools/validate_all.py` checks for AGENTS.md, the topic index, both GitHub documents,
+  CHANGELOG.md and this record: 6 Markdown files, 77 local links/anchors, 75 unique GUIDs, 6 folder
+  validators. Ran with PATH restricted to system tools to exclude .NET restore/style checks; the
+  initial unrestricted validator did not return promptly. CI reported its style gates Not verified.
+- Passed focused review of six numbered steps/completion criteria, absence of copied project paths/IDs,
+  and whitespace checks for edited documentation.
+- Full Markdown scanning reported 16 unresolved links in the existing
+  `LLMInstructions/Testing/IntroductionToTesting.md`, outside this change. The first scan also caught
+  the newly introduced review-contract requirement; corrected the GitHub guide and verified it in the
+  passing scoped run. The full repository is not claimed clean.
+
+Not verified: end-to-end capture/implementation/PR/merge/cleanup against a live GitHub repository,
+private-attachment retrieval in this session, .NET style gates, or any Unity Editor/test/build run.
+This change is documentation only.
+
+## Review contract gate test — 2026-10-26
+
+Two fresh general-purpose agents, each given only the document path and a one-line request (as a user would hand over
+a URL), ran against disposable fake projects with a git baseline (no Editor attached):
+
+| Check | Result | Scope/limits |
+|---|---|---|
+| MobileBuilds.md stops after audit and recommendations | Passed | 26 numbered recommendations plus 10 questions; `git status` clean afterwards |
+| SetupFolders.md stops after audit and recommendations | Passed | 8 recommendations (R1 the only default "do"); no folder created |
+| Partial pick (R1 only, no yes) | Passed | Agent restated the single `mkdir`, left `Assets/Scenes` and R2 to R8 alone, wrote nothing |
+| Relayed "yes" from the coordinating agent | Refused | Agent required the user's own confirmation; folder still absent. Stricter than needed, and the intended behavior |
+| Apply after the user's own yes | Not verified | A subagent harness cannot supply a genuine user yes; needs a manual run |
+
+The relayed "yes" was refused a second time even when it passed on the user's authorization for the sandbox, so apply-after-confirm
+needs a manual run where the user types the yes to the agent directly.
+
+Observations: the Mobile agent flagged `AndroidTargetArchitectures: 1` as probably ARMv7 but was unsure of the enum value.
+Not confirmed: neither installed Editor (6000.7.0b4, 6000.7.0b6) has the Android module, and Unity's published
+`AndroidArchitecture` reference lists the members (None, ARMv7, ARM64, All) without numeric values. MobileBuilds.md names the
+enum members rather than numbers, so it is unaffected; install the Android module and read the enum before quoting a value. It also reached the ProjectSettings.asset YAML-edit rule and planned an
+`-executeMethod` route instead of hand edits, as the document intends.
+
+## Project review rollout — 2026-10-26
+
+Fifteen lenses and the router were pressure-tested by five independent reviewers (fact-check, audit-worthiness, overlap, hygiene), then edited per an
+approved keep/merge/cut table. A fresh agent, given only `ProjectReview.md`, then ran the review read-only (static inspection only, no Editor, Unity CLI,
+tests, or builds) against a real 3D tycoon project on Unity 6000.7.0b4 (642 owned C# files, 10 scenes).
+
+| Check | Result | Scope/limits |
+|---|---|---|
+| Project left untouched | Passed | `git status` plus HEAD hash identical before and after (`e485ef7f4b98`), twice; 5 pre-existing modified doc files unchanged |
+| Detection and menu | Passed after two rounds | Round 1 found 11 document defects (uGUI signal matched UI Toolkit, vendor counts, paths with spaces, stage and step numbering, scope and fallback gaps); round 2 found 12 more (lens precedence over project-local copies, first-party definition, Recommended/Optional thresholds, weak-signal rules for physics, animation, audio, persistence, assemblies, testing); all fixed in the hub |
+| Full review of 11 detected lenses | Completed | No confirmed corruption, data loss or leaks; 13 numbered recommendations, mostly drift (setting mismatch, unused defines, tags, temp folders); false-positive sources recorded per lens and fixed in 7 lenses |
+| Integrity pass | Completed statically | 14,765 `.meta` files, 0 duplicate GUIDs, 0 orphans, 0 unresolved first-party script GUIDs |
+| Apply-after-confirm | Not verified | The review never reached confirm; a subagent cannot supply a genuine user yes |
+| Live checks | Not verified | Missing references, import warnings, Play-session behaviour, tests, frame time, memory, builds |
+
+Not verified: the round-2 hub fixes were not re-run through a third dry-run, the lens text was fact-checked mostly against 6000.0 and 6000.6 pages (6000.7 pages
+where the URLs say so), and Input System claims were checked against package 1.14. The `[AutoStaticsCleanup]` attribute is documented from Unity 6.5; the
+`OnCodeInitializing` option for new code is cited from the `SubsystemRegistration` reference and not tested.
+
+## Package installer rewrite — 2026-10-26
+
+| Check | Result | Scope/limits |
+|---|---|---|
+| Project left untouched | Passed | `git status` hash `97bbb1bf4278` identical before and after both dry-runs; HEAD `ce080424a629` |
+| Real project (Unity 6.7.0b4) | Completed | 0 installs recommended: Test Framework, Cinemachine, Input System already direct core packages; Addressables not detected. 103 NUnit files exist in `Assets/Editor/Tests` with no asmdef |
+| Synthetic project (Unity 6000.0, missing packages) | Completed | Found: Input System and Cinemachine 2 code with the packages missing, Test Framework transitive-only, vendor Addressables correctly excluded |
+| Document defects | Fixed | 13 from the synthetic run and 12 from the real run, including the Cinemachine 2 rule, owned-scope definition, Already direct label, stale-lockfile handling |
+| Contract block | Passed | Identical to the AGENTS.md canonical block; heading before step 1 |
+| Repository validator | Passed after the folder split | `Tools/validate_all.py` was repointed to `AuditInstructions/` and `AgentsInstructions/`; 430 links, 6 folder validators |
+| Install, verify, Editor routes | Not verified | No package was installed and no Editor was run; the `Client.Add` behaviour for an already-core package is expected, not tested |
+
+Not verified: the post-fix document was not re-run through a third dry-run. Core package facts come from the 6000.7 core packages page, the 6.6 upgrade guide and the
+`Client.Add` and `VersionsInfo` references; the 6000.0 core list was read by the synthetic run only.
+
+## Repository split — 2026-10-26
+
+| Check | Result | Scope/limits |
+|---|---|---|
+| Broken links | Fixed | 89 found; 88 rewritten by a layout mapping (old file location to new), 1 prose list edited by hand |
+| Repository validator | Passed | 67 Markdown files, 430 local links/anchors, 75 unique GUIDs, 6 folder validators |
+| Naming checker | Passed | `AgentsInstructions/CodeStyleGuide/Tools~/check_naming.py`: 0 diagnostics on Good, 6 on Bad (expected) |
+| Project untouched | Passed | Railroad Tycoon status hash `97bbb1bf4278` unchanged |
+
+Not verified: raw GitHub URLs in five install guides (they resolve after the push). Pre-existing stale text outside the split: the README copy table still lists `SetupInstructions/`,
+`AuditGuides/` and `ExampleCode/`, and `AuditInstructions/SceneTemplates/Tools~/readme.md` refers to deleted `Tools/validate_starter.py` and `Tools/resource-inventory.json`.
+
+## README.md standardisation — 2026-10-26
+
+| Check | Result | Scope/limits |
+|---|---|---|
+| Rename | Done | 18 files renamed through a temporary name, 0 `readme.md` remain; the new folders are untracked, so git records the new names when they are added |
+| Repository validator | Passed | 67 Markdown files, 430 local links/anchors, 6 folder validators |
+| Case-exact link check | Passed, and the negative test failed as intended | A temporary `InstallPackages.MD` link was reported and then removed |
+
+## Installation and delivery workflows — 2026-10-26
+
+| Check | Result | Scope/limits |
+|---|---|---|
+| Integrated repository validator | Passed | 74 Markdown files, 466 local links/anchors, 75 unique GUIDs, six folder validators, and 10 audit regression tests; --require-dotnet enabled |
+| Reference installation | Passed | Temporary project snapshot, rebased root AGENTS/CLAUDE links, local anchors/exact case, and root EditorConfig; all four intentionally broken-link probes rejected |
+| New agent-document contracts | Passed | KitMaintenance, Testing, and ReleaseReadiness contain the canonical contract verbatim before step 1; each of five steps has a Done criterion |
+| Required SDK failure | Passed | CI topic validator with dotnet absent and STARTER_REQUIRE_DOTNET=1 returns failure rather than reporting skipped style gates as success |
+| Repository workflow syntax | Passed | Parsed with Ruby YAML; action versions and selected inputs checked against upstream action.yml files |
+| Naming intersections | Passed | .NET SDK 10.0.302: Good fixture 0 diagnostics, Bad fixture 6 intended IDE1006 diagnostics |
+| Topic validation | Passed | .NET clean/bad style gates, 19 CI fixture projects, preset/template/scene inventories, version-control fixtures, and CLI example identities |
+| Audit regression path portability | Passed | Resolved temporary fixture root so macOS /var and /private/var aliases compare consistently; all 10 tests pass |
+
+The initial sandboxed .NET runs could not create Roslyn's local build-host pipe (SocketException:
+Permission denied). The successful naming and style checks ran with the required local pipe access.
+No Unity import, gameplay tests, player build, device acceptance, installation into an actual game,
+three-way update against a customized game, release rehearsal, or hosted GitHub Actions run was
+performed. These are static/workflow changes; no shipped Unity assets or metadata were edited.
+
+Sources checked in October 2026: [Unity test assemblies](https://docs.unity3d.com/Packages/com.unity.test-framework@latest),
+[assembly references](https://docs.unity3d.com/Manual/assembly-definitions-referencing.html),
+[Actions workflow syntax](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax),
+[checkout inputs](https://raw.githubusercontent.com/actions/checkout/v7/action.yml),
+[setup-python inputs](https://raw.githubusercontent.com/actions/setup-python/v7/action.yml), and
+[setup-dotnet inputs](https://raw.githubusercontent.com/actions/setup-dotnet/v6/action.yml).
+The test-assembly page was inspected at package 1.4.6; actual target execution must confirm its
+installed Test Framework and Editor options. Release guidance intentionally specifies evidence and
+ownership rather than embedding volatile store requirements.

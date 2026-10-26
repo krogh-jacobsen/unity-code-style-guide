@@ -1,0 +1,69 @@
+using System;
+using System.Threading;
+using UnityEngine;
+
+    #ROOTNAMESPACEBEGIN#
+/// <summary>Runs one cancellable operation while enabled. Starting another cancels the previous one.</summary>
+public sealed class #SCRIPTNAME# : MonoBehaviour
+{
+    [Tooltip("Seconds the sample operation waits. Replace the wait with the real asynchronous work.")]
+    [SerializeField, Min(0f)] private float m_delaySeconds = 1f;
+
+    private CancellationTokenSource m_operationSource;
+
+    private void OnEnable()
+    {
+        StartOperation();
+    }
+
+    private void OnDisable()
+    {
+        CancelOperation();
+    }
+
+    public void StartOperation()
+    {
+        CancelOperation();
+        m_operationSource = CancellationTokenSource.CreateLinkedTokenSource(destroyCancellationToken);
+        // Fire and forget: the method observes its own outcome, so the discard is deliberate.
+        _ = RunOperationAsync(m_operationSource.Token);
+    }
+
+    public void CancelOperation()
+    {
+        if (m_operationSource == null)
+        {
+            return;
+        }
+
+        m_operationSource.Cancel();
+        m_operationSource.Dispose();
+        m_operationSource = null;
+    }
+
+    // The owner observes every outcome, so an ignored Awaitable cannot hide an exception.
+    private async Awaitable RunOperationAsync(CancellationToken token)
+    {
+        try
+        {
+            await Awaitable.WaitForSecondsAsync(m_delaySeconds, token);
+
+            // The object may have been destroyed or disabled while waiting.
+            if (this == null || !isActiveAndEnabled)
+            {
+                return;
+            }
+
+            // Continue with the work that must follow the wait.
+        }
+        catch (OperationCanceledException)
+        {
+            // Disabling, destroying, or restarting cancels this operation intentionally.
+        }
+        catch (Exception exception)
+        {
+            Debug.LogException(exception, this);
+        }
+    }
+}
+#ROOTNAMESPACEEND#

@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "id": "before-confirmation",
+      "entry_points": "all",
+      "context": {
+        "authorization": "Audit and recommend only; no IDs selected or confirmed."
+      },
+      "expected": [
+        "Inspect and recommend without project writes, installs, test runs, or builds.",
+        "Report selected work as proposals, not applied."
+      ]
+    },
+    {
+      "id": "older-editor",
+      "entry_points": "all",
+      "context": {
+        "editor": "6000.0.40f1",
+        "packages": "Use only versions resolved in this target; newer optional APIs are absent."
+      },
+      "expected": [
+        "Inspect actual compatibility rather than assuming the starter engine line.",
+        "Defer incompatible items or propose a separately confirmed adaptation."
+      ]
+    },
+    {
+      "id": "dirty-workspace",
+      "entry_points": "all",
+      "context": {
+        "git": "Unrelated staged and unstaged user changes exist.",
+        "editor": "An Editor has unsaved scene changes."
+      },
+      "expected": [
+        "Preserve user edits and unsaved scenes; continue independent read-only inspection.",
+        "Do not clean, stash, save, close, or reset user work without applicable authorization."
+      ]
+    },
+    {
+      "id": "cli-unavailable",
+      "entry_points": "all",
+      "context": {
+        "tools": "Unity CLI and command bridge are unavailable; saved project files are readable."
+      },
+      "expected": [
+        "Continue the static audit and identify an Editor UI or existing-tool fallback.",
+        "Mark dependent live checks Not verified; do not install a bridge implicitly."
+      ]
+    },
+    {
+      "id": "missing-prerequisite",
+      "entry_points": "all",
+      "context": {
+        "prerequisite": "A capability required by one requested item is absent (package, module, host, or device)."
+      },
+      "expected": [
+        "Keep independent audit work moving and name the missing prerequisite.",
+        "Propose any prerequisite installation separately; leave dependent checks Not verified."
+      ]
+    },
+    {
+      "id": "partial-install",
+      "entry_points": [
+        "ScriptTemplates/SetupScriptTemplates.md",
+        "Presets/SetupPresets.md",
+        "SceneTemplates/SetupSceneTemplates.md",
+        "SetupInstructions/README.md"
+      ],
+      "context": {
+        "destination": "One selected asset exists without its metadata; another selected pair is already identical."
+      },
+      "expected": [
+        "Report the incomplete pair as a conflict; preserve it until resolved.",
+        "Preserve the identical pair and customized metadata; do not invent GUIDs or overwrite content."
+      ]
+    },
+    {
+      "id": "repeat-run",
+      "entry_points": [
+        "ScriptTemplates/SetupScriptTemplates.md",
+        "Presets/SetupPresets.md",
+        "SceneTemplates/SetupSceneTemplates.md",
+        "FolderStructure/SetupFolders.md",
+        "VersionControl/SetupVersionControl.md",
+        "ContinuousIntegration/SetupCI.md",
+        "PackageInstaller/InstallPackages.md",
+        "ProjectSettings/ProjectSettings.md",
+        "Testing/TestingInstructions.md"
+      ],
+      "context": {
+        "destination": "Previously confirmed setup is complete; all selected values and resource identities already match."
+      },
+      "expected": [
+        "Report no change needed for matching items; create no duplicates or replacement identities.",
+        "Separate any verification still unperformed from the matching saved state."
+      ]
+    },
+    {
+      "id": "single-platform",
+      "entry_points": [
+        "BuildSettings/DesktopBuilds.md",
+        "BuildSettings/MobileBuilds.md",
+        "SetupInstructions/README.md"
+      ],
+      "context": {
+        "targets": "Only one platform is selected: Windows for desktop or Android for mobile.",
+        "authorization": "Only that platform is eligible for the exact confirmation list."
+      },
+      "expected": [
+        "Configure/build only the selected platform after confirmation.",
+        "Unselected platforms are Not applicable, not missing-host blockers."
+      ]
+    }
+  ]
+}

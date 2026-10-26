@@ -1,0 +1,78 @@
+# Licence-free checks for a Unity project. Install as .github/workflows/unity-checks.yml, with the
+# files from Scripts/ copied to .github/unity-ci/. Needs no secrets and no Unity licence.
+#
+# It does NOT run EditMode or PlayMode tests: those need the Unity Editor, and a Personal licence
+# cannot be activated on a hosted runner. A green run means the project is structurally sound and
+# follows the style guide, not that its tests pass. Run `unity test` locally (see the Testing guide).
+name: Unity checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: unity-checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # Repository root. Point this at the Unity project folder when it is a subfolder.
+      UNITY_PROJECT_PATH: ${{ github.workspace }}
+      UNITY_NON_INTERACTIVE: '1'
+      UNITY_NO_CONSENT_PROMPT: '1'
+      UNITY_NO_UPDATE_CHECK: '1'
+    steps:
+      # Text and .meta files only: LFS objects are not needed, so the checkout stays fast.
+      - uses: actions/checkout@v4
+        with:
+          lfs: false
+
+      - name: Structure, GUIDs, and test isolation
+        run: python3 .github/unity-ci/check_unity_project.py
+
+      # The Unity CLI only reads files here. No sign-in or licence is involved.
+      - name: Install the Unity CLI
+        run: |
+          curl -fsSL https://unity.com/install.sh | bash
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      # `unity vcs doctor` expects LFS hooks when .gitattributes uses LFS, and a CI checkout has none.
+      - name: Install LFS hooks
+        run: git lfs install --local
+
+      # Ignore rules, LFS patterns, line endings, and package pinning. Exit 4 means a finding.
+      - name: Repository settings (unity vcs doctor)
+        run: unity vcs doctor "$UNITY_PROJECT_PATH"
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Require the style configuration
+        run: test -f "$UNITY_PROJECT_PATH/.editorconfig" || { echo "::error::No .editorconfig. Install the EditorConfig starter first."; exit 1; }
+
+      - name: Restore the lint project
+        run: dotnet restore .github/unity-ci/Lint.csproj
+
+      - name: Whitespace and formatting
+        run: dotnet format whitespace .github/unity-ci/Lint.csproj --no-restore --verify-no-changes
+
+      - name: Naming
+        run: dotnet format style .github/unity-ci/Lint.csproj --no-restore --diagnostics IDE1006 --severity info --verify-no-changes
+
+      - name: State what did not run
+        if: always()
+        run: |
+          {
+            echo "### Not run in this job"
+            echo "- EditMode and PlayMode tests (they need the Unity Editor and a licence)"
+            echo "- A player build"
+          } >> "$GITHUB_STEP_SUMMARY"

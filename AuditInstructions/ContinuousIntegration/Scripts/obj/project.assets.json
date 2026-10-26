@@ -1,0 +1,80 @@
+{
+  "version": 4,
+  "targets": {
+    "netstandard2.1": {}
+  },
+  "libraries": {},
+  "projectFileDependencyGroups": {
+    "netstandard2.1": []
+  },
+  "packageFolders": {
+    "/Users/thomaskr/.nuget/packages/": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "/Users/thomaskr/Github/UnityProjects/unity-code-style-guide/AuditInstructions/ContinuousIntegration/Scripts/Lint.csproj",
+      "projectName": "Lint",
+      "projectPath": "/Users/thomaskr/Github/UnityProjects/unity-code-style-guide/AuditInstructions/ContinuousIntegration/Scripts/Lint.csproj",
+      "packagesPath": "/Users/thomaskr/.nuget/packages/",
+      "outputPath": "/Users/thomaskr/Github/UnityProjects/unity-code-style-guide/AuditInstructions/ContinuousIntegration/Scripts/obj/",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "/Users/thomaskr/.nuget/NuGet/NuGet.Config"
+      ],
+      "originalTargetFrameworks": [
+        "netstandard2.1"
+      ],
+      "sources": {
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "netstandard2.1": {
+          "framework": "netstandard2.1",
+          "targetAlias": "netstandard2.1",
+          "projectReferences": {}
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      },
+      "SdkAnalysisLevel": "10.0.300"
+    },
+    "frameworks": {
+      "netstandard2.1": {
+        "framework": "netstandard2.1",
+        "targetAlias": "netstandard2.1",
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "NETStandard.Library.Ref",
+            "version": "[2.1.0, 2.1.0]"
+          }
+        ],
+        "frameworkReferences": {
+          "NETStandard.Library": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.302/RuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}

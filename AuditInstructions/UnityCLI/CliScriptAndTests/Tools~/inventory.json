@@ -1,0 +1,16 @@
+{
+  ".": "c629aea62ac3743aea317d68bc1944a8",
+  "Editor": "92d9663b0a17a43b6a10871721a1ee80",
+  "Editor/CliScriptAndTests.Editor.asmdef": "0e85513204ac945af84e4d6242cd47ae",
+  "Editor/ScriptGenerationCommand.cs": "f455df3638eed4f4bbb2193f96fd8064",
+  "Editor/ScriptGenerator.cs": "7c0b55870d8cd40ccab5ad6a35111c29",
+  "Generated": "8e31db9eda76d440aa4b0009aedd7a8a",
+  "Generated/CliScriptAndTests.Generated.asmdef": "b8cf68ed962f14de19d19a8863210782",
+  "Templates": "147cb8faf68c54262804a5eb288b6825",
+  "Templates/SampleScoreCounter.cs.txt": "9a5eee5169ffc44d7b8109643c763853",
+  "Tests": "6e982329930144f4fa43d4bc729cba0a",
+  "Tests/EditMode": "f0fbc4daa6a054ff6b7aa9d69ba29354",
+  "Tests/EditMode/CliScriptAndTests.EditMode.Tests.asmdef": "1123ab253784946d48be49b2d7f2c292",
+  "Tests/EditMode/GeneratedScoreCounterTests.cs": "260bc5ff9aea94e77bf4d5e3a6ed29e6",
+  "Tests/EditMode/ScriptGeneratorTests.cs": "fc8ff4b8135994f67bc384f16b492170"
+}

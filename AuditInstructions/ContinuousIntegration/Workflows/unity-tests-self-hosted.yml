@@ -1,0 +1,57 @@
+# Optional. Runs EditMode and PlayMode tests with the Unity CLI on a runner YOU host, where your own
+# Unity licence is already active. Install as .github/workflows/unity-tests-self-hosted.yml.
+#
+# Setup, once: register a self-hosted runner with the label `unity` on a machine where the Editor
+# version in ProjectVersion.txt is installed, `unity license status` shows a licence, and the project
+# is not open in the Editor. See SetupCI.md.
+#
+# SECURITY: a self-hosted runner executes whatever a workflow checks out. This file runs only for
+# branches in this repository and for manual dispatch, never for forks. Do not use a self-hosted
+# runner with a public repository unless you accept that risk.
+name: Unity tests (self-hosted)
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: unity-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: [self-hosted, unity]
+    timeout-minutes: 60
+    env:
+      # Set the same project subfolder here as in unity-checks.yml.
+      UNITY_PROJECT_PATH: ${{ github.workspace }}
+      UNITY_FORMAT: github
+      UNITY_NON_INTERACTIVE: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Licence and Editor preflight
+        working-directory: ${{ env.UNITY_PROJECT_PATH }}
+        run: unity doctor --ci
+
+      - name: EditMode tests
+        run: unity test "$UNITY_PROJECT_PATH" --mode EditMode --report-format junit --output "$RUNNER_TEMP/editmode.xml"
+
+      - name: PlayMode tests
+        run: unity test "$UNITY_PROJECT_PATH" --mode PlayMode --report-format junit --output "$RUNNER_TEMP/playmode.xml"
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            ${{ runner.temp }}/editmode.xml
+            ${{ runner.temp }}/playmode.xml
+          if-no-files-found: warn

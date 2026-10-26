@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "47/cpMiZjeA=",
+  "success": true,
+  "projectFilePath": "/Users/thomaskr/Github/UnityProjects/unity-code-style-guide/AuditInstructions/ContinuousIntegration/Scripts/Lint.csproj",
+  "expectedPackageFiles": [
+    "/Users/thomaskr/.nuget/packages/netstandard.library.ref/2.1.0/netstandard.library.ref.2.1.0.nupkg.sha512"
+  ],
+  "logs": []
+}

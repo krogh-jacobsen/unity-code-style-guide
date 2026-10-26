@@ -1,0 +1,13 @@
+using UnityEditor;
+
+    #ROOTNAMESPACEBEGIN#
+// Add CustomEditor(typeof(YourOwnedType)) after selecting the target.
+[CanEditMultipleObjects]
+public sealed class #SCRIPTNAME# : Editor
+{
+    public override void OnInspectorGUI()
+    {
+        DrawDefaultInspector();
+    }
+}
+#ROOTNAMESPACEEND#

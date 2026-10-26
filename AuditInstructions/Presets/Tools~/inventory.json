@@ -1,0 +1,15 @@
+{
+  "Animations/FBXAnimationImporter.preset": "a1c8dd08508c4341a75ed3fd45a1bfd5",
+  "Audio/AmbienceAudioImporter.preset": "2ab0a5b23622b46e691e0ba9fba25ecf",
+  "Audio/LayeredAmbienceAudioImporter.preset": "370ad86a5eb1d47e9a43f258a1e6e80e",
+  "Audio/MusicAudioImporter.preset": "6ad43c7dea473466bb6e33ba84426394",
+  "Audio/SFXAudioImporter.preset": "b5cd1643fcc1e4237a3652bde885ab25",
+  "Audio/SpatialSFXAudioImporter.preset": "22dbbcb91dde34dc39cbf56beb605c18",
+  "Audio/UIAudioImporter.preset": "d7473bccbe2ca42bba6967e205d90af3",
+  "Audio/UIShortAudioImporter.preset": "3f34697a999664156938eab0b9439b00",
+  "Models/FBXModelImporter.preset": "5fbe9a9b7b7441dea18aa7fce90c4820",
+  "Textures/AlbedoTextureImporter.preset": "f61eb0483155c4510af0ab38dfedddf2",
+  "Textures/MaskTextureImporter.preset": "c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4",
+  "Textures/NormalTextureImporter.preset": "e909e14824a2d4c7bbbddfffaad65823",
+  "Textures/UISpriteTextureImporter.preset": "2e363ae08c3a848c7854d798a8dd05f2"
+}

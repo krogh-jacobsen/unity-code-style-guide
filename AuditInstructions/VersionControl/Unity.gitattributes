@@ -1,0 +1,66 @@
+# BEGIN unity-code-style-guide: Unity attributes
+# Install at the repository root. Scene and prefab merging is configured separately (per machine)
+# with `unity vcs merge-setup`; see SetupVersionControl.md. Edit outside this block, not inside it.
+
+# Let Git normalize line endings on check-in, and keep text types identical on every platform.
+* text=auto
+*.cs text eol=lf
+*.asmdef text eol=lf
+*.asmref text eol=lf
+*.uxml text eol=lf
+*.uss text eol=lf
+*.tss text eol=lf
+*.shader text eol=lf
+*.hlsl text eol=lf
+*.cginc text eol=lf
+*.compute text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.meta text eol=lf
+
+# Unity YAML under Force Text serialization. .asset stays auto: some .asset files are binary.
+*.unity text eol=lf
+*.prefab text eol=lf
+*.mat text eol=lf
+*.anim text eol=lf
+*.controller text eol=lf
+*.physicMaterial text eol=lf
+*.inputactions text eol=lf
+*.asset text=auto eol=lf
+
+# BEGIN LFS (optional): remove this section when the project does not use Git LFS.
+# Every contributor and CI runner needs git-lfs installed before the first checkout of these files.
+# Textures and images
+*.png filter=lfs diff=lfs merge=lfs -text
+*.jpg filter=lfs diff=lfs merge=lfs -text
+*.jpeg filter=lfs diff=lfs merge=lfs -text
+*.tga filter=lfs diff=lfs merge=lfs -text
+*.tif filter=lfs diff=lfs merge=lfs -text
+*.tiff filter=lfs diff=lfs merge=lfs -text
+*.bmp filter=lfs diff=lfs merge=lfs -text
+*.gif filter=lfs diff=lfs merge=lfs -text
+*.exr filter=lfs diff=lfs merge=lfs -text
+*.hdr filter=lfs diff=lfs merge=lfs -text
+# Models and animation
+*.fbx filter=lfs diff=lfs merge=lfs -text
+*.obj filter=lfs diff=lfs merge=lfs -text
+*.dae filter=lfs diff=lfs merge=lfs -text
+*.blend filter=lfs diff=lfs merge=lfs -text
+# Audio and video
+*.wav filter=lfs diff=lfs merge=lfs -text
+*.mp3 filter=lfs diff=lfs merge=lfs -text
+*.ogg filter=lfs diff=lfs merge=lfs -text
+*.aif filter=lfs diff=lfs merge=lfs -text
+*.aiff filter=lfs diff=lfs merge=lfs -text
+*.flac filter=lfs diff=lfs merge=lfs -text
+*.mp4 filter=lfs diff=lfs merge=lfs -text
+*.mov filter=lfs diff=lfs merge=lfs -text
+*.webm filter=lfs diff=lfs merge=lfs -text
+# Source art (kept in ArtSource/)
+*.psd filter=lfs diff=lfs merge=lfs -text
+*.kra filter=lfs diff=lfs merge=lfs -text
+*.ai filter=lfs diff=lfs merge=lfs -text
+*.sbsar filter=lfs diff=lfs merge=lfs -text
+*.spp filter=lfs diff=lfs merge=lfs -text
+# END LFS
+# END unity-code-style-guide: Unity attributes

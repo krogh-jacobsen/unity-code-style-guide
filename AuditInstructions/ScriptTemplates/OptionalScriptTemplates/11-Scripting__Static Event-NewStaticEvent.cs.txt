@@ -1,0 +1,16 @@
+using System;
+using Unity.Scripting.LifecycleManagement;
+
+    #ROOTNAMESPACEBEGIN#
+/// <summary>Session-scoped event; listeners own their subscription lifetime.</summary>
+public static partial class #SCRIPTNAME#
+{
+    [AutoStaticsCleanup]
+    public static event Action EventRaised;
+
+    public static void Raise()
+    {
+        EventRaised?.Invoke();
+    }
+}
+#ROOTNAMESPACEEND#

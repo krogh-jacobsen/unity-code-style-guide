@@ -1,0 +1,36 @@
+using System.Collections;
+using System.Reflection;
+using NUnit.Framework;
+using Sample.Game;
+using UnityEngine;
+using UnityEngine.TestTools;
+
+public sealed class AwaitableOperationTests
+{
+    private static void SetDelay(NewAwaitableOperation op, float seconds)
+    {
+        typeof(NewAwaitableOperation).GetField("m_delaySeconds", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(op, seconds);
+    }
+
+    [UnityTest]
+    public IEnumerator RestartDisableReenableDestroy_ProducesNoErrors()
+    {
+        GameObject go = new GameObject("op");
+        go.SetActive(false);
+        NewAwaitableOperation op = go.AddComponent<NewAwaitableOperation>();
+        SetDelay(op, 0.05f);
+        go.SetActive(true);          // OnEnable starts an operation
+        op.StartOperation();         // restart cancels the first
+        op.StartOperation();
+        yield return null;
+        go.SetActive(false);         // OnDisable cancels
+        yield return new WaitForSeconds(0.2f);
+        go.SetActive(true);          // starts again and runs to completion
+        yield return new WaitForSeconds(0.25f);
+        op.CancelOperation();
+        op.CancelOperation();        // idempotent
+        Object.Destroy(go);          // destroy cancels any running operation
+        yield return new WaitForSeconds(0.1f);
+        LogAssert.NoUnexpectedReceived();
+    }
+}
