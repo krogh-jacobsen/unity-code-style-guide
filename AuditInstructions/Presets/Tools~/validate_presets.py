@@ -2,6 +2,7 @@
 import json
 import re
 import sys
+import subprocess
 from pathlib import Path
 
 FOLDER = Path(__file__).resolve().parents[1]
@@ -45,7 +46,21 @@ for relative, expected in json.loads((Path(__file__).parent / "inventory.json").
     require(path.exists(), f"Inventory resource missing: {relative}")
     require(expected in meta_guids(path), f"Resource GUID drift: {relative}")
 
+# Replay fixtures are maintained here; this validates their shape, not agent/Unity behavior.
+cases = json.loads((Path(__file__).parent / "workflow_scenarios.json").read_text())["cases"]
+require(bool(cases), "Missing preset workflow scenarios")
+require(len({case["id"] for case in cases}) == len(cases), "Duplicate preset scenario IDs")
+for case in cases:
+    require(case["entry_points"] == ["Presets/SetupPresets.md"], f"Unexpected scenario target: {case['id']}")
+    require(bool(case["context"]) and bool(case["expected"]), f"Incomplete scenario: {case['id']}")
+    require(all(isinstance(item, str) and item.strip() for item in case["expected"]),
+            f"Empty expected outcome: {case['id']}")
+
+regression = subprocess.run([sys.executable, str(Path(__file__).with_name("test_preset_workflows.py"))],
+                            capture_output=True, text=True)
+require(regression.returncode == 0, "Preset replay regressions failed:\n" + regression.stderr)
+
 if errors:
     print("\n".join(errors), file=sys.stderr)
     raise SystemExit(1)
-print(f"PASS presets: {len(presets)} partial presets, GUID table matches metadata and inventory")
+print(f"PASS presets: {len(presets)} partial presets, GUID table matches metadata and inventory; {len(cases)} workflow scenarios structurally valid; 3 replay regressions passed")

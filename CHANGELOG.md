@@ -1,5 +1,12 @@
 # Change log
 
+## 2026-10-26 — Preset installation and registration pressure-test refinements
+
+- Expanded preset discovery to active installations, package/reference copies, registrations, and helpers; existing paths are reused. Added baseline/local/upstream update comparison, explicit unknown-baseline handling, effective-policy review, recovery, and tested Editor updates preserving GUIDs and metadata.
+- Added version-checked registration APIs, concrete single/alternative glob examples, positive/negative/overlap checks, separate live and saved-file readback, targeted saves, genuine new imports, and no-op reruns. Timestamp changes alone do not establish a configuration write.
+- Clarified mixed-folder audio selection, future-import effects of updating registered presets, and corrections within approved scope. Qualified beta compatibility claims with historical and reported conflicting evidence rather than a universal model pass.
+- Added nine topic-owned decision scenarios, a topic-local replay generator, regressions for approval boundaries and safe output generation, and a disposable-project validation procedure. Static checks and runtime/replay limitations are recorded in Validation.md; preset assets and metadata are unchanged.
+
 ## 2026-10-26 — Audit pressure-test corrections and coverage (R1–R10, R12)
 
 - Corrected static cleanup semantics (`NoAutoStaticsCleanup` preserves state, generated cleanup needs a `partial` type, mutable `static readonly` contents need inspection), reconciled the Static Event template's documented 6.5 minimum with its 6.6/6.7 compile-tested versions, and made older-Editor adaptations separate custom resources.

@@ -476,3 +476,51 @@ Sources checked in October 2026: [Unity test assemblies](https://docs.unity3d.co
 The test-assembly page was inspected at package 1.4.6; actual target execution must confirm its
 installed Test Framework and Editor options. Release guidance intentionally specifies evidence and
 ownership rather than embedding volatile store requirements.
+
+
+## Preset compatibility evidence
+
+This table qualifies the earlier preset results; it does not replace their historical observations.
+The later model failure is supplied session feedback, not a reproduced failure in this repository.
+Missing original revisions/fixture identifiers are explicitly unknown rather than inferred from the
+current preset assets. The same Editor version alone does not make two test contexts equivalent.
+
+| Evidence | Editor / host | Preset revision | Importer | Operation | Fixture | Result | Limitations |
+|---|---|---|---|---|---|---|---|
+| Earlier recorded disposable run (October 2026) | 6000.7.0b4 / macOS Apple Silicon | Exact source commit not recorded in original result | AudioImporter | Preset Manager first import | Disposable-project audio; exact fixture IDs not recorded | Passed in that run | No universal project/version compatibility claim |
+| Earlier recorded disposable run (October 2026) | 6000.7.0b4 / macOS Apple Silicon | Exact source commit not recorded in original result | ModelImporter | Preset Manager first import | Disposable-project model; exact fixture IDs not recorded | Passed in that run | Does not establish every FBX/rig/model configuration |
+| Earlier recorded disposable run (October 2026) | 6000.7.0b4 / macOS Apple Silicon | Exact source commit not recorded in original result | TextureImporter | Preset Manager first import | Disposable-project textures; exact fixture IDs not recorded | Native application crash observed | Initial import then explicit ApplyTo/SaveAndReimport was the tested alternative |
+| User-supplied pressure-test feedback (reviewed 2026-10-26) | 6000.7.0b4 / host not supplied | Unknown | ModelImporter | First import with defaults | Project fixture/log not supplied | Model crash reported in that project history | Not reproduced here; cause and relationship to earlier pass unresolved |
+
+## Preset workflow refinements — 2026-10-26
+
+Implemented the approved R1–R9 documentation and validation-coverage changes while preserving
+pre-existing working-tree edits. No preset asset bytes or metadata were changed. The standalone
+workflow now distinguishes first installation from tested Editor updates, preset identity from
+customization, matching from import behavior, and live configuration from disk persistence.
+
+| Check | Result | Scope/limits |
+|---|---|---|
+| Preset resource and scenario validation | Passed | 13 partial presets; GUID table/inventory match; nine structurally valid decision scenarios |
+| Preset replay regressions | Passed | Three tests: decision/audit prompt boundaries and withheld grading; existing output preservation; repository output rejection |
+| Isolated publication snapshot | Passed | Integrated validator with --require-dotnet: 75 Markdown files, 472 links/anchors, 75 GUIDs, six folder validators, 10 shared audit tests, 22 CI fixtures and .NET style gates |
+| Roslyn naming intersections | Passed | .NET SDK 10.0.302; Good fixture zero IDE1006 diagnostics, Bad fixture six expected diagnostics |
+| Concurrent checkout preservation | Verified for publication | Commit prepared from HEAD plus preset-only changes; pre-existing and concurrent workflow edits excluded from publication and retained locally |
+
+The isolated snapshot excludes unrelated working-tree work, so its shared regression count differs
+from the current checkout. Preset checks do not imply that the nine agent decisions or Unity operations
+were exercised. The initial sandboxed integrated-check attempt required a rerun with local .NET
+access; the isolated publication run above completed successfully.
+
+Not verified in this change: fresh-agent grading of the nine new decision scenarios, a Unity
+update/save helper, actual first-import filters/persistence/no-op behavior, model crash reproduction,
+player builds, or profiling. The disposable-project procedure defines those checks without claiming
+they ran. No Unity project is part of this documentation repository.
+
+Sources checked for the review in October 2026: Unity's
+[Preset Manager filter documentation](https://docs.unity3d.com/cn/current/Manual/class-PresetManager.html),
+[GetDefaultPresetsForType signature](https://docs.unity3d.com/ScriptReference/Presets.Preset.GetDefaultPresetsForType.html),
+and [SetDefaultPresetsForType signature and example](https://docs.unity3d.com/ScriptReference/Presets.Preset.SetDefaultPresetsForType.html).
+The setter page still mentions the older getter in prose; use installed signatures rather than that
+stale name. No universal targeted-save API or tested identity-preserving update implementation is
+asserted by these documentation changes; the guide requires target-version discovery and validation.

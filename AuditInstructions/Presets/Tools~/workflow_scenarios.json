@@ -1,0 +1,132 @@
+{
+  "cases": [
+    {
+      "id": "preset-established-installation",
+      "entry_points": [
+        "Presets/SetupPresets.md"
+      ],
+      "context": {
+        "destination": "Active presets are registered from Assets/Presets. Assets/KitReference/Presets contains different-GUID bundled copies. Assets/Settings/Presets is absent. Relevant helpers reference the active path."
+      },
+      "expected": [
+        "Discover active and reference copies and inspect registrations/helper references; reuse Assets/Presets.",
+        "Keep reference identities separate; propose no migration or duplicate installation."
+      ]
+    },
+    {
+      "id": "preset-customized-update",
+      "entry_points": [
+        "Presets/SetupPresets.md"
+      ],
+      "context": {
+        "source": "Old revision A and new revision B are immutable. The active preset retains its upstream GUID but includes a local audio-quality change; upstream changes load type. A second same-GUID preset has an unknown baseline.",
+        "scope": "Updates are requested for comparison only; nothing is confirmed."
+      },
+      "expected": [
+        "Compare baseline/local/upstream effective properties and exclusions; GUID equality does not prove unmodified content.",
+        "Preserve local policy and explicitly resolve unknown-baseline content before proposing a tested Editor update; no filesystem overwrite or metadata replacement."
+      ]
+    },
+    {
+      "id": "preset-approved-update",
+      "entry_points": [
+        "Presets/SetupPresets.md"
+      ],
+      "context": {
+        "proposal": "Confirmed update of the active Assets/Presets/Audio/SFX.preset from A to B retains the local quality setting and changes only the included load-type policy. Existing GUID/metadata and references must remain; registered future-import rules reference this preset. No existing importers are selected.",
+        "tools": "Editor APIs are available, but the identity-preserving update route has not been tested on a disposable copy."
+      },
+      "expected": [
+        "Test the version-checked Editor update route on a disposable copy before updating the active destination; retain recovery outside Assets.",
+        "Verify saved effective properties/exclusions, unchanged metadata/GUID/references, and a no-op repeat comparison; do not apply to existing importers.",
+        "Report future-import consequences of changing the registered preset even if its registration list is unchanged."
+      ],
+      "task": "Continue the workflow from the supplied review/decision state. Execute only authorized work when a real target and safe tools exist. The fictional fixture itself authorizes no real workspace changes."
+    },
+    {
+      "id": "preset-unsaved-registration",
+      "entry_points": [
+        "Presets/SetupPresets.md"
+      ],
+      "context": {
+        "authorization": "Exact rules and test paths are already confirmed.",
+        "evidence": "The setter succeeds and a genuine import follows the new SFX rule. The live list has the new filter, but the saved Preset Manager file still has an older filter. Unrelated assets and a scene are dirty."
+      },
+      "expected": [
+        "Report persistence failed/incomplete despite the successful setter/import.",
+        "Use a version-checked targeted configuration save and independently verify live and saved identities/filters/enabled states/order; preserve unrelated dirty assets/scenes."
+      ],
+      "task": "Continue the workflow from the supplied review/decision state. Execute only authorized work when a real target and safe tools exist. The fictional fixture itself authorizes no real workspace changes."
+    },
+    {
+      "id": "preset-filter-syntax",
+      "entry_points": [
+        "Presets/SetupPresets.md"
+      ],
+      "context": {
+        "proposal": "Register SFX only under Assets/FixtureGame/Audio/SFX including nested folders, and UI under Assets/FixtureGame/Audio/UI. Preview only; no writes are confirmed.",
+        "filter": "A helper suggests glob:\"(Assets/FixtureGame/Audio/SFX/**)\". The project has sibling Audio/SFXExtra, case-variant audio/sfx, vendor copies, and overlapping generic audio rules."
+      },
+      "expected": [
+        "Use a quoted single pattern and correctly grouped alternatives outside quotes; preview through the target Unity matcher.",
+        "Check direct/nested positives, case/sibling/vendor negatives, and the effective ordered overlap outcome; shell/Python glob is not Unity evidence."
+      ]
+    },
+    {
+      "id": "preset-helper-side-effects",
+      "entry_points": [
+        "Presets/SetupPresets.md"
+      ],
+      "context": {
+        "tools": "Installed Editor exposes GetDefaultPresetsForType. A legacy helper uses old DefaultPreset members, replaces the entire list with selected entries, and calls a global SaveAssets. Existing rules include unrelated and disabled entries."
+      },
+      "expected": [
+        "Inspect API signatures and helper side effects before execution; preserve unrelated entries, order, and enabled states.",
+        "Propose a compatible targeted route instead of invoking the unsafe helper or triggering an updater/global save."
+      ]
+    },
+    {
+      "id": "preset-mixed-audio-folder",
+      "entry_points": [
+        "Presets/SetupPresets.md"
+      ],
+      "context": {
+        "assets": "One Ambience folder holds long stereo beds, 100 ms positional animal calls with many concurrent voices, and short authored stereo loops. Future content has no clear path separation."
+      },
+      "expected": [
+        "Classify by playback usage, duration, concurrency, and spatial/stereo requirements; do not assign Streaming to the whole folder.",
+        "Recommend explicit mappings or narrower existing subfolders; leave ambiguous future defaults unregistered and propose restructuring separately."
+      ]
+    },
+    {
+      "id": "preset-conflicting-compatibility",
+      "entry_points": [
+        "Presets/SetupPresets.md"
+      ],
+      "context": {
+        "evidence": "Historical disposable 6000.7.0b4 audio/model defaults passed and texture defaults crashed. Another project session reports a model first-import crash on that version without a retained fixture or preset revision."
+      },
+      "expected": [
+        "Keep both observations with their source, operation, fixture/revision limits, and unknown fields; no universal model pass or confirmed universal crash.",
+        "Keep beta textures on explicit application and model defaults unvalidated pending isolated investigation; invent no reproduced result."
+      ]
+    },
+    {
+      "id": "preset-correction-and-noop",
+      "entry_points": [
+        "Presets/SetupPresets.md"
+      ],
+      "context": {
+        "authorization": "Policy, SFX owned scope, preset identity, fixture creation/cleanup, and targeted configuration persistence were explicitly confirmed.",
+        "evidence": "The approved single-folder filter needs a syntax correction; the first save route failed readback. A later corrected run matches live and disk. An unrelated Editor process touches the configuration timestamp without changing bytes.",
+        "scope": "Another folder is newly suggested but was not approved."
+      },
+      "expected": [
+        "Correct syntax/save mechanism within unchanged approved scope without another approval loop; obtain confirmation for the additional folder.",
+        "On the matching rerun, make no setter/save calls or duplicate rules and require unchanged configuration bytes; timestamp alone is not failure.",
+        "Require genuine first imports without existing metadata, cleanup through Editor APIs, and preserved unrelated dirty work; missing checks remain Not verified."
+      ],
+      "task": "Continue the workflow from the supplied review/decision state. Execute only authorized work when a real target and safe tools exist. The fictional fixture itself authorizes no real workspace changes."
+    }
+  ]
+}

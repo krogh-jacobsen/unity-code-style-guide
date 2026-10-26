@@ -16,7 +16,7 @@ This folder ships 13 small, partial presets and an agent guide that installs the
 
 | I want to… | Give your agent |
 |---|---|
-| Install presets, optionally apply or register them | [SetupPresets.md](SetupPresets.md) |
+| Install or update presets, optionally apply or register them | [SetupPresets.md](SetupPresets.md) |
 
 Example prompts:
 
@@ -40,7 +40,7 @@ Presets involve three different actions, and the agent does only the ones you ch
 
 | Step | What happens | Risk |
 |---|---|---|
-| **Install** (default) | Copies the preset files into `Assets/Settings/Presets/`. No existing asset changes. | Lowest |
+| **Install/update** | Installs new presets or updates explicitly selected existing presets at their established path. Updating a registered preset can change future imports. | Low for first installation; updates need comparison |
 | **Apply** | Applies a preset to assets you name. Their importer settings change. | Changes real assets |
 | **Register** | Adds a Preset Manager rule so future imports in chosen folders use a preset. | Affects every new import |
 
@@ -62,7 +62,9 @@ survive. That is what makes applying them to a project with existing content saf
 
 ## Key decisions
 
-**Pick one audio policy per clip.** The audio presets are alternatives, not layers.
+**Pick one audio policy per clip.** The audio presets are alternatives, not layers. Classify by
+playback use, length, overlapping voices, and spatial/stereo needs. An Ambience folder can contain
+both long beds and tiny animal calls; one folder-wide rule may be inappropriate.
 
 - UI Short for tiny clicks where compression artifacts matter and PCM size is acceptable.
 - Spatial SFX for noisy, frequently overlapping positional effects. It forces mono, so keep stereo
@@ -113,11 +115,14 @@ desktop game, with these limits:
 
 ## Things to know
 
-- **Texture defaults on Unity 6000.7.0b4.** Registering texture presets as defaults crashed that
-  beta during first import. The guide installs and applies explicitly instead. Audio and model
-  defaults worked. Re-test on your own Editor version before relying on texture defaults.
-- **Where files go.** `Assets/Settings/Presets/<Role>/`. `Assets/Settings` is often already there
-  from your Unity template; the agent reuses it.
+- **Compatibility is specific to a test.** A disposable 6000.7.0b4 run passed audio/model default
+  imports and crashed on texture first import. Another project session reported a model first-import
+  crash on that version; it remains unreproduced here. The guide keeps texture application explicit
+  on that beta and model defaults unvalidated pending investigation. See the
+  [evidence record](../../Validation.md#preset-compatibility-evidence) for the limits.
+- **Where files go.** The agent discovers active installations, reference copies, and registrations
+  first. It reuses established paths such as `Assets/Presets`; a new installation without one uses
+  `Assets/Settings/Presets/<Role>/`. Moving an installation is a separate choice.
 - **No enforcement.** Nothing here re-applies a preset when someone changes an importer. Persistent
   enforcement (an `AssetPostprocessor`) is a project decision, not part of the starter.
 - **Never delete `.meta` files to reapply defaults.** That changes an asset's GUID and breaks
@@ -125,8 +130,30 @@ desktop game, with these limits:
 - **License.** The presets are MIT licensed. The agent places a copy of the license in your
   third-party notices.
 
+## Updating an existing installation
+
+Ask: *"Compare my installed presets with this revision and recommend updates, preserving my local
+changes and existing asset references."* A matching GUID means it is the same asset, not that its
+content is untouched. The agent compares the old source, your version, and the proposed revision;
+it presents policy changes and handles unknown baselines explicitly before you confirm an update.
+
+Updates use a tested Editor route and preserve destination metadata. They do not automatically
+reapply policy to existing content. Because registered defaults reference the preset asset, updating
+that asset can affect future imports even when the registration itself stays unchanged.
+
+## What successful registration proves
+
+A rule must match the intended paths, configure genuinely new imports, and survive saving. The
+agent reports live configuration and saved-file readback separately, preserves unrelated dirty
+work, and checks a matching rerun performs no configuration writes. Fixing syntax within your
+approved scope does not require another selection round; expanding that scope does.
+
+For maintenance, [Tools~](Tools~/README.md) contains decision replay cases and a disposable-project
+procedure. Python checks validate resource structure and fixture coverage; actual Unity imports
+and persistence require their own observed evidence.
+
 ## What the agent reports
 
-Each preset is Installed, Already installed, or in Conflict, with its GUID. Unity import, applying to
+Each preset is Installed, Updated, Already installed, or in Conflict, with its GUID. Unity import, applying to
 assets, and registering defaults are reported separately, and any check it couldn't run is marked
 *Not verified*.

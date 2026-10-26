@@ -17,11 +17,12 @@ Each preset is two files, `<Role>/<Name>.preset` and `<Role>/<Name>.preset.meta`
 
 ## Operating rules
 
-- Do three separate things only when selected, in this order: **install** (copy files),
+- Do three separate things only when selected, in this order: **install/update** (manage selected preset assets),
   **apply** (change existing asset importers), **register** (future-import rules). Install is the
   recommended default.
-- Copy shipped bytes and metadata unchanged. Never author, edit, or regenerate a `.preset` or its
-  `.meta`, never invent GUIDs, and never delete metadata to force a re-import.
+- For first installation, copy shipped bytes and metadata unchanged. Update imported presets only
+  through the confirmed Editor workflow in step 3; preserve destination metadata and references.
+  Never hand-edit serialized preset YAML, invent GUIDs, or delete metadata to force a re-import.
 - The presets are tuned for desktop PC and Mac games (Windows and macOS standalone). When the
   project also targets mobile, Web, console, or VR, tell the user the audio and model policies were
   not reviewed for those targets and ask before applying them; the texture role presets are
@@ -52,6 +53,10 @@ Steps below that apply, install, or build run only after stage 4, and only for c
 finding during those steps becomes a new recommendation and returns to stage 3.
 
 Here, steps 1 and 2 are the audit and the recommendations; steps 3 to 6 run only for confirmed items.
+A correction that fulfills the approved policy, preset identities, owned paths, and preservation
+requirements stays within that authorization: for example, fixing filter syntax or using a targeted
+save route after a failed readback. Record the correction and rerun affected checks. A changed policy,
+additional path or asset, migration, or broader write becomes a new recommendation for confirmation.
 
 ## 1. Preflight
 
@@ -60,9 +65,17 @@ workspace, containing `Assets` and `ProjectSettings/ProjectVersion.txt`. Record:
 
 - Editor version, whether that Editor is open, and source-control state.
 - Target platforms (Build Profiles and the active build target), to apply the desktop rule above.
-- Existing contents of `Assets/Settings/Presets/` and any presets already registered under
-  Project Settings > Preset Manager.
-- Whether the project has a Unity-template `Assets/Settings` folder (reuse it as it stands).
+- Presets throughout `Assets` and available package assets, including bundled reference copies;
+  record path, GUID, content/source revision, and whether each is an active installation or reference.
+  Read Preset Manager registrations and relevant scripts/configuration referencing these paths.
+- The established active installation path (for example `Assets/Presets`). Reuse it; use
+  `Assets/Settings/Presets/<Role>/` only for a new installation without an established path.
+  Resolve multiple candidates before recommending a destination; migration is a separate selection.
+- Existing helpers' API compatibility and write scope: inspect list replacement, save calls, and
+  side effects before proposing execution. Record unrelated dirty assets/scenes to preserve.
+- For an update, immutable old/new source revisions and actual local content. Match by GUID and
+  path; a matching GUID establishes identity, not that content is unmodified. Mark a missing baseline
+  unknown and compare manually before recommending replacement.
 - The source revision you will use. Resolve `main` to a commit when you can and report it.
 
 **Done:** the target, Editor state, existing presets, and source revision are known, and the audit
@@ -75,7 +88,7 @@ stage 4, even when the user says "use defaults".
 
 | Question | Default |
 |---|---|
-| Which operation: install only, apply to existing assets, or register defaults? | Install only |
+| Which operations: install/update preset assets, apply to existing assets, register defaults? | First installation only; updates individually proposed |
 | Which asset roles do you have: textures (albedo, normal, mask, UI sprite), audio (music, ambience, SFX, UI), static models, animation-only? | Only roles with real content in the project |
 | For apply or register: which owned folders? | None; ask for exact folders |
 | Which audio policy for each kind of clip? | One policy per clip; ask when unclear |
@@ -105,6 +118,10 @@ Rules for choosing:
   tiny clicks when PCM size is acceptable. SpatialSFX suits noisy overlapping positional effects, and
   forces mono (keep stereo for authored stereo beds and music). LayeredAmbience suits short loops that
   would otherwise create many streams; use Ambience for long beds.
+- Classify audio by actual playback use, duration, expected concurrent voices, and spatial/stereo
+  requirements; folder names are evidence, not policy. A mixed Ambience folder may contain both long
+  beds and tiny animal calls. Recommend narrower existing subfolders or explicit asset mappings;
+  folder restructuring needs its own confirmation. Ambiguous future imports remain unregistered.
 - Keep the animation-only preset distinct from a character or rig import policy.
 - **Models:** the FBX Model preset turns Read/Write off. Unity requires Read/Write on for meshes used
   by a Mesh Collider, a Particle System shape, or a Terrain detail mesh, or the Player build can
@@ -117,7 +134,7 @@ Rules for choosing:
 - Each preset is partial: it includes only its listed policy and preserves everything else, including
   user data, bundle labels, external mappings, and platform overrides.
 
-Turn the answers into numbered recommendations (stage 2): one per preset worth installing (only for
+Turn the answers into numbered recommendations (stage 2): one per preset worth installing or updating (only for
 roles with real content), one each for applying to existing assets, registering defaults, and platform
 budgets (step 6). Give each its finding from the audit, why it matters, risk, and a default. The user
 may pick any subset (stage 3), then confirms the exact list (stage 4).
@@ -125,38 +142,59 @@ may pick any subset (stage 3), then confirms the exact list (stage 4).
 **Done:** the recommendations were shown, the user picked from them, and the selected presets, the
 operation, and any exact target folders or assets were confirmed before any file was written.
 
-## 3. Install
+## 3. Install or update
 
-Only the presets confirmed in stage 4. Stage first, then check, then copy.
+Only the preset installations or updates confirmed in stage 4. Stage first, then check every destination.
 
 1. **Stage.** Download each selected `.preset` and `.preset.meta` into a temporary folder outside
    the target's `Assets`, plus the license. URL-encode filenames with spaces. Reject HTML or error
    responses, and any pair that is missing a half.
 2. **Verify.** Each `.meta` must contain the `guid:` from the table above. Stop on a mismatch.
-3. **Preflight destinations.** Each preset installs to `Assets/Settings/Presets/<Role>/<Name>.preset`
-   (keep the role subfolder), with its `.meta` beside it. Reject path traversal, symlinked entries,
-   and case-only collisions. Check each GUID against existing project assets, including package assets.
+3. **Preflight destinations.** Use the established active path from preflight; a new installation
+   defaults to `Assets/Settings/Presets/<Role>/<Name>.preset`, with its `.meta` beside it. Reject
+   path traversal, symlinked entries, and case-only collisions. Check each GUID against existing project assets, including package assets.
 
    | Destination state | Action |
    |---|---|
    | Absent and the GUID unused | New: install |
    | Same bytes and GUID at the path | Already installed: leave it |
-   | Different content or GUID, a half pair, or the GUID elsewhere | Conflict: report both paths and resolve before copying |
+   | Same identity and verified intended effective properties/exclusions after an Editor resave | Already current: retain local serialization and metadata |
+   | Same GUID elsewhere at the established active path | Reuse that path; classify its content before planning work |
+   | Different content with the destination GUID intact | Update candidate: compare baseline → local and baseline → upstream |
+   | Different-GUID reference copy | Separate asset: preserve it and its references; identify the selected active copy |
+   | A half pair, duplicate GUIDs, unresolved destination, or identity mismatch | Conflict: report paths and resolve before writes |
 
-4. **Copy.** With the target's Editor closed, create only missing directories and copy the staged
-   pairs intact; Unity generates metadata for the new folders. With the Editor open, use an
-   approved route that preserves the pairs, or ask the user to close the project's Editor. Install
-   no bridge or package, and never overwrite an imported or customized preset.
+4. **Execute the selected branch.**
+   - **First installation:** with the target's Editor closed, create only missing directories and
+     copy staged pairs intact; Unity generates folder metadata. With the Editor open, use an
+     approved import route preserving the pairs, or ask the user to close that Editor.
+   - **Update:** classify upstream-only, local-only, overlapping, and unknown-baseline differences.
+     Present effective included-property and exclusion-policy changes, source/destination identities,
+     affected default rules, exact Editor commands, and recovery/validation steps before confirmation.
+     Preserve local-only changes; resolve overlaps/unknown baselines explicitly. Keep recovery bytes
+     outside `Assets`. Load the pinned source preset through an available, project-approved Editor
+     route and update the existing asset through version-checked Editor APIs; preserve its GUID,
+     metadata, references, and unrelated importer settings. Test that route on a disposable copy
+     before changing the destination. Keep source inspection in a separate disposable project when
+     needed to avoid importing a duplicate source GUID into the target. If no safe route exists,
+     leave the destination untouched and
+     report Update Not verified. An Editor-resaved preset may differ in bytes: compare effective
+     properties and exclusions, rather than promising byte-identical upstream serialization.
+   Install no bridge/package or permanent updater. Closing the Editor does not authorize filesystem
+   replacement of an imported preset. Application to existing asset importers remains step 4 only.
 5. **License.** Place the MIT license in the project's existing third-party notices location outside
    `Assets`, or at `ThirdPartyNotices/UnityCodeStyleGuide-LICENSE.txt`. Reuse an identical notice;
    preserve unrelated ones.
 6. **Import and read back.** Import through existing Editor access, or open the project when that is
    safe and in scope. Read each installed asset's bytes and GUID; check the logs for fresh errors.
-   A repeat run must plan no copies. With no safe import route, report files copied and import
-   **Not verified**, with the next action.
+   For updates, also read back effective properties/exclusions and existing references after a
+   targeted save and reload; metadata must remain unchanged. Record actual per-preset source revisions
+   for partial outcomes. A repeat run must plan no copies or updates. With no safe import route,
+   report files copied (first installations only) and import **Not verified**, with the next action.
 
-**Done:** every selected pair is installed or already present, the license is placed, a repeat run
-does nothing, and import has an observed result or an explicit pending check.
+**Done:** every selected preset is installed, updated, already present, or explicitly unresolved;
+the license is placed for completed work, completed items need no further writes, and import/update
+policy, identity, reference, and saved-state checks have observed results or explicit pending checks.
 
 ## 4. Apply to existing assets (only when selected and confirmed)
 
@@ -183,26 +221,51 @@ unperformed application is stated.
 
 ## 5. Register as defaults (only when selected and confirmed)
 
-Only the rules confirmed in stage 4. Default presets apply when Unity imports an asset or creates a component, and only to new imports;
-they do not reconfigure assets that already exist. Configure them in Project Settings >
-Preset Manager, or by script with `Preset.GetDefaultListForType` and
-`Preset.SetDefaultPresetsForType(PresetType, DefaultPreset[])`.
+Only the rules confirmed in stage 4. Defaults configure new imports; they do not reconfigure existing
+asset importers. Use Project Settings > Preset Manager or version-checked Editor APIs. The documented
+getter is `Preset.GetDefaultPresetsForType(PresetType)`; use it with
+`Preset.SetDefaultPresetsForType(PresetType, DefaultPreset[])`. Confirm signatures, DefaultPreset
+members, and a targeted persistence route against the installed Editor before executing helpers.
 
-- Scope every filter to owned folders. A filter matches file names, folders, and extensions, and a
-  `glob:` prefix enables case-sensitive glob patterns. Preview what each filter matches first.
-- Order matters: entries apply top to bottom and later entries override earlier ones. Read the existing
-  list, preserve unrelated rules, reuse a matching registration, and never add duplicates on a rerun.
-- **Textures on Unity 6000.7.0b4:** registering texture defaults crashed Unity during first import.
-  On that version, import the texture first, then apply the preset explicitly (step 4). Treat any
-  other Editor version as unverified until a fresh texture import succeeds there. Audio and model
-  defaults passed on that version.
-- Verify with a genuinely new asset imported into a filtered folder, then remove the test asset
-  through Editor APIs. Install no `AssetPostprocessor` or other enforcer; persistent enforcement is a
-  separate project decision.
-- If a safe new-import test is unavailable, keep the files and report registration as unvalidated.
+1. **Preview matching and order.** Scope filters to confirmed owned paths. Glob matching is
+   case-sensitive. Use `glob:"Assets/Game/Audio/SFX/**"` for one pattern; alternatives use
+   `glob:("Assets/Game/Audio/SFX/**"|"Assets/Game/Audio/UI/**")`. Parentheses go outside the quoted
+   alternatives; `glob:"(Assets/Game/Audio/SFX/**)"` is not that alternatives syntax.
+   Check matching through Unity's target-version matcher, not a shell or Python glob approximation.
+   Preview direct/nested positive paths, case differences, sibling and vendor negatives, and assets
+   matching overlapping roles. Include the planned result of the entire ordered list: later entries
+   override earlier included properties. Preserve unrelated entries, order, and enabled states.
+2. **Register only differences.** Read the existing list, reuse matching entries, and require setter
+   success when a change is needed. Inspect helpers before calling them; supplying the entire list
+   requires retaining unrelated entries. Add no duplicate registrations. Save only Preset Manager
+   configuration through the verified Editor route; a global asset/scene save is outside this task.
+3. **Read back memory and disk separately.** Compare the live list and independently read saved
+   Preset Manager settings for preset GUIDs, filters, enabled states, and order. Read disk without
+   editing serialized YAML. A successful API return or fresh import alone does not prove persistence.
+   If either view differs, registration is incomplete; correct within approved scope and repeat.
+4. **Exercise genuine new imports.** With no existing metadata, import a representative fixture for
+   each distinct rule/policy and relevant overlap into confirmed test paths. Check intended values,
+   preserved overrides, and negative paths; create vendor-negative fixtures only in a disposable
+   project. Existing-asset Reimport is not this test. Include fixture creation/cleanup in the approved
+   validation scope and remove only those test assets through Editor APIs. Install no enforcer.
+5. **Verify a no-op rerun.** After fixture cleanup and pending Editor saves settle, rerun configuration.
+   Matching rules must cause no setter/save calls, duplicates, or configuration-byte changes. Record
+   modification time as supporting evidence in a controlled run, not a universal pass/fail condition.
+   Check unrelated dirty assets/scenes and rules remain untouched. A safe reopen/reload is additional
+   persistence evidence when in scope; do not close an Editor containing unsaved work to obtain it.
 
-**Done:** the selected rules are saved, a new import shows the intended policy, and unrelated rules
-are untouched, or the unperformed check is stated.
+**Compatibility evidence (October 2026):** a disposable 6000.7.0b4 run observed audio/model default
+imports passing and texture first-import crashes. A later project session reported a model first-import
+crash on the same version; it was not reproduced in this guide revision. These are fixture-specific
+observations, not an Editor-wide pass. On that beta use initial import → explicit application (step 4)
+for textures; keep model defaults unvalidated pending isolated investigation of the reported crash.
+Treat every other version/importer/operation combination as unverified until exercised. Keep prior
+and conflicting evidence with Editor, preset revision, importer, operation, fixture, result, and limits;
+unknown fields stay unknown. Optional repository history: [validation record](../../Validation.md).
+
+**Done:** every selected rule has separate live, saved-file, match, genuine-import, and no-op results;
+unrelated rules/dirty work are preserved. Missing safe routes or fixtures are Not verified, and failed
+checks remain failed/incomplete rather than a completed registration.
 
 ## 6. Platform budgets (separate selection)
 
@@ -218,16 +281,19 @@ apply budgets from this step unless the user selected and confirmed them.
 | Item | Status | Detail |
 |---|---|---|
 | Source URL and revision | | |
-| Each selected preset | Installed / Already installed / Conflict | Path and GUID |
+| Each selected preset | Installed / Updated / Already installed / Conflict | Path, GUID, actual source revision, local adaptations |
 | License | Placed / Already present | Location |
-| Repeat run | Nothing to do / Work found | |
+| Repeat run | Nothing to do / Work found / Not verified | Copies/updates and registration setter/save calls; configuration-byte comparison |
 | Unity import | Verified / Not verified | Next action if pending |
 | Apply to assets | Applied / Not selected / Not verified | Targets and readback |
-| Register defaults | Registered / Not selected / Not verified | Filters, order, new-import result |
+| Register defaults | Registered / Incomplete / Not selected / Not verified | Preset identities, filters, enabled states, order; separate live/disk, match, genuine-import, and no-op results |
 | Unpicked recommendations | Proposal | IDs, with the reason each was skipped |
 
 Put conflicts, unanswered choices, unpicked recommendations, and failed checks in a "Needs your
 decision" block at the top.
+
+**Done:** every selected operation and unpicked proposal has an outcome, with failures and missing
+evidence separated from verified results.
 
 ## References
 
