@@ -4,6 +4,20 @@ The intended profile is [Unity 6.7](AgentsInstructions/UnityTechStack/UnityTechS
 that choice from the exact prerelease Editor tested. It is not a guarantee for every 6000.7 patch,
 package upgrade, target platform, or copied project. Date: 2026-10-12.
 
+## Folder guides: folders first and scaffold mode — 2026-11-17
+
+Documentation-only change to the folder guides, their readme, and the setup coordinator, drawn from
+one real project setup (Unity 6000.7.0b6, Editor open, Unity CLI 1.0.1 connected). The behaviors the
+guides now describe (CLI-driven `CreateFolder`/`MoveAsset`, the render pipeline relocation, the
+verification set, and the first-commit size) were observed in that setup, not re-run for this change.
+
+| Check | Result | Evidence / limit |
+|---|---|---|
+| Full repository validator | Passed | `python3 -B -u AuditInstructions/Tools/validate_all.py`: 84 Markdown files, 563 local links/anchors, 75 unique GUIDs, 7 folder validators, 14 workflow tests; run without `--require-dotnet` |
+| Review contract copies | Passed | Contract checks in the same run; the contract text was not edited |
+| Fresh-agent decision replay | Not verified | The archived folder cases predate scaffold mode and vendor relocation; they were not rerun |
+| Clean-clone `.gitkeep` behavior | Not verified | Rationale (orphaned `.meta` deleted on import) not reproduced on a fresh clone for this change |
+
 ## Fresh-agent discipline pressure tests — 2026-10-26
 
 Five fresh agents (`fork_turns=none`, inherited model/reasoning with no overrides) tested frozen copies

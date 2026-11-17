@@ -65,6 +65,13 @@ recommend stages first and aggregate every recommendation into one list, with ID
 so the user picks across topics once and confirms once. A delegated workflow must not re-prompt for
 an item already confirmed here; it applies only the confirmed items from its own recommendations.
 
+**Apply folders first.** Once confirmed, apply the folder layout before anything else: before
+resources are copied into `Assets` (step 2), version control, and packages. This includes any
+confirmed [ReviewFolders.md](../FolderStructure/ReviewFolders.md) batch that moves vendor or sample
+folders into `Assets/ThirdPartyAssets/`, with owned dependencies such as a render pipeline asset
+moved out of them first. With vendor content already relocated, the version control step's
+ThirdPartyAssets ignore section covers it in one rule and the first commit holds only owned content.
+
 ## 1. Establish choices
 
 Confirm the destination, project name/namespace, installed Editor, platform, and selected resources.
@@ -89,14 +96,16 @@ selected presets/templates/examples are staged for import.
 
 ## 3. Configure the selected baseline
 
+The folder layout row is applied first; this table sets no order among the other rows.
+
 | Guide | Outcome | Selection |
 |---|---|---|
+| [Folder layout](../FolderStructure/README.md) | Owned feature layout (minimal or scaffold), correct special folders, vendor content relocated | Baseline; applied first |
 | [Tech stack](../../AgentsInstructions/UnityTechStack/UnityTechStack.md) | Exact Editor/packages, selected systems, targets | Baseline |
 | [Project settings](../ProjectSettings/README.md) | Settings match the agreed project/platform | Baseline plus explicit options |
 | [Mac and Windows builds](../BuildSettings/DesktopBuilds.md) | Desktop support contract, budgets, build profiles, and native player acceptance | Only selected desktop targets |
 | [Android and iOS builds](../BuildSettings/MobileBuilds.md) | Mobile support contract, store/toolchain checks, budgets, and device acceptance | Only selected mobile targets |
 | [Package audit](../PackageInstaller/InstallPackages.md) | Existing dependencies inspected; only confirmed missing packages installed | When package setup or a missing prerequisite is in scope |
-| [Folder layout](../FolderStructure/README.md) | Small owned feature layout and correct special folders | Baseline; expand when used |
 | [Version control](../VersionControl/README.md) | Unity ignore and attribute rules installed; settings that Git depends on confirmed | Baseline |
 | [CI](../ContinuousIntegration/README.md) | Licence-free checks installed; Editor tests run locally or on the user's own runner | When tests/examples selected |
 | [Presets](../Presets/README.md) | Scoped import policy registered with tested filters | Optional assets |

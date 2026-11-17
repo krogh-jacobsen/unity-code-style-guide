@@ -1,5 +1,11 @@
 # Change log
 
+## 2026-11-17 — Folders first, scaffold mode, and vendor relocation
+
+- Folder setup is now the first step of project setup. The setup coordinator applies the folder layout, including vendor relocation into `Assets/ThirdPartyAssets/`, before copying resources into `Assets`, version control, and packages, so the ThirdPartyAssets ignore section covers vendor content in one rule.
+- Added an explicit scaffold mode to SetupFolders.md beside the minimal default: the full `{ProjectName}` tree with a `FeatureExample` feature and `.gitkeep` markers in empty leaf folders, with the reason they are needed. The example feature is renamed from `Inventory` to `FeatureExample`.
+- ReviewFolders.md gained vendor-relocation checks (owned dependencies such as an active render pipeline asset inside a vendor folder, hard-coded vendor paths, `Resources`), the never-committed rollback rule, an Editor-open CLI route example, and the verification set used in a real Unity 6000.7 setup.
+
 ## 2026-10-26 — Fresh-agent discipline pressure tests
 
 - Ran five fresh sessions with withheld expected outcomes: 38 initial cases plus 16 corrective cases, all 54 matching independently reviewed decisions. Archived frozen sources, fixture inputs, response JSON and grades separately from Unity execution evidence.
