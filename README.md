@@ -1,38 +1,62 @@
-# Unity starter conventions and audits
+# Unity C# Code Style & LLM Audit Instructions
+  
+There may be no single right way to write C#, but agreeing on one removes the guesswork. You focus on the solution, and your team and your LLM follow the same consistent rules which ultimately leads to a higher code base quality.
 
-A selectable kit of Unity C# conventions, project setup and review instructions, script templates,
-import presets, and strategy scene templates. This repository contains documentation and resources;
-it is not a Unity project. Adapt stylistic preferences to your team and keep the policy,
-EditorConfig, templates, and examples consistent.
+This [Unity C# style guide](AgentsInstructions/CodeStyleGuide/README.md) is built to work well with LLM assistants and focus on Unity 6.7 and newer projects. It combines industry standard C# and general Unity best practices with a few opinionated conventions that are easy to adapt to your own.
 
-## Start here
+Originally an appendix to a popular ebook [Unity C# style guide for Unity 6, I co-authored, the repo now also includes LLM agent instructions and audit files. 
 
-| Situation | Entry point |
+Use, copy and cherrypick what is helpfulfor your rpoject your own Unity Project needs. More info in below.
+
+# Unity Audit & Project Start files
+
+Besides the Code Style instructions, this repo also a selection of tools, instructions and audit files which I found helpful and use in my Unity projects. You can use them for setting up new projects, or to audit or optimize an exsiting. You can pick and choose what is helpful for you and leave the rest. 
+
+## Overview
+
+### What's in the repo
+
+| Area | What you'll find | Start here |
+|---|---|---|
+| **Code style guide** | Naming, formatting and class-layout rules for Unity 6.7+, a ready-made `.editorconfig`, a naming checker script with good/bad fixtures | [Style guide](AgentsInstructions/CodeStyleGuide/UnityStyleGuide.md) · [README](AgentsInstructions/CodeStyleGuide/README.md) |
+| **Agent instructions** | An example `AGENTS.md` to copy and adapt, plus the Unity 6.7 tech stack profile your LLM should assume | [AgentsInstructions](AgentsInstructions/README.md) · [Tech stack](AgentsInstructions/UnityTechStack/UnityTechStack.md) |
+| **Project setup** | End-to-end setup workflow, folder structure, version control (`.gitignore`, `.gitattributes`, LFS), package installer, project and build settings (desktop and mobile) | [Setup workflow](AuditInstructions/SetupInstructions/README.md) |
+| **Reusable Unity resources** | Script templates (core and optional), 13 texture/audio/model/animation import presets, 3 scene templates (asset look-dev, strategy sandbox, UI preview) | [Script templates](AuditInstructions/ScriptTemplates/README.md) · [Presets](AuditInstructions/Presets/README.md) · [Scene templates](AuditInstructions/SceneTemplates/README.md) |
+| **Project audits** | A review router plus 20+ discipline lenses: performance, physics, rendering, UI Toolkit/uGUI, networking, audio, persistence, testing and more | [Review router](AuditInstructions/ProjectAuditGuides/ProjectReview.md) |
+| **Automation and CI** | GitHub Actions workflows (cloud and self-hosted), PR template, GitHub issue/PR instructions, Unity CLI cheatsheet with a worked example, testing setup | [CI](AuditInstructions/ContinuousIntegration/README.md) · [GitHub](AuditInstructions/Github/README.md) · [Unity CLI](AuditInstructions/UnityCLI/UnityCLI.md) · [Testing](AuditInstructions/Testing/README.md) |
+| **Release and migration** | Release-readiness checklist, experimental CoreCLR migration prep | [Release readiness](AuditInstructions/ReleaseReadiness/README.md) · [CoreCLR](AuditInstructions/CoreCLRmigration/README.md) |
+| **Maintenance and evidence** | Kit update workflow, validation scripts, replay tests, audit research and the compatibility record | [Kit maintenance](AuditInstructions/KitMaintenance/README.md) · [Research](AuditResearch.md) · [Validation](Validation.md) |
+
+Every audit and setup guide follows the same four stages: **audit → recommend → choose → confirm**. Nothing changes until you confirm. Full topic list: [AuditInstructions](AuditInstructions/README.md).
+
+### Where to start
+
+| I want to… | Go to |
 |---|---|
 | Understand the conventions | [Agent instructions](AGENTS.md) and [style guide](AgentsInstructions/CodeStyleGuide/UnityStyleGuide.md) |
-| Set up a project | [Setup workflow](AuditInstructions/SetupInstructions/README.md) |
-| Audit an existing project | [Review router](AuditInstructions/ProjectAuditGuides/ProjectReview.md); select applicable lenses |
-| Find one setup or audit topic | [Topic index](AuditInstructions/README.md) |
+| Set up a new project | [Setup workflow](AuditInstructions/SetupInstructions/README.md) |
+| Audit an existing project | [Review router](AuditInstructions/ProjectAuditGuides/ProjectReview.md) |
+| Find one specific topic | [Topic index](AuditInstructions/README.md) |
 | Update an installed copy | [Kit maintenance](AuditInstructions/KitMaintenance/README.md) |
-| Prepare a release | [Release readiness](AuditInstructions/ReleaseReadiness/README.md) |
-| Understand audit best-practice coverage and tradeoffs | [Research and pressure test](AuditResearch.md) |
-| Check tested compatibility | [Validation record](Validation.md) and [stack profile](AgentsInstructions/UnityTechStack/UnityTechStack.md) |
 
-Skills supply execution mechanics; project choices and resolved package versions govern APIs.
-Examples illustrate specific behavior and do not prescribe an architecture.
 
 ## How to install
 
-First audit the destination and confirm the selected changes through the
-[setup workflow](AuditInstructions/SetupInstructions/README.md). Use one source commit for the whole
-selection. There is no automatic installer.
+There is no automatic installer. Your LLM does the work, and you decide what it changes. Pick the
+size of adoption that fits:
 
-Keep a **reference snapshot** at `Documentation/UnityStarterKit/` outside `Assets`, preserving the
-source hierarchy. Include the files and directories listed in
-[installation.json](AuditInstructions/SetupInstructions/installation.json). This snapshot contains
-resource sources and maintenance tools as reference material; Unity resources are installed only
-when selected and copied separately into `Assets`. Exclude checkout internals, caches, and generated
-outputs. The manifest is the authoritative snapshot list; this table explains its destinations.
+| I want to… | Do this |
+|---|---|
+| **Try one thing** (a style guide, a preset, one audit) | Copy the URL of that topic's agent document from the [topic index](AuditInstructions/README.md) and tell your LLM "implement this in my Unity project". |
+| **Adopt the whole kit** | Hand the [setup workflow](AuditInstructions/SetupInstructions/README.md) to your LLM. It audits your project, recommends changes, and applies only the ones you pick and confirm. Use one source commit for the whole selection. |
+| **Keep the kit for reference and updates** | Keep a **reference snapshot** at `Documentation/UnityStarterKit/`, outside `Assets`, with the source hierarchy intact. See [Where files end up](#where-files-end-up). |
+
+### Where files end up
+
+The reference snapshot holds the kit's documents, resource sources and maintenance tools.
+[installation.json](AuditInstructions/SetupInstructions/installation.json) is the authoritative list
+of what goes into it. Exclude checkout internals, caches and generated outputs. Unity resources are
+copied into `Assets` separately, and only when selected. The table below shows where each piece lands.
 
 | Source here | Destination relative to the Unity project root | Action |
 |---|---|---|
@@ -48,26 +72,30 @@ outputs. The manifest is the authoritative snapshot list; this table explains it
 | AuditInstructions/UnityCLI/CliScriptAndTests/ selected example assets | Assets/Examples/CliScriptAndTests/ | Optional example; follow its README and isolate tests |
 | LICENSE | ThirdPartyNotices/UnityCodeStyleGuide-LICENSE.txt | Retain attribution for reused resources; preserve unrelated notices |
 
-The root README belongs to the game; keep this kit's README in the snapshot. Adapt the snapshot's
-stack profile to the target and record that adaptation for future merges. Existing project choices
-win over starter defaults. Other instruction-entry tools can point to the target's root AGENTS.md.
+### Rules when installing
 
-Inspect all conflicts before copying. Preserve existing metadata; use Editor APIs for existing
-imported assets. First installation of selected intact asset/metadata pairs with the Editor closed
-uses the [resource protocol](AuditInstructions/SetupInstructions/InstallResources.md). Keep `Tools~/`
-and documentation out of the imported selection.
+- **Your project wins.** Existing project choices take priority over starter defaults.
+- **Your README stays yours.** The root README belongs to the game; this kit's README lives in the snapshot.
+- **Adapt the stack profile** to your target and record that adaptation for future merges.
+- **Other instruction-entry tools** can point to your root AGENTS.md.
+- **Inspect conflicts before copying.** Preserve existing metadata, and use Editor APIs for assets that are already imported.
+- **First install of asset and metadata pairs** happens with the Editor closed, following the [resource protocol](AuditInstructions/SetupInstructions/InstallResources.md).
+- **Keep `Tools~/` and documentation** out of the imported selection.
 
-The repository's installation check stages this layout in a temporary fake destination and checks
-local links, anchors, case, root instruction rebasing, and the active EditorConfig copy:
+### Check and record
+
+The repository's installation check stages this layout in a temporary fake destination and verifies
+local links, anchors, case, root instruction rebasing, and the active EditorConfig copy. It does not
+install into your game.
 
 ```sh
 python3 AuditInstructions/Tools/check_installation.py
 ```
 
-It does not install into your game. If you choose another layout or merge existing instructions,
-check the resulting target's links separately. Record source revision, selected groups, destination
-paths, and local adaptations in `Documentation/UnityStarterKit-installation.json` after confirmation;
-the [update workflow](AuditInstructions/KitMaintenance/UpdateKit.md) defines that record.
+If you choose another layout or merge existing instructions, check your target's links separately.
+After confirmation, record the source revision, selected groups, destination paths and local
+adaptations in `Documentation/UnityStarterKit-installation.json`. The
+[update workflow](AuditInstructions/KitMaintenance/UpdateKit.md) defines that record.
 
 ## Loading model
 
