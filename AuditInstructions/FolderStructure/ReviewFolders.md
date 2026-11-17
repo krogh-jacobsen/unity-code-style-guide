@@ -10,7 +10,7 @@ recommend improvements, and, only when the user opts in, move content in small r
 This document is self-contained. For a brand-new project, use [SetupFolders.md](SetupFolders.md)
 instead; it hands vendor relocation into `Assets/ThirdPartyAssets/` to this document as a batch in
 the first step of project setup (see [Vendor relocation](#vendor-relocation)).
-**Last verified: November 2026.**
+**Last verified: 17 November 2026.**
 
 ## Operating rules
 
@@ -67,7 +67,8 @@ finding during those steps becomes a new recommendation and returns to stage 3.
 
 ## 1. Preflight
 
-Read the project's own instructions first; they win over this document. Then record:
+Read the project's own instructions first; they win over this document. A recorded choice (for
+example "no asmdefs") is respected: report what it implies, and recommend no reversal. Then record:
 
 - Editor version and whether the Editor is open. Moves need the Editor (or an Editor-driven CLI
   command); a review alone can read the files directly.
@@ -109,25 +110,34 @@ ArtSource/                # Optional, beside Assets: PSD, Blend, other source fi
 Packages/                 # Reusable code as embedded packages
 Assets/
 ├── ScriptTemplates/  StreamingAssets/  ThirdPartyAssets/   # direct children when used
-├── Settings/Presets/     # Import presets (the starter's convention)
-└── {ProjectName}/
+├── Settings/             # Template-created pipeline and volume assets; Presets/ by convention
+├── Editor/Tests/<Area>/  # Central EditMode tests when the project has no test asmdefs
+├── {CoreName}/           # Optional reusable framework root; references no game-root content
+└── {ProjectName}/        # Owned roots may start with one underscore to sort first
     ├── Scenes/  Settings/  Shared/  SceneTemplates/
-    └── {Feature}/        # Scenes, Scripts, Editor, Tests, Data, Prefabs, Art, UI
+    └── {Feature}/        # Scenes, Scripts, Editor, Data, Prefabs, Art, UI; Tests/ with test asmdefs
 ```
+
+Folder setup ([SetupFolders.md](SetupFolders.md)) defines these levels and rules; this review checks
+an existing tree against them.
 
 Check each area, citing a path as evidence for every finding:
 
 | Area | Look for |
 |---|---|
 | Organization | Type-first folders (`Scripts`, `Prefabs` at the root) instead of feature-first; duplicate or ambiguous roots (`Scripts` and `Code`); loose assets in the `Assets` root |
-| Naming | Spaces, mixed casing, case-only duplicates, dot-prefixed names (Unity skips them on import), accidental `~` suffixes |
-| Depth and paths | Nesting beyond about four levels below the content root; very long asset paths |
+| Naming | Spaces, mixed casing, case-only duplicates, dot-prefixed names (Unity skips them on import), accidental `~` suffixes, names starting with a digit (`3rdPartyAssets`, which the starter's ThirdPartyAssets ignore rule also misses) |
+| Depth and paths | Nesting beyond about four levels below the content root; very long asset paths; a feature `Scripts` folder past about 20 files, to split by concern (`Construction`, `Simulation`) within the nesting limit (a guideline) |
+| Layering | With a core root: search it for game-root namespaces, type names, and asset GUIDs, and report each hit; the same feature name in both roots with no stated reason. Without asmdefs this check is the only enforcement of the one-way direction |
 | Ownership | Content under a feature that other features own, and `Shared` content that depends on feature code or assets; dependency cycles between features |
 | Special folders | `StreamingAssets` or `ScriptTemplates` not direct children of `Assets`; `Resources` used for convenience instead of a loading need; `Plugins`, `Editor`, or `Gizmos` placed where they change compilation or behavior |
-| Assemblies | Scripts outside any intended asmdef; `Editor` folders inside runtime asmdefs without Editor-only assemblies; test asmdefs that cannot reference production assemblies |
+| Assemblies | Scripts outside any intended asmdef; `Editor` folders inside runtime asmdefs without Editor-only assemblies; test asmdefs that cannot reference production assemblies; per-feature `Tests` folders with no test asmdef (EditMode tests run from a central `Editor/Tests` in the predefined Editor assembly; PlayMode tests need a test asmdef) |
 | Vendor content | Vendor files mixed with owned content; vendor files modified in place |
 | Source art | PSD, Blend, or other source files inside `Assets` |
-| Template leftovers | Unused sample scenes and assets |
+| Docs in `Assets` | Guides, plans, and other Markdown inside `Assets`, which import as TextAssets; propose a project-root `Docs/` or a `~` folder. A short `README.md` per root or feature is fine |
+| Generated and tool folders | `_Recovery` (scenes recovered after an Editor crash) and tool `Temp` folders untracked in the tree: propose the version control workflow's ignore rules. Tool-owned roots (`TextMesh Pro`, package `Samples`) are Leave |
+| Template leftovers | Unused sample scenes and assets; template assets loose at the `Assets` root (volume profile, pipeline global settings), a Low-risk move into `Assets/Settings` |
+| Settings | More than one `Settings` folder per level, or content at the wrong level: template assets in `Assets/Settings`, framework defaults in the core root's, game configuration in the game root's |
 
 Rate each finding **Risk** (likely to cause bugs or build failures), **Improve** (clear benefit), or
 **Optional** (taste), and give its **move risk** from the next table.
@@ -142,7 +152,7 @@ folder position carries meaning.
 | Low | Prefabs, materials, textures, models, audio, ScriptableObject assets, UI files, and scenes, moved between ordinary folders | Unity references them by GUID, and the Editor moves the `.meta` file with the asset |
 | Medium | Scripts, asmdefs, asmrefs, and anything moved into or out of an `Editor`, `Plugins`, or `Standard Assets` folder | Folder position selects the compile phase and assembly, and an asmdef covers the whole folder tree beneath it, so a move can change which assembly a script belongs to |
 | High | `Resources` contents, Addressables, `StreamingAssets` contents, hard-coded `"Assets/..."` strings, import presets and postprocessors scoped by path, CI and `.gitignore` or LFS patterns | Their meaning depends on the path text. Unity's Addressables default address is the asset path, so a moved asset's address can change |
-| Leave | `Packages/`, `ProjectSettings/`, vendor content with a required layout, template-created `Assets/Settings`, `Editor Default Resources`, and the special folders themselves | Unity or the vendor expects them where they are |
+| Leave | `Packages/`, `ProjectSettings/`, vendor content with a required layout, tool-owned roots (`TextMesh Pro`, package `Samples`), template-created `Assets/Settings`, `Editor Default Resources`, and the special folders themselves | Unity or the vendor expects them where they are |
 
 Before rating anything Medium or High, search the project for `Resources.Load`, hard-coded `Assets/`
 paths, Addressables addresses, and path-scoped presets, and record what you find.
@@ -236,6 +246,10 @@ committed with verification passed, or fully undone with the cause reported.
 | Item | Status | Detail |
 |---|---|---|
 | Each finding | Risk / Improve / Optional | Path, evidence, recommendation, move risk |
+| Layering check | Passed / Hits / Not applicable | Core-root references to game-root content, duplicate feature names |
+| Docs in `Assets` | None / Found | Paths and proposed home |
+| Generated and tool folders | None / Found | Paths, tracked state, proposed ignore rule |
+| Tests placement | Per feature (asmdefs) / Central `Editor/Tests` / None | Recorded project choice, if any |
 | Unpicked recommendations | Proposal | ID and reason left open |
 | Each batch | Applied / Undone / Not started | Moves, commit, checks |
 | Each check | Passed / Failed / Not verified | Evidence |

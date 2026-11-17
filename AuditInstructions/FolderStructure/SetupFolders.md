@@ -9,15 +9,12 @@ Scaffold the owned-content folders of a newly created Unity project. This docume
 self-contained and creates directories only (plus `.gitkeep` markers in scaffold mode): presets,
 script templates, scenes, asmdefs, packages, project settings, and copied guides are separate tasks.
 Use the tools you already have; install no package, CLI, or setup script.
-**Last verified: November 2026.**
+**Last verified: 17 November 2026.**
 
 Run it as the first step of project setup, before `.gitignore`, version control, and package work.
-With vendor and sample content already inside `Assets/ThirdPartyAssets/`, the starter's
-`Unity.gitignore` ThirdPartyAssets section excludes all of it with one rule, no per-vendor ignore
-lines are needed, and the first commit holds only owned content. In one real setup the first
-`git add` shrank from a 12 GB `Library` plus about 7 GB of vendor imports to 55 files (about
-400 KB). That section is optional; where it is removed, the relocation still groups vendor content
-but no longer keeps it out of the repository.
+With vendor content already inside `Assets/ThirdPartyAssets/`, the starter's optional
+`Unity.gitignore` ThirdPartyAssets section excludes all of it with one rule, and the first commit
+holds only owned content.
 
 ## Operating rules
 
@@ -27,7 +24,10 @@ but no longer keeps it out of the repository.
 - Relocating existing content (vendor folders at the `Assets` root, for example) belongs to
   [ReviewFolders.md](ReviewFolders.md). Propose it as a ReviewFolders move batch in the same first
   step, rather than moving anything here.
-- The target project's own instructions take precedence over this document.
+- The target project's own instructions take precedence over this document. A recorded project
+  choice (for example "no asmdefs") is respected: report what it implies, and recommend no reversal.
+- For a brand-new project with no owned content, the audit, recommendations, and exact change list
+  may go in one message; stage 4 confirmation still comes before any write.
 - Leave existing assets, instructions, and unsaved work untouched.
 - When required instructions cannot be read, stop before creating anything rather than working
   from memory. Report the source URL or path you followed.
@@ -72,25 +72,29 @@ destination before writing. This starter repository is not a Unity project.
 Inspect the existing folders under `Assets`, any established owned-content root, source-control
 changes when available, and whether the project's Editor is open.
 
-Look for what the Unity template left behind. Template-created projects arrive with a
-`Assets/Settings` folder (its contents depend on the template, for example render pipeline and volume
-settings) and often a sample scene and sample assets. List what exists by inspection, and do not
-assume names. Reuse `Assets/Settings` as it stands; leave sample content in place and report it.
+List what the Unity template left behind, by inspection: an `Assets/Settings` folder (contents vary
+by template), often a sample scene and assets, and sometimes assets loose at the `Assets` root (a
+volume profile, pipeline global settings). Reuse `Assets/Settings` as it stands and leave the rest in
+place, reported; moving loose root assets into `Assets/Settings` is a low-risk ReviewFolders.md
+recommendation.
 
-List vendor and sample folders that sit directly under `Assets` (Asset Store packs, demo scenes,
-imported samples). Each one whose layout permits relocation becomes a proposed ThirdPartyAssets move
-batch for [ReviewFolders.md](ReviewFolders.md), including its pre-move checks (a render pipeline
-asset or other `ProjectSettings` dependency inside the vendor folder, hard-coded `Assets/` paths,
-`Resources` folders). Record whether the target's `.gitignore` already has the ThirdPartyAssets
-section.
+Vendor folders directly under `Assets` (Asset Store packs, demo scenes) whose layout permits
+relocation become proposed ThirdPartyAssets move batches for [ReviewFolders.md](ReviewFolders.md),
+with its pre-move checks. Record whether the target's `.gitignore` has the ThirdPartyAssets
+section. Tool-owned roots that a tool or package placed at the `Assets` root (`TextMesh Pro`, package
+`Samples`, and similar) stay where the tool expects them: report them and propose no move. Report
+generated folders such as `_Recovery` (scenes the Editor recovers after a crash) and tool `Temp`
+folders, and point to the [version control workflow](../VersionControl/SetupVersionControl.md) for
+their ignore rules; create nothing for them.
 
 Check the project's location. The full path and project name should contain no spaces, and the
 project should sit close to the drive root on Windows: [reported path-length failures](https://discussions.unity.com/t/unity-editor-still-hits-windows-max-path-260-char-limit-even-with-longpathsenabled-any-real-fix/1732098)
 hit IL2CPP and Android builds, and Unity publishes no safe limit. Warn the user when the path is long
 instead of moving the project.
 
-**Done:** the target project, local rules, existing folders, template leftovers, vendor folders at
-the `Assets` root, path length, and Editor state are known, and nothing has been created.
+**Done:** the target project, local rules, existing folders, template leftovers, vendor, tool-owned,
+and generated folders at the `Assets` root, path length, and Editor state are known, and nothing has
+been created.
 
 ## 2. Ask
 
@@ -100,16 +104,16 @@ become recommendations that still go through stages 3 and 4, even when the user 
 | Question | Default |
 |---|---|
 | Owned-content root name? | An existing root if one is established; otherwise `Assets/{ProjectName}`, using the project directory's name |
+| Is there a reusable framework layer in addition to the game? | No: one root. Yes: a core root beside the game root (see [Layered roots](#layered-roots)) |
 | Mode: minimal or scaffold? | Minimal. Scaffold creates the full boilerplate tree in step 3, with `.gitkeep` markers, for a team that wants the convention visible from day one |
 | Which real features exist now, and what does each need next? | Minimal: none, create the root alone. Scaffold: `FeatureExample` only, to copy and rename |
 | Project-wide `Scenes`, `Settings`, `Shared`, or `SceneTemplates`? | Minimal: only for a responsibility the user selects. Scaffold: all four |
-| `Tests/EditMode` and `Tests/PlayMode` folders? | Minimal: no. Scaffold: inside `FeatureExample` |
-| Vendor or sample folders at the `Assets` root? | Propose moving each into `Assets/ThirdPartyAssets/` through ReviewFolders.md in this same step, when its layout permits relocation |
+| Where do tests live? | Nowhere yet: create no `Tests` folders. (a) Per feature `Tests/EditMode` and `Tests/PlayMode`, which need test asmdefs (a separate task). (b) One central `Assets/Editor/Tests/<Area>` for EditMode tests without asmdefs |
+| Vendor folders at the `Assets` root? | Move each relocatable one into `Assets/ThirdPartyAssets/` through ReviewFolders.md, in this step |
 | `Resources`, `Plugins`, or `StreamingAssets`? | No: create only for an actual loading, plugin, or raw-content requirement |
 | Extra feature subfolders (`Audio`, `Animations`, `VFX`, `Materials`)? | None: add per feature when content of that kind exists |
 | Keep source art files (PSD, Blend, and similar) in the project? | No. When yes, use a project-root `ArtSource` folder beside `Assets`, outside the import pipeline |
-| Reusable code to share across projects? | No. A local package is a separate task, not part of folder scaffolding |
-| Sample content from the template? | Leave it in place and report it |
+| Reusable code to share across projects? | No. A local package is a separate task |
 
 **Done:** every proposed directory has a stated purpose and a concrete path under the target `Assets`,
 or is the explicitly selected project-root `ArtSource` beside `Assets`.
@@ -128,16 +132,18 @@ Assets/
 ├── StreamingAssets/      # Optional raw player content; must be a direct child of Assets
 ├── ThirdPartyAssets/     # Vendor imports whose layout permits relocation
 ├── Settings/Presets/     # Selected import presets (separate task); a starter convention, not a Unity special folder
+├── Editor/Tests/         # Tests option (b): central EditMode tests, one subfolder per area
+├── {CoreName}/           # Optional core root: the reusable framework layer, laid out like the game root
 └── {ProjectName}/
     ├── SceneTemplates/   # Optional source scenes/templates and shared resources
     ├── Scenes/           # Bootstrap, composition, and other project-wide scenes
-    ├── Settings/         # Project-wide URP, Input Actions, shared UI settings
+    ├── Settings/         # Game configuration: Input Actions, shared UI, owned pipeline assets
     ├── Shared/           # Independent shared code and content
     └── FeatureExample/   # Example feature; copy and rename it for each real one
         ├── Scenes/       # Optional feature-owned, test, or demo scenes
         ├── Scripts/
         ├── Editor/
-        ├── Tests/        # Optional; EditMode/ and PlayMode/ subfolders
+        ├── Tests/        # Tests option (a) only; EditMode/ and PlayMode/ subfolders
         ├── Data/         # Authored configuration assets
         ├── Prefabs/
         ├── Art/          # Models, textures, materials; add Audio/, Animations/, VFX/ when used
@@ -152,25 +158,43 @@ branches above (`ArtSource`, `StreamingAssets`, `ScriptTemplates`, `Settings/Pre
 ```text
 {ProjectName}/SceneTemplates/  Scenes/  Settings/  Shared/
 {ProjectName}/FeatureExample/Scenes/  Scripts/  Editor/  Data/  Prefabs/  Art/  UI/
-{ProjectName}/FeatureExample/Tests/EditMode/  Tests/PlayMode/
 ```
 
 `Art/Audio`, `Art/Animations`, `Art/VFX`, and `UI/Sprites` stay out: add them when content of that
-kind exists. Add `Assets/ThirdPartyAssets/` when vendor content is being relocated.
+kind exists. Add `Assets/ThirdPartyAssets/` when vendor content is being relocated. Add
+`FeatureExample/Tests/EditMode` and `Tests/PlayMode` only for tests option (a), and `Editor/Tests`
+only for option (b); every test folder created has a way to run.
 
 Put an empty `.gitkeep` file in every leaf folder that has no other content. Git tracks the folder's
-`.meta` file but not an empty folder, and on a clean clone Unity treats `Foo.meta` with no `Foo/` as
-orphaned and deletes it, so an unmarked scaffold silently disappears. Unity ignores dot-prefixed
-files, so `.gitkeep` gets no `.meta` and does not show in the Project window. A `.gitkeep` can be
-deleted once the folder holds real content.
+`.meta` but not an empty folder, and on a clean clone Unity deletes `Foo.meta` when `Foo/` is
+missing, so an unmarked scaffold silently disappears. Unity ignores dot-prefixed files, so
+`.gitkeep` gets no `.meta` and stays out of the Project window. Delete it once the folder has content.
+
+### Layered roots
+
+A reusable framework layer gets its own owned root beside the game root (in one mature project,
+`_StrategyCore` and `_RailroadTycoon`), laid out like `{ProjectName}`.
+
+- Dependencies run one way: the game root may reference the core root; the core root references
+  no game-root code, asset, or feature.
+- Generic, reusable behaviour goes in core; game-specific content and tuning go in the game root.
+- A feature name exists in one root only, unless the report states the reason (for example a core
+  `Audio` system and the game's `Audio` content).
+- Without asmdefs the direction is a convention, enforced by the core-reference check in
+  [ReviewFolders.md](ReviewFolders.md); asmdefs would enforce it at compile time (a separate task).
+- The core root inside `Assets` is the accepted interim; move it to a package (a separate task) once
+  a second project needs it.
 
 ### Naming and ownership
 
-Name every folder you create in PascalCase, with no spaces and consistent casing. Do not start a
+Name every folder you create in PascalCase, with no spaces and consistent casing. An owned root may
+start with one underscore (`_Core`, `_Game`) so it sorts above vendor and tool folders in the Project
+window; that is a choice, not a requirement. Start no name with a digit: keep `ThirdPartyAssets`
+rather than `3rdPartyAssets`, which the starter's ignore rule would also miss. Report an existing
+differing name as a recommendation; renaming belongs to ReviewFolders.md. Do not start a
 name with a dot: the Editor's create menu turns a leading dot into an underscore, and Unity ignores
 dot-prefixed folders when importing. Unity also ignores folders ending in `~` and folders named
-`cvs`, so use that suffix only when you intend the contents to stay out of the project (for example
-`Documentation~`). Keep nesting shallow: aim for at most four levels below the owned-content root.
+`cvs`; use the suffix only for contents meant to stay out of the project (`Documentation~`). Keep nesting shallow: aim for at most four levels below the owned-content root.
 Those naming and nesting limits are this guide's recommendations, not Unity requirements.
 
 Apply these ownership rules when placing a folder:
@@ -179,18 +203,27 @@ Apply these ownership rules when placing a folder:
   feature consumes it. Multiple consumers alone do not make something shared.
 - Use `Shared` only for content with an independent responsibility that depends on no feature
   implementation, through code or asset references.
-- Use project-level `Scenes` and `Settings` for composition and configuration that spans features.
-- Keep guides, build outputs, and validation reports outside `Assets`.
+- Put game-wide content that no single feature owns (environment art, terrain and world data,
+  animation sets, editor tools) in plainly named folders under the owning root (`Environment`,
+  `Terrains`, `Tools`). It references no feature code. `Shared` holds independent code and content
+  with its own responsibility; these folders are the game's content library, grouped by kind.
+- Use project-level `Scenes` for composition that spans features. `Settings` has three levels:
+  `Assets/Settings` holds what the template created (pipeline and volume assets), reused in place;
+  `{CoreName}/Settings` holds framework defaults; `{ProjectName}/Settings` holds game configuration
+  (Input Actions, shared UI settings, pipeline assets the project owns beyond the template's).
+- Keep guides, plans, build outputs, and validation reports outside `Assets`, in a project-root
+  `Docs/` folder (or a folder ending in `~`). Text files inside `Assets` import as TextAssets. One
+  short `README.md` per root or feature, stating its purpose and dependency direction, is the
+  exception; writing them is a separate task.
 - Create `Resources` or `Plugins` only for an actual loading or plugin requirement, and honor
-  platform-specific plugin paths. Custom Android Gradle templates and a custom main manifest
-  belong in `Assets/Plugins/Android/`; Unity generates them when the matching Publishing Settings
-  option is enabled, so enable the option instead of creating the files by hand. See the
-  [mobile build setup](../BuildSettings/MobileBuilds.md).
-- Keep reusable cross-project code out of `Shared`. Unity's custom-package layout (a folder with a
-  `package.json`, plus `Runtime`, `Editor`, and `Tests`) in `Packages/` is the supported home for it;
-  do not create `package.json` files in this workflow.
+  platform-specific plugin paths (Android build files: see the
+  [mobile build setup](../BuildSettings/MobileBuilds.md)). Everything in a `Resources` folder ships in
+  the player build, so list each one in the report.
+- Keep reusable cross-project code out of `Shared`: its supported home is a custom package in
+  `Packages/` (a separate task; create no `package.json` here).
 - Keep source art in `ArtSource`, beside `Assets`, instead of importing it.
-- Defer `Assets/Settings/Presets` and `Assets/ScriptTemplates` to their own workflows.
+- Defer presets and `Assets/ScriptTemplates` to their own workflows. `Settings/Presets` is this
+  starter's convention; an established `Assets/Presets` is equally fine.
 - Folder creation does not configure test assemblies or asmdefs, and it does not create a permanent
   setup report. In minimal mode it creates no placeholder files, because every folder is about to
   receive content; scaffold mode's `.gitkeep` markers are the only exception.
@@ -216,21 +249,17 @@ Choose the route by destination, scope, and Editor state:
   with ordinary filesystem operations. It stays outside Unity import regardless of Editor state.
 - **New-project Assets scaffolding, Editor closed:** create only the selected missing directories
   with ordinary filesystem operations. Unity generates their metadata on import.
-- **Editor open:** use existing Editor access (for example `AssetDatabase.CreateFolder`) for selected
-  imported folders, checking each path first and targeting the project explicitly. One route that
-  worked: with the Unity CLI connected to the open Editor, a `command eval` call ran C# that created
-  the folders and returned the results. Discover the installed CLI's commands rather than copying
-  this one. If no route is available, defer creation or ask for a safe closed-Editor route for
-  new-project scaffolding. Never install a bridge or close an Editor with unsaved work.
+- **Editor open:** use existing Editor access (for example `AssetDatabase.CreateFolder`), checking
+  each path first and targeting the project explicitly. One route that worked: a Unity CLI
+  `command eval` call against the open Editor ran that C# and returned the results; discover the
+  installed CLI's commands rather than copying this one. With no route, defer creation or ask for a
+  safe closed-Editor route. Never install a bridge or close an Editor with unsaved work.
 - **`.gitkeep` markers (scaffold mode):** write them with ordinary filesystem operations after the
-  folders exist, whatever the Editor state. Unity does not import dot-prefixed files, so no metadata
-  is involved.
+  folders exist, whatever the Editor state; Unity does not import them.
 - **Established project Assets changes:** continue read-only inventory, then route imported-folder
-  additions or reorganization to [ReviewFolders.md](ReviewFolders.md) for an Editor-owned plan.
-  An existing owned root alone does not imply reorganization, and does not block a specifically
-  selected project-root ArtSource proposal. This workflow never moves existing content; vendor
-  relocation into `Assets/ThirdPartyAssets/` runs as a ReviewFolders.md batch in the same first step,
-  after the target folder exists.
+  additions or reorganization to [ReviewFolders.md](ReviewFolders.md). An existing owned root alone
+  does not imply reorganization, nor block a selected project-root ArtSource. Vendor relocation runs
+  there as a batch in the same first step, after `Assets/ThirdPartyAssets/` exists.
 
 If a failure interrupts creation, report the paths already created. A rerun must reuse them and
 create only the remaining selected directories.
@@ -246,10 +275,10 @@ confirmed path is Created or Already present, with existing content and metadata
 - Repeat the missing-folder check; it must find nothing to create.
 - Compare before and after. Only the selected directories and Unity-generated folder metadata belong
   to this run. Preserve unrelated concurrent edits.
-- After an observed Unity import, confirm that the new folders under `Assets` have generated
-  metadata (folders ending in `~` and `ArtSource` get none, by design), GUIDs are unique, pre-existing metadata is unchanged, and the import log has no fresh errors. Open the project
-  for import only when a safe route exists and doing so is within scope; otherwise mark the import
-  checks **Not verified** and tell the user to open the project in Unity.
+- After an observed Unity import, confirm the new folders under `Assets` have generated metadata
+  (`~` folders and `ArtSource` get none), GUIDs are unique, pre-existing metadata is unchanged, and
+  the import log has no fresh errors. Open the project only when a safe route exists within scope;
+  otherwise mark the import checks **Not verified** and tell the user to open it in Unity.
 - Run no gameplay tests or player build for empty-folder scaffolding.
 
 Empty directories do not survive source control. Commit Unity-generated metadata together with the
@@ -265,7 +294,12 @@ Verified or Not verified.
 | Target project, content root, source URL | | |
 | Audit and recommendations shown, confirmation received | Yes / Stopped before confirming | Items picked |
 | Unpicked recommendations | Proposal | Path and reason |
-| Template leftovers (`Assets/Settings`, sample content) | Reused / Left in place | What exists |
+| Template leftovers (`Assets/Settings`, sample content, loose root assets) | Reused / Left in place | What exists |
+| Layered roots | One root / Core and game | Root names; core-reference check deferred to ReviewFolders.md |
+| Tests placement | None / Per feature (asmdefs) / Central `Editor/Tests` | Recorded project choice, if any |
+| Tool-owned and generated folders | Reported | Paths; ignore rules pointed to |
+| Docs inside `Assets` | None / Reported | Paths and proposed home |
+| `Resources` folders | None / Listed | Paths |
 | Project path | OK / Warned | Length and spaces |
 | Mode | Minimal / Scaffold | `.gitkeep` count in scaffold mode |
 | Each selected path | Created / Already present / Conflict | Path |

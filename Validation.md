@@ -4,6 +4,22 @@ The intended profile is [Unity 6.7](AgentsInstructions/UnityTechStack/UnityTechS
 that choice from the exact prerelease Editor tested. It is not a guarantee for every 6000.7 patch,
 package upgrade, target platform, or copied project. Date: 2026-10-12.
 
+## Folder guides: rules from a mature project — 2026-11-17
+
+Documentation change drawn from a read-only look at one mature project (Unity-Railroad-Tycoon-Game).
+Unity claims were checked against the Unity 6.6 Manual through a fetch agent.
+
+| Check | Result | Evidence / limit |
+|---|---|---|
+| Full repository validator | Passed | `validate_all.py`: 84 Markdown files, 567 local links/anchors, 75 unique GUIDs, 7 folder validators; version control 40 ignored / 18 tracked paths including `_Recovery` both ways; run without `--require-dotnet` |
+| Hidden-asset import rules, TextAsset import of `.md`/`.txt` | Confirmed | Manual: special folders and Text Asset pages |
+| `Resources` contents ship in the player | Not re-checked | Long-standing Manual statement; not fetched for this change |
+| EditMode tests without an asmdef | Contradicts the Manual; observed working | The Manual requires a test assembly; the mature project runs 1,205 passing EditMode tests from `Assets/Editor/Tests` with no asmdef (Test Framework 1.9). Guides present it as observed behaviour |
+| PlayMode tests need a test asmdef | Confirmed | Manual: Edit Mode vs Play Mode tests |
+| `Assets/_Recovery` from crash recovery | Not documented; observed | Untracked folder of recovered `.unity` scenes in the mature project |
+| Underscore sorts owned roots first | Not verified | Stated as a convention, not a Unity rule |
+| Fresh-agent decision replay | Not verified | Not rerun for these changes |
+
 ## Folder guides: folders first and scaffold mode — 2026-11-17
 
 Documentation-only change to the folder guides, their readme, and the setup coordinator, drawn from

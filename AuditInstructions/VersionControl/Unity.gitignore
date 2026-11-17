@@ -79,6 +79,11 @@ crashlytics-build.properties
 InitTestScene*.unity*
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
 
+# Scenes the Editor recovers after a crash (observed in Unity 6; not documented). Save any you need
+# under owned content first.
+/[Aa]ssets/_Recovery/
+/[Aa]ssets/_Recovery.meta
+
 # Addressables generated content.
 /ServerData
 /[Aa]ssets/StreamingAssets/aa*

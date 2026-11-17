@@ -50,6 +50,7 @@ rules around it survive an update.
 | **Profiling and diagnostic captures** | See below |
 | **`Assets/ThirdPartyAssets/`** | See below |
 | Addressables, Test Runner, and Visual Scripting output | Generated content |
+| `Assets/_Recovery/` | Scenes the Editor recovers after a crash; save any you need under owned content first |
 
 Everything else is committed, including `ProjectSettings/`, `Packages/manifest.json`,
 `Packages/packages-lock.json`, and **every `.meta` file**. A `.meta` file holds an asset's GUID, and a

@@ -1,5 +1,11 @@
 # Change log
 
+## 2026-11-17 — Folder rules from a mature project
+
+- SetupFolders.md: optional layered roots (a core root beside the game root, one-way dependency, core stays in `Assets` until a second project needs it), underscore-prefixed owned roots, a tests-placement decision (per feature with test asmdefs, or a central `Editor/Tests` without them; scaffold creates no test folders by default), three `Settings` levels, game-wide content folders, docs outside `Assets` with a per-folder README exception, tool-owned and generated folders, digit-leading names, either Preset location, and a one-message fast path for empty projects.
+- ReviewFolders.md: layering check (core-root references to game-root content, duplicate feature names), docs in `Assets`, generated and tool folders, loose template assets, `Settings` levels, oversized `Scripts` folders, and matching report rows.
+- `Unity.gitignore` now ignores `Assets/_Recovery/`; the version control validator checks it both ways.
+
 ## 2026-11-17 — Folders first, scaffold mode, and vendor relocation
 
 - Folder setup is now the first step of project setup. The setup coordinator applies the folder layout, including vendor relocation into `Assets/ThirdPartyAssets/`, before copying resources into `Assets`, version control, and packages, so the ThirdPartyAssets ignore section covers vendor content in one rule.
