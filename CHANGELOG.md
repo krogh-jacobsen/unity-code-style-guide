@@ -1,5 +1,14 @@
 # Change log
 
+## 2026-11-18 — World and tooling lens wording from a real project
+
+- Terrain: new Authored-asset isolation row (runtime edits on a private `TerrainData` copy, restore rebinds renderer and collider and destroys the copy); tile and stream rows are marked Not applicable for single-terrain scenes.
+- Navigation: new Custom graph search row (failure result handled, bounded cost, invalidation on graph edits); Route lifetime now covers a runtime bake source (terrain, colliders) changing without a surface rebuild.
+- Testing: new Test inclusion without asmdefs row (Editor-folder placement, no NUnit in runtime code, probes guarded by a define absent from Release variants); policy-excluded categories are recorded as "Not run (policy)"; a bounded settle followed by a state assertion is valid; `[Explicit]` probes with throwing helpers are not assertion-free; `InternalsVisibleTo("Assembly-CSharp-Editor")` noted as the alternative to heavy private reflection.
+- Assemblies: the test-inclusion row covers asmdef projects and points no-asmdef projects to Testing; the define caveat adds `UNITY_INCLUDE_INSTRUMENTATION` for probe code.
+- Editor tooling (Tool authoring): a tool that refuses dirty scenes and Play Mode and saves before returning may rely on version control instead of Undo.
+- Assets and memory: new Unused content row requiring both a GUID search and a path-string search before calling an asset unreferenced.
+
 ## 2026-11-17 — Learnings from a real Editor-tooling setup (P1–P13)
 
 - Non-destructive by default: AGENTS.md now says any change outside the confirmed list, however small, returns to the user before it is made, and that every confirmed item states its undo. The style guide, stack profile, and project rules open with an audit-first preface for existing projects. The canonical review contract and all 19 copies now say the same: stage 4 gives each change its undo, and noting an unconfirmed change in a report is not confirmation.
