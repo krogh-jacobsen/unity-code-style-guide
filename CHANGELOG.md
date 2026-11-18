@@ -1,5 +1,11 @@
 # Change log
 
+## 2026-11-18 — Updating an adapted copy with no installation record
+
+- UpdateKit.md has a new read-only step 2 for kit material copied without a recorded source revision: match files by name across upstream history, bound the search by the date the copy arrived, score each upstream commit by line similarity, and take the best as a reconstructed baseline. Each file is classified near-pristine, adapted, or local fork (thresholds 0.95 and 0.60, reported with the scores).
+- Forks get proposals only. The workflow recommends an overlay (a pinned unmodified snapshot plus a short local overrides file referenced from `AGENTS.md`) and writing `UnityStarterKit-installation.json` with `baseline_method` and `local_forks`. The apply table has a matching overlay row; later steps are renumbered.
+- The KitMaintenance README explains why a copy can look rewritten against today's upstream while being an old untouched snapshot.
+
 ## 2026-11-17 — Learnings from a real Editor-tooling setup (P1–P13)
 
 - Non-destructive by default: AGENTS.md now says any change outside the confirmed list, however small, returns to the user before it is made, and that every confirmed item states its undo. The style guide, stack profile, and project rules open with an audit-first preface for existing projects. The canonical review contract and all 19 copies now say the same: stage 4 gives each change its undo, and noting an unconfirmed change in a report is not confirmation.

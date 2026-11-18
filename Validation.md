@@ -4,6 +4,15 @@ The intended profile is [Unity 6.7](AgentsInstructions/UnityTechStack/UnityTechS
 that choice from the exact prerelease Editor tested. It is not a guarantee for every 6000.7 patch,
 package upgrade, target platform, or copied project. Date: 2026-10-12.
 
+## Baseline reconstruction for adapted copies — 2026-11-18
+
+| Check | Result | Evidence / limit |
+|---|---|---|
+| Procedure on a real adapted copy, read-only | Passed | 17 review documents copied into a project's own docs folder with no source revision. Over the 32 first-parent upstream commits, the best mean similarity was 0.99 (17 of 17 matched) at the 2026-10-12 commits, the date the project's history shows the copy arriving; per file 0.96 to 1.00, so none is a fork. Against current upstream the mean is 0.44. About 3 s |
+| `README.md` name collision | Observed | The same name exists in several upstream folders; comparing every candidate is required, as the step now says |
+| Overlay conversion, installation record write | Not verified | Documentation only; no project was changed |
+| Thresholds 0.95 / 0.60 | Not verified | Starting values; only the near-pristine band was exercised |
+
 ## Setup learnings P1–P13 — 2026-11-17
 
 Documentation, template, and tool changes drawn from one real setup (Unity 6000.7.0b6, Editor-tooling
