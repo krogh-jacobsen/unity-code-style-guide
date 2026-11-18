@@ -60,9 +60,10 @@ from the sections below; the sections stay the owner of the rule and its rationa
 - **Grep** rows have a line-based PCRE pattern below. **Candidate** means the pattern
   over-approximates (comments, strings, locals, legitimate exceptions); read each hit before
   counting it. **Read** rows have no reliable pattern.
-- `Tools~/check_naming.py` validates the kit's own `.editorconfig` naming rules against its two
-  bundled fixtures and needs the .NET SDK. It does not scan a target project yet; a `--target` mode
-  is a planned follow-up. For a project, use the N rows.
+- With the .NET SDK, `python3 Tools~/check_naming.py --target <project> [--editorconfig <file>]`
+  counts IDE1006 naming violations in owned C# (vendor folders excluded) per rule, split into runtime,
+  Editor, and test code. It covers the prefix and capitalization rows; use the remaining N rows for
+  the rest. Without arguments it validates the kit's rules against its bundled fixtures.
 
 | ID | Rule | Check | Scope note |
 |---|---|---|---|

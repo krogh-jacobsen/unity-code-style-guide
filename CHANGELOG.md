@@ -1,5 +1,10 @@
 # Change log
 
+## 2026-11-18 — Naming check for a real project
+
+- `check_naming.py --target <project> [--editorconfig <file>]` counts IDE1006 naming violations in a Unity project's owned C# per rule, split into runtime, Editor, and test code, with the folders where most of them are. It reads the project only: the Unity CLI exposes compile errors but not IDE analyzers, so the script copies the owned files under the chosen `.editorconfig` into a temporary SDK project and runs `dotnet format style --verify-no-changes`. Vendor folders are excluded by a configurable list.
+- Without arguments the script still runs its fixture self-test, now also checking that each diagnostic maps to the right rule. The style guide, CodeStyleGuide README, and EditorConfig README describe the new mode.
+
 ## 2026-11-18 — Style guide usable as a review check
 
 - UnityStyleGuide.md opens with a Checkable rules table: 34 rows (14 naming, 6 formatting, 14 class organization), each restating an existing rule with a grep, candidate-grep, or read check and a scope note. A tested PCRE pattern block sits under the table. The table says the project's own standard sets severity, that a kit-only rule is a conflict rather than drift, and that runtime and Editor/tooling code are counted separately.
