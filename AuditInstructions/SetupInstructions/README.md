@@ -43,7 +43,9 @@ explicit user confirmation.
 3. **Choose.** The user picks any subset of IDs, "all recommended", or none. Carry over only the
    picked items; unpicked items stay proposals in the report.
 4. **Confirm.** Present the exact changes for the picked subset (files, settings, values, commands)
-   and obtain explicit user authorization before making them, including saving the report.
+   and obtain explicit user authorization before making them, including saving the report. Give
+   each change its undo: a commit checkpoint, a backup copy of a settings file, a log of moves, or
+   the trash instead of a permanent delete.
    Confirmation need not contain the literal word "yes": after the concrete scope is presented,
    "implement R1 and R3" can both select and confirm those items. Selection alone ("R1 and R3")
    chooses scope without authorizing implementation. Honor existing authorization for unchanged
@@ -56,8 +58,10 @@ explicit user confirmation.
    Changed scope needs confirmation for the changed items. In a non-interactive session, or when
    authorization is absent, stop after stage 2 and change nothing.
 
-Steps below that apply, install, or build run only after stage 4, and only for confirmed items. A new
-finding during those steps becomes a new recommendation and returns to stage 3.
+Steps below that apply, install, or build run only after stage 4, and only for confirmed items. Any
+change outside the confirmed list, however small or obviously helpful (an extra `.gitkeep`, a
+related setting), is a new recommendation: it returns to stage 3 before it is made. Noting it in a
+report is not confirmation.
 
 **Across topics.** Each workflow this document delegates to (folders, version control, CI, script
 templates, presets, and the guides in step 3) has its own review contract. Run their audit and
@@ -72,7 +76,33 @@ folders into `Assets/ThirdPartyAssets/`, with owned dependencies such as a rende
 moved out of them first. With vendor content already relocated, the version control step's
 ThirdPartyAssets ignore section covers it in one rule and the first commit holds only owned content.
 
+**Present in tiers.** Order the aggregated list by dependency, and apply it in the same order:
+
+| Tier | Topics |
+|---|---|
+| 1. Repository safety | Folder layout (first, as above), version control, the pre-commit check below |
+| 2. Pipeline and packages | Packages, render pipeline, project and build settings |
+| 3. Kit, style, and code | Reference snapshot, root instructions, `.editorconfig`, templates, presets, scene templates |
+| 4. Tests and CI | Test assemblies, CI checks |
+
+Offer a commit checkpoint between tiers as its own recommendation, default do; it is also each tier's
+undo point. **Before the first commit**, list what `git add -A` would stage
+(`git ls-files --cached --others --exclude-standard`) and report every file over 100 MB, which
+GitHub rejects, and vendor or Asset Store content whose license does not allow redistribution in
+this repository. Recommend LFS, the ThirdPartyAssets ignore section, or moving the file out. With no
+`.gitignore` yet, `Library/` alone can be gigabytes: version control comes before any commit.
+
 ## 1. Establish choices
+
+Ask the project profile first; it sets the defaults for every later recommendation. Topics a
+profile skips by default are listed once as "skipped by profile" instead of one recommendation each;
+the user can still pick any of them.
+
+| Profile | Default skip |
+|---|---|
+| Game | None |
+| Editor tooling or package repository | Presets, scene templates, desktop and mobile build guides, runtime script templates (keep the Editor and test templates) |
+| Other | None; ask per topic |
 
 Confirm the destination, project name/namespace, installed Editor, platform, and selected resources.
 Read [UnityTechStack.md](../../AgentsInstructions/UnityTechStack/UnityTechStack.md). Retain the URP/Input System/UI Toolkit/Awaitable/ObjectPool

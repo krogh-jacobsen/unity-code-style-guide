@@ -57,9 +57,19 @@ directories and copy the staged resource/metadata pairs intact. This is an initi
 not permission to overwrite imported assets. Leave existing destination folder metadata in place;
 Unity generates metadata for new directories. Follow stricter target-project instructions.
 
-With the Editor open, use an already available, project-approved import route that preserves the
-preflighted identities and prevents partial pairs being imported. Otherwise ask the user to close
-that Editor when ready. Preserve dirty work; install no bridge or package to make this workflow run.
+Closing the Editor is the default. When the user keeps it open and an existing command channel can
+run Editor code (for example `unity command eval`), this guarded route keeps Unity from importing a
+partial pair:
+
+1. Preflight each selected GUID with `AssetDatabase.GUIDToAssetPath`: it must return an empty string.
+2. Call `AssetDatabase.DisallowAutoRefresh()`.
+3. Copy each pair, the `.meta` file before its asset, creating only required missing directories.
+4. Call `AssetDatabase.AllowAutoRefresh()` once per `DisallowAutoRefresh()`, then `AssetDatabase.Refresh()`.
+5. Read back `GUIDToAssetPath` for every GUID (it must name the intended path) and compare each
+   installed file's bytes with the staged copy.
+
+With neither route, ask the user to close that Editor when ready. Preserve dirty work; install no
+bridge or package to make this workflow run.
 
 Include the source MIT license in the project's existing third-party notices location outside `Assets`,
 or use `ThirdPartyNotices/UnityCodeStyleGuide-LICENSE.txt`. Reuse an identical notice; preserve unrelated

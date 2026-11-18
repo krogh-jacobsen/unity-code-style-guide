@@ -50,6 +50,8 @@ ExportedObj/
 *.mdb
 *.opendb
 *.VC.db
+# The kit's reference snapshot ships its own Lint.csproj for CI; keep snapshot project files tracked.
+!/Documentation/UnityStarterKit/**/*.csproj
 
 # Unity-generated meta files for the generated files above.
 *.pidb.meta

@@ -45,7 +45,9 @@ explicit user confirmation.
 3. **Choose.** The user picks any subset of IDs, "all recommended", or none. Carry over only the
    picked items; unpicked items stay proposals in the report.
 4. **Confirm.** Present the exact changes for the picked subset (files, settings, values, commands)
-   and obtain explicit user authorization before making them, including saving the report.
+   and obtain explicit user authorization before making them, including saving the report. Give
+   each change its undo: a commit checkpoint, a backup copy of a settings file, a log of moves, or
+   the trash instead of a permanent delete.
    Confirmation need not contain the literal word "yes": after the concrete scope is presented,
    "implement R1 and R3" can both select and confirm those items. Selection alone ("R1 and R3")
    chooses scope without authorizing implementation. Honor existing authorization for unchanged
@@ -58,8 +60,10 @@ explicit user confirmation.
    Changed scope needs confirmation for the changed items. In a non-interactive session, or when
    authorization is absent, stop after stage 2 and change nothing.
 
-Steps below that apply, install, or build run only after stage 4, and only for confirmed items. A new
-finding during those steps becomes a new recommendation and returns to stage 3.
+Steps below that apply, install, or build run only after stage 4, and only for confirmed items. Any
+change outside the confirmed list, however small or obviously helpful (an extra `.gitkeep`, a
+related setting), is a new recommendation: it returns to stage 3 before it is made. Noting it in a
+report is not confirmation.
 
 Here, steps 1 and 2 are the audit and the recommendations; steps 3 to 5 run only for confirmed items.
 
@@ -110,11 +114,13 @@ not install groups. All selected files install flat into `Assets/ScriptTemplates
 | 16 | UI Toolkit Editor Window | `OptionalScriptTemplates/16-Scripting__UI Toolkit Editor Window-NewUIToolkitWindow` | Editor-only; choose a unique menu path | `6a9841d6af62642e1a5366591f611729` |
 | 17 | UI Toolkit Property Drawer | `OptionalScriptTemplates/17-Scripting__UI Toolkit Property Drawer-NewUIToolkitDrawer` | Editor-only; supply the target type | `adcf1d46ad9e54b5ea5836c18000a892` |
 | 18 | Awaitable Operation | `OptionalScriptTemplates/18-Scripting__Awaitable Operation-NewAwaitableOperation` | Unity 6 (`Awaitable`, `destroyCancellationToken`); replace the sample wait with real work | `406ed49d3c7214eb1a541e7cb061acb1` |
+| 19 | CLI Command | `OptionalScriptTemplates/19-Scripting__CLI Command-NewCliCommand` | Editor-only; package `com.unity.pipeline` (`Unity.Pipeline.Commands`), `string` arguments only; give the command a unique name. Compile Not verified | `c2a2d924497d4769a8f346edfa73f828` |
 
 Notes on choosing:
 
 - Awaitable Operation is the async pattern: one cancellable operation owned by the component, cancelled on disable, destroy, or restart, with every outcome observed.
 - The five defaults need no package and no project-specific base class. Everything else is opt-in.
+- CLI Command registers a `unity command` entry point and follows the [CLI example](../UnityCLI/CliScriptAndTests/README.md); its compile check has not been run, so report it Not verified until it compiles in the target.
 - Choose one Inspector approach per target: IMGUI (6 to 8) or UI Toolkit (15 to 17). Unity recommends
   UI Toolkit for new Editor UI; IMGUI still works. Drawer and Editor templates are deliberately
   unregistered placeholders: the user adds `[CustomEditor]` or `[CustomPropertyDrawer]` with a real target.

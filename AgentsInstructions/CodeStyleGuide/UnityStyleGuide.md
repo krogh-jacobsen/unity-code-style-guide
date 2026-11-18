@@ -1,5 +1,9 @@
 # Unity C# Style Guide & Naming
 
+> **Applying this to an existing project:** audit first. Report where the project differs, list each
+> proposed change, and let the user pick and confirm the exact list before editing anything, whether
+> they handed over the whole kit or only this document. Writing new code under these rules needs no audit.
+
 Use the following conventions.  
 
 ## Table of contents:

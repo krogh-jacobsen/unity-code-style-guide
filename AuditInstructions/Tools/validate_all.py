@@ -108,6 +108,12 @@ for path in agent_documents:
         for error in contract_errors(path.read_text(), contract):
             require(False, f"{path.relative_to(ROOT)}: {error}")
 
+# AgentsInstructions are reference policies, not staged workflows; each carries the same audit-first preface.
+preface = "> **Applying this to an existing project:** audit first."
+for name in ("AgentsInstructions/CodeStyleGuide/UnityStyleGuide.md", "AgentsInstructions/UnityTechStack/UnityTechStack.md",
+             "AgentsInstructions/UnityProjectRules/UnityRules.md"):
+    require(preface in "\n".join((ROOT / name).read_text().splitlines()[:6]), f"{name}: missing audit-first preface")
+
 # Agent documents date their volatile facts ("Last verified: October 2026"); warn when they age.
 STALE_DAYS = 183
 warnings = []

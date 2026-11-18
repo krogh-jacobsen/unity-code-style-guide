@@ -4,6 +4,25 @@ The intended profile is [Unity 6.7](AgentsInstructions/UnityTechStack/UnityTechS
 that choice from the exact prerelease Editor tested. It is not a guarantee for every 6000.7 patch,
 package upgrade, target platform, or copied project. Date: 2026-10-12.
 
+## Setup learnings P1–P13 — 2026-11-17
+
+Documentation, template, and tool changes drawn from one real setup (Unity 6000.7.0b6, Editor-tooling
+repository, URP only, Editor open and driven through `unity command eval`) at kit revision d803c89.
+The Unity behaviours described (stale `GraphicsSettings` entry, VFX Graph dropping out with HDRP, the
+guarded Editor-open import) were observed in that setup, not re-run for this change.
+
+| Check | Result | Evidence / limit |
+|---|---|---|
+| Full repository validator | Passed | `python3 -B AuditInstructions/Tools/validate_all.py --require-dotnet`: 84 Markdown files, 570 local links/anchors, 76 unique GUIDs, 7 folder validators, 14 workflow tests |
+| Snapshot `Lint.csproj` stays tracked; `*.glb` routes to LFS | Passed | Version control validator, with Git: 40 ignored, 19 tracked, 8 LFS paths |
+| `Lint.csproj` edit point | Passed | CI validator with `dotnet format`: an embedded package is not linted by default and fails the naming gate once its `Compile` line is added |
+| Snapshot exclusion and `--target` | Passed | Installation check: replay archives excluded, links to them accepted only because they exist upstream; `--target` self-check on the staged project; `--target` on a non-project reports 3 failures |
+| AgentsInstructions audit-first preface | Passed | New `validate_all.py` check on 3 documents |
+| CLI Command template | Partial | Tokens, GUID, inventory, and table verified; compile against `com.unity.pipeline` Not verified |
+| `GraphicsSettings.m_RenderPipelineGlobalSettingsMap` cleanup | Not verified | Observed in the real setup only; property name not checked against other Editor versions |
+| Review contract wording (P13) | Pass | Applied to the canonical contract and all 19 copies, including both folder guides; `validate_all.py --require-dotnet` passes |
+| Fresh-agent decision replay | Not verified | Not rerun for these changes |
+
 ## Folder guides: rules from a mature project — 2026-11-17
 
 Documentation change drawn from a read-only look at one mature project (Unity-Railroad-Tycoon-Game).

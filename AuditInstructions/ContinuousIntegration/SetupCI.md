@@ -57,7 +57,9 @@ explicit user confirmation.
 3. **Choose.** The user picks any subset of IDs, "all recommended", or none. Carry over only the
    picked items; unpicked items stay proposals in the report.
 4. **Confirm.** Present the exact changes for the picked subset (files, settings, values, commands)
-   and obtain explicit user authorization before making them, including saving the report.
+   and obtain explicit user authorization before making them, including saving the report. Give
+   each change its undo: a commit checkpoint, a backup copy of a settings file, a log of moves, or
+   the trash instead of a permanent delete.
    Confirmation need not contain the literal word "yes": after the concrete scope is presented,
    "implement R1 and R3" can both select and confirm those items. Selection alone ("R1 and R3")
    chooses scope without authorizing implementation. Honor existing authorization for unchanged
@@ -70,8 +72,10 @@ explicit user confirmation.
    Changed scope needs confirmation for the changed items. In a non-interactive session, or when
    authorization is absent, stop after stage 2 and change nothing.
 
-Steps below that apply, install, or build run only after stage 4, and only for confirmed items. A new
-finding during those steps becomes a new recommendation and returns to stage 3.
+Steps below that apply, install, or build run only after stage 4, and only for confirmed items. Any
+change outside the confirmed list, however small or obviously helpful (an extra `.gitkeep`, a
+related setting), is a new recommendation: it returns to stage 3 before it is made. Noting it in a
+report is not confirmation.
 
 ## 1. Preflight
 
@@ -80,6 +84,8 @@ This step is the audit input and changes nothing. Identify one Unity project and
 - The **host**. The workflows are GitHub Actions. For another host, install the scripts only and say the
   workflow is not provided (`unity ci init --provider gitlab` covers GitLab for licensed projects).
 - **Project root versus repository root.** Tier A takes the project path from `UNITY_PROJECT_PATH`.
+- **Owned code outside `Assets`**: embedded packages under `Packages/` and repository-level code
+  folders. The style gate lints only `Assets` until each is added to `Lint.csproj`.
 - Existing `.github/workflows/`, `.github/unity-ci/`, and `.github/pull_request_template.md`.
 - An **`.editorconfig`** in the project or repository root. The style checks measure against it, so if it
   is missing, install the [EditorConfig starter](../../AgentsInstructions/CodeStyleGuide/EditorConfig/README.md) first or skip the style steps.
@@ -127,8 +133,10 @@ Only the items confirmed in stage 4. Stage the files, check them, then copy. Fil
 2. **Destinations.** Absent: install. Identical: leave it. Different content: a conflict. Show both and
    resolve it before copying; never overwrite a project's own workflow or template.
 3. **Edit points**, and only these: `UNITY_PROJECT_PATH` in both selected workflow files when the
-   project is a repository subfolder (and the matching `Lint.csproj` exclusions if the project has more vendor or
-   sample folders); the `branches:` list when the default branch is not `main`.
+   project is a repository subfolder; in `Lint.csproj`, `LintExclude` for more vendor or sample
+   folders and one `Compile` line per owned code root outside `Assets` (embedded packages under
+   `Packages/`, repository-level folders such as `Utilities/`), as its comments show; the
+   `branches:` list when the default branch is not `main`.
 4. If the style gate is report-only, add `continue-on-error: true` to the two `dotnet format` steps and
    say that is temporary.
 

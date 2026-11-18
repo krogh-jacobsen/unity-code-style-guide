@@ -246,6 +246,15 @@ if shutil.which("dotnet"):
             write(root / "Assets/ThirdPartyAssets/Vendor/V.cs", "public class v_bad{private int Bad;}\n")
             os_gates = dotnet(*gates["naming"])
             require("ThirdPartyAssets" not in os_gates.stdout + os_gates.stderr, "Lint project must exclude ThirdPartyAssets")
+            # The documented edit point for owned roots outside Assets must bring those files into the gate.
+            (root / "Assets/Game/Bad.cs").unlink()
+            write(root / "Packages/com.company.tool/Editor/Tool.cs", "public class Tool{private int badField;}\n")
+            require(dotnet(*gates["naming"]).returncode == 0, "Lint project must not include embedded packages by default")
+            text = (lint / "Lint.csproj").read_text()
+            example = '<Compile Include="$(UnityProject)/Packages/com.company.tool/**/*.cs" Exclude="$(LintExclude)" />'
+            require(example in text, "Lint.csproj lost its embedded-package edit-point example")
+            (lint / "Lint.csproj").write_text(text.replace("</ItemGroup>", f"  {example}\n  </ItemGroup>"))
+            require(dotnet(*gates["naming"]).returncode == 2, "Lint.csproj edit point did not include an embedded package")
 else:
     if os.environ.get("STARTER_REQUIRE_DOTNET") == "1":
         errors.append("Required style gates could not run: no dotnet SDK")

@@ -22,8 +22,8 @@ optional_root = FOLDER / "OptionalScriptTemplates"
 defaults = list(FOLDER.glob("*.cs.txt"))
 optional = list(optional_root.glob("*.cs.txt"))
 retired = list((optional_root / "ReferenceOnly").glob("*.cs.txt"))
-require((len(defaults), len(optional), len(retired)) == (5, 12, 1),
-        "Template selection inventory must be 5 default, 12 optional, 1 retired")
+require((len(defaults), len(optional), len(retired)) == (5, 13, 1),
+        "Template selection inventory must be 5 default, 13 optional, 1 retired")
 
 for path in defaults + optional + retired:
     require(bool(meta_guids(path)), f"Missing template metadata: {path.name}")

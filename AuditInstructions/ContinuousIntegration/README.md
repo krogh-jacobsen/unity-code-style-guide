@@ -98,7 +98,8 @@ choose:
 - **Fix** whitespace with `dotnet format whitespace`, on code you own, as its own commit.
 
 Vendor code is excluded from the style checks (`ThirdPartyAssets`, `Plugins`, `Samples`, `TextMesh Pro`,
-`TutorialInfo`). Add your own vendor folders to `Lint.csproj`.
+`TutorialInfo`). Add your own vendor folders to `Lint.csproj`, and add owned code that lives outside
+`Assets` (an embedded package, a repository-level `Utilities/` folder): only `Assets` is linted by default.
 
 ## Pressure-tested, October 2026
 

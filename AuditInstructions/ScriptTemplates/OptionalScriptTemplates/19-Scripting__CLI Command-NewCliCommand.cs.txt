@@ -1,0 +1,15 @@
+using Unity.Pipeline.Commands;
+
+    #ROOTNAMESPACEBEGIN#
+/// <summary>Unity CLI command. Editor-only: place it in an Editor folder or an Editor-only assembly.</summary>
+public static class #SCRIPTNAME#
+{
+    /// <summary>Runs the command; arguments arrive as strings, so parse and validate them here.</summary>
+    [CliCommand("#SCRIPTNAME#", "Describe what this command does.", MainThreadRequired = true)]
+    public static string Run(
+        [CliArg("target", "Describe what this argument selects.")] string target)
+    {
+        return $"#SCRIPTNAME# ran for '{target}'.";
+    }
+}
+#ROOTNAMESPACEEND#

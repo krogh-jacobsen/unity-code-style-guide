@@ -47,6 +47,7 @@ Example prompts:
 |---|---|
 | Editor tooling, IMGUI | Custom Editor, Editor Window, Property Drawer |
 | Editor tooling, UI Toolkit | Custom Editor, Editor Window, Property Drawer |
+| Editor tooling, Unity CLI | CLI Command (needs `com.unity.pipeline`; compile not yet verified) |
 | Tests | EditMode and PlayMode skeletons, ignored until you add an assertion |
 | Runtime patterns | Static Event, Object Pool Handler, Awaitable Operation |
 | Networking | NetworkBehaviour (needs Netcode for GameObjects) |

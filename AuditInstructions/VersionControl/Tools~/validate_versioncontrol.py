@@ -29,10 +29,11 @@ TRACKED = [
     "Assets/StreamingAssets/settings.json", "ProjectSettings/ProjectSettings.asset", "ProjectSettings/ProjectVersion.txt",
     "Packages/manifest.json", "Packages/packages-lock.json", "ArtSource/hero.psd", ".vscode/extensions.json",
     "Assets/ThirdPartyAssetsExtra/Own.cs", "Assets/Game/ThirdPartyAssets/Own.cs", "Assets/Game/ProfilerNotes.md", "Assets/_Game/Recovery/Note.cs",
-    ".editorconfig",
+    ".editorconfig", "Documentation/UnityStarterKit/AuditInstructions/ContinuousIntegration/Scripts/Lint.csproj",
 ]
 LFS = ["Assets/Game/Art/a.png", "Assets/Game/Art/a.tga", "Assets/Game/Art/model.fbx", "Assets/Game/Audio/a.wav",
-       "Assets/Game/Video/a.mp4", "ArtSource/hero.psd", "ArtSource/rig.blend"]
+       "Assets/Game/Video/a.mp4", "ArtSource/hero.psd", "ArtSource/rig.blend",
+       "Assets/Game/Art/model.glb"]
 EOL_LF = ["Assets/Game/Scripts/Player.cs", "Assets/Scenes/Main.unity", "Assets/Game/UI/Hud.uxml", "Assets/Game/Player.prefab.meta"]
 NOT_LFS = ["Assets/Game/Scripts/Player.cs", "Assets/Scenes/Main.unity", "Assets/Game/Data/Config.asset", "Packages/manifest.json"]
 

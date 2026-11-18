@@ -26,7 +26,9 @@ explicit user confirmation.
 3. **Choose.** The user picks any subset of IDs, "all recommended", or none. Carry over only the
    picked items; unpicked items stay proposals in the report.
 4. **Confirm.** Present the exact changes for the picked subset (files, settings, values, commands)
-   and obtain explicit user authorization before making them, including saving the report.
+   and obtain explicit user authorization before making them, including saving the report. Give
+   each change its undo: a commit checkpoint, a backup copy of a settings file, a log of moves, or
+   the trash instead of a permanent delete.
    Confirmation need not contain the literal word "yes": after the concrete scope is presented,
    "implement R1 and R3" can both select and confirm those items. Selection alone ("R1 and R3")
    chooses scope without authorizing implementation. Honor existing authorization for unchanged
@@ -39,8 +41,10 @@ explicit user confirmation.
    Changed scope needs confirmation for the changed items. In a non-interactive session, or when
    authorization is absent, stop after stage 2 and change nothing.
 
-Steps below that apply, install, or build run only after stage 4, and only for confirmed items. A new
-finding during those steps becomes a new recommendation and returns to stage 3.
+Steps below that apply, install, or build run only after stage 4, and only for confirmed items. Any
+change outside the confirmed list, however small or obviously helpful (an extra `.gitkeep`, a
+related setting), is a new recommendation: it returns to stage 3 before it is made. Noting it in a
+report is not confirmation.
 
 ## 1. Preflight the installation
 
@@ -76,6 +80,33 @@ risk, and default. A missing old snapshot means manual comparison, never an assu
 | Imported assets | Existing GUID-owned destinations | Edit through Unity APIs, preserving metadata, references, and importer customizations; import new pairs only after conflict preflight | Confirmed asset update with a safe Editor route |
 | Removed/moved files | Confirmed paths | Fix references; use AssetDatabase for imported moves/deletes | Explicitly selected removal/move |
 | Installation record | Documentation/UnityStarterKit-installation.json | Record upstream repository URL, old/new immutable commits, snapshot path, selected groups, source-to-destination mappings, local adaptations, per-group revisions, and validation results | After selected updates are accounted for |
+
+A compact record looks like this; keep the keys, add groups as installed:
+
+```json
+{
+  "upstream": "https://github.com/<owner>/unity-code-style-guide",
+  "installed_revision": "d803c89",
+  "previous_revision": null,
+  "snapshot_path": "Documentation/UnityStarterKit",
+  "groups": [
+    { "group": "root-instructions", "source": "AGENTS.md", "destination": "AGENTS.md",
+      "method": "merged; links rebased to the snapshot", "revision": "d803c89" },
+    { "group": "script-templates", "source": "AuditInstructions/ScriptTemplates/",
+      "destination": "Assets/ScriptTemplates/", "method": "copied pairs, Editor closed", "revision": "d803c89",
+      "files": [
+        { "path": "Assets/ScriptTemplates/7-Scripting__Editor Window-NewEditorWindow.cs.txt",
+          "guid": "<guid from its .meta>" }
+      ] }
+  ],
+  "not_installed": [ { "group": "presets", "reason": "skipped by profile: Editor tooling" } ],
+  "local_adaptations": [ "UnityTechStack.md: URP only, Editor-only repository" ],
+  "validation": [
+    { "check": "check_installation.py --target .", "result": "Passed" },
+    { "check": "template compile", "result": "Not verified", "reason": "no Editor run" }
+  ]
+}
+```
 
 Keep per-group revisions when only part of the kit is updated. Retain the baseline needed for the
 next comparison (an accessible immutable source revision or archived source bytes). A partial failure

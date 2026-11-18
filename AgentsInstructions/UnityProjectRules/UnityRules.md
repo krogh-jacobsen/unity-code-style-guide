@@ -1,3 +1,7 @@
+> **Applying this to an existing project:** audit first. Report where the project differs, list each
+> proposed change, and let the user pick and confirm the exact list before editing anything, whether
+> they handed over the whole kit or only this document. Writing new code under these rules needs no audit.
+
 - Always  serializefield. I want to use inspector for debugging
 - Always add tooltip. It's more userfriendly for debugging and its a great way for more self-documenting code.
 - Use a bootstrap scene. I prefer that over service locator patterns
