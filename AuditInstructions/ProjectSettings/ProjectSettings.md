@@ -42,7 +42,9 @@ explicit user confirmation.
 3. **Choose.** The user picks any subset of IDs, "all recommended", or none. Carry over only the
    picked items; unpicked items stay proposals in the report.
 4. **Confirm.** Present the exact changes for the picked subset (files, settings, values, commands)
-   and obtain explicit user authorization before making them, including saving the report.
+   and obtain explicit user authorization before making them, including saving the report. Give
+   each change its undo: a commit checkpoint, a backup copy of a settings file, a log of moves, or
+   the trash instead of a permanent delete.
    Confirmation need not contain the literal word "yes": after the concrete scope is presented,
    "implement R1 and R3" can both select and confirm those items. Selection alone ("R1 and R3")
    chooses scope without authorizing implementation. Honor existing authorization for unchanged
@@ -55,8 +57,10 @@ explicit user confirmation.
    Changed scope needs confirmation for the changed items. In a non-interactive session, or when
    authorization is absent, stop after stage 2 and change nothing.
 
-Steps below that apply, install, or build run only after stage 4, and only for confirmed items. A new
-finding during those steps becomes a new recommendation and returns to stage 3.
+Steps below that apply, install, or build run only after stage 4, and only for confirmed items. Any
+change outside the confirmed list, however small or obviously helpful (an extra `.gitkeep`, a
+related setting), is a new recommendation: it returns to stage 3 before it is made. Noting it in a
+report is not confirmation.
 
 ## 1. Preflight
 
@@ -114,6 +118,21 @@ Apply only the items confirmed in stage 4; every other row is reported. Mark eac
 | Tags, layers, sorting layers | Add only names the game uses | `TagManager` through `SerializedObject` | Never reuse or renumber an occupied slot |
 | Scenes in the build | Only real scenes, enabled | `EditorBuildSettings.scenes` or Build Profiles | |
 | Product and company name | Final values before any shipping build | `PlayerSettings.productName`, `companyName` | They set `persistentDataPath`; see the build guides |
+
+### After removing a render pipeline
+
+Removing a render pipeline package (for example HDRP from a URP project) leaves its entry in
+`GraphicsSettings`' `m_RenderPipelineGlobalSettingsMap`, an array of pairs whose `first` is the
+pipeline's full type name and whose `second` is its global settings asset. Saving does not clean it
+(observed on 6000.7.0b6). When a confirmed change removes a pipeline:
+
+1. Open `new SerializedObject(GraphicsSettings.GetGraphicsSettings())` and find
+   `m_RenderPipelineGlobalSettingsMap`.
+2. Find the element whose `first` names the removed pipeline type, such as
+   `UnityEngine.Rendering.HighDefinition.HDRenderPipeline`. Leave every other element.
+3. `DeleteArrayElementAtIndex(index)`, then `ApplyModifiedPropertiesWithoutUndo()` and
+   `AssetDatabase.SaveAssets()`.
+4. Read the array back: the removed type is absent and the remaining pipeline's entry is intact.
 
 Platform architecture, graphics APIs, scripting backend, stripping, and quality tiers belong to the
 build guides ([desktop](../BuildSettings/DesktopBuilds.md), [mobile](../BuildSettings/MobileBuilds.md)).

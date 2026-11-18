@@ -1,5 +1,26 @@
 # Change log
 
+## 2026-11-17 — Learnings from a real Editor-tooling setup (P1–P13)
+
+- Non-destructive by default: AGENTS.md now says any change outside the confirmed list, however small, returns to the user before it is made, and that every confirmed item states its undo. The style guide, stack profile, and project rules open with an audit-first preface for existing projects. The canonical review contract and all 19 copies now say the same: stage 4 gives each change its undo, and noting an unconfirmed change in a report is not confirmation.
+- Setup workflow: an up-front project profile (game, Editor tooling or package repository, other) skips presets, scene templates, build guides, and runtime templates by default for tooling repositories. Recommendations are grouped in four dependency-ordered tiers with optional commit checkpoints, and a pre-first-commit check flags files over GitHub's 100 MB limit and vendor content that must not be redistributed.
+- Silent failures fixed: `Unity.gitignore` keeps `Lint.csproj` in the kit snapshot tracked; package removal keeps dependencies that only the removed package pulled in when any project content (vendor assets included) uses them; removing a render pipeline now includes cleaning its stale `GraphicsSettings` entry; `Lint.csproj` has documented edit points for owned code outside `Assets`.
+- Resource installation gained a guarded Editor-open route (auto-refresh suspended, `.meta` copied first, GUIDs read back). UpdateKit.md shows a complete example installation record.
+- AGENTS.md has a "This project" placeholder section; install rules say which links not to rebase. `check_installation.py --target <project>` checks a real installation read-only.
+- Smaller: `*.glb` routes to LFS; the replay evidence archives (about 5 MB) are excluded from the reference snapshot (7.2 → 1.9 MB) and stay upstream; new optional CLI Command script template (Editor-only, needs `com.unity.pipeline`, compile not yet verified).
+
+## 2026-11-17 — Folder rules from a mature project
+
+- SetupFolders.md: optional layered roots (a core root beside the game root, one-way dependency, core stays in `Assets` until a second project needs it), underscore-prefixed owned roots, a tests-placement decision (per feature with test asmdefs, or a central `Editor/Tests` without them; scaffold creates no test folders by default), three `Settings` levels, game-wide content folders, docs outside `Assets` with a per-folder README exception, tool-owned and generated folders, digit-leading names, either Preset location, and a one-message fast path for empty projects.
+- ReviewFolders.md: layering check (core-root references to game-root content, duplicate feature names), docs in `Assets`, generated and tool folders, loose template assets, `Settings` levels, oversized `Scripts` folders, and matching report rows.
+- `Unity.gitignore` now ignores `Assets/_Recovery/`; the version control validator checks it both ways.
+
+## 2026-11-17 — Folders first, scaffold mode, and vendor relocation
+
+- Folder setup is now the first step of project setup. The setup coordinator applies the folder layout, including vendor relocation into `Assets/ThirdPartyAssets/`, before copying resources into `Assets`, version control, and packages, so the ThirdPartyAssets ignore section covers vendor content in one rule.
+- Added an explicit scaffold mode to SetupFolders.md beside the minimal default: the full `{ProjectName}` tree with a `FeatureExample` feature and `.gitkeep` markers in empty leaf folders, with the reason they are needed. The example feature is renamed from `Inventory` to `FeatureExample`.
+- ReviewFolders.md gained vendor-relocation checks (owned dependencies such as an active render pipeline asset inside a vendor folder, hard-coded vendor paths, `Resources`), the never-committed rollback rule, an Editor-open CLI route example, and the verification set used in a real Unity 6000.7 setup.
+
 ## 2026-10-26 — Fresh-agent discipline pressure tests
 
 - Ran five fresh sessions with withheld expected outcomes: 38 initial cases plus 16 corrective cases, all 54 matching independently reviewed decisions. Archived frozen sources, fixture inputs, response JSON and grades separately from Unity execution evidence.

@@ -5,6 +5,14 @@ Use this as the target project's canonical instruction file. Adapt the selected 
 contains reusable documentation and assets; it is not a Unity project. To change this repository,
 follow [Maintaining this repository](#maintaining-this-repository); a target project can drop that section.
 
+## This project
+
+Installers replace these placeholders with the target's facts; this starter repository leaves them empty.
+
+- **Stack adaptations:** _To fill in: changes to the stack profile, for example URP only or Editor-only._
+- **Layout:** _To fill in: content root, owned code roots outside `Assets`, the kit snapshot path._
+- **Local rules:** _To fill in: project rules that take precedence over the defaults below._
+
 ## Working rules
 
 - Before the first owned C# change, read [the style policy](AgentsInstructions/CodeStyleGuide/UnityStyleGuide.md).
@@ -16,6 +24,13 @@ follow [Maintaining this repository](#maintaining-this-repository); a target pro
 - Run every [AuditInstructions](AuditInstructions/README.md) document audit-first: report what is in
   place, recommend changes, let the user pick which to carry over, and change nothing before an
   explicit user authorization for the exact change list. Unpicked recommendations stay proposals.
+  Applying the [AgentsInstructions](AgentsInstructions/README.md) documents (style policy, stack
+  profile, rules) to an existing project follows the same audit-first flow.
+- Return any change outside the confirmed list to the user as a new recommendation before making it,
+  however small or obviously helpful (an extra `.gitkeep`, a related setting). Noting it in a report
+  is not confirmation.
+- State each confirmed item's undo in the change list: a commit checkpoint, a backup copy of a
+  settings file, a log of moves, or the trash instead of a permanent delete.
 - Prefer available Unity CLI skills for Editor control, project creation, testing, and builds.
   Discover installed CLI help and the connected Editor's command catalog; target the project
   explicitly. Use the Package Manager Client API for package changes through the Editor.
@@ -40,8 +55,8 @@ creation of selected missing directories is allowed. Follow the
 [folder-only workflow](AuditInstructions/FolderStructure/SetupFolders.md); preserve existing content
 and metadata, and let Unity generate new folder metadata on import.
 
-For first installation of selected shipped templates/presets with the target Editor closed, copy
-preflighted source asset/metadata pairs intact. Follow the
+For first installation of selected shipped templates/presets with the target Editor closed (or with
+auto-refresh suspended, as the protocol describes), copy preflighted source asset/metadata pairs intact. Follow the
 [resource installation protocol](AuditInstructions/SetupInstructions/InstallResources.md); existing
 imported assets and customized metadata remain subject to the Editor rules above.
 
@@ -148,7 +163,9 @@ explicit user confirmation.
 3. **Choose.** The user picks any subset of IDs, "all recommended", or none. Carry over only the
    picked items; unpicked items stay proposals in the report.
 4. **Confirm.** Present the exact changes for the picked subset (files, settings, values, commands)
-   and obtain explicit user authorization before making them, including saving the report.
+   and obtain explicit user authorization before making them, including saving the report. Give
+   each change its undo: a commit checkpoint, a backup copy of a settings file, a log of moves, or
+   the trash instead of a permanent delete.
    Confirmation need not contain the literal word "yes": after the concrete scope is presented,
    "implement R1 and R3" can both select and confirm those items. Selection alone ("R1 and R3")
    chooses scope without authorizing implementation. Honor existing authorization for unchanged
@@ -161,8 +178,10 @@ explicit user confirmation.
    Changed scope needs confirmation for the changed items. In a non-interactive session, or when
    authorization is absent, stop after stage 2 and change nothing.
 
-Steps below that apply, install, or build run only after stage 4, and only for confirmed items. A new
-finding during those steps becomes a new recommendation and returns to stage 3.
+Steps below that apply, install, or build run only after stage 4, and only for confirmed items. Any
+change outside the confirmed list, however small or obviously helpful (an extra `.gitkeep`, a
+related setting), is a new recommendation: it returns to stage 3 before it is made. Noting it in a
+report is not confirmation.
 ```
 - **End every step on a `**Done:**` criterion** that an agent can check. Strong criteria are both
   checkable and exhaustive ("every row has a status").

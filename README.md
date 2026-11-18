@@ -60,7 +60,7 @@ copied into `Assets` separately, and only when selected. The table below shows w
 
 | Source here | Destination relative to the Unity project root | Action |
 |---|---|---|
-| Manifest `snapshot_sources`, with their existing paths | `Documentation/UnityStarterKit/` | Retain complete reference hierarchy; merge or choose another location if occupied |
+| Manifest `snapshot_sources`, with their existing paths, minus `snapshot_exclude` | `Documentation/UnityStarterKit/` | Retain complete reference hierarchy; merge or choose another location if occupied. Excluded replay archives (about 5 MB) stay upstream; snapshot links to them resolve only there |
 | AGENTS.md | AGENTS.md | Merge conventions and routing; prefix file links with `Documentation/UnityStarterKit/`; retain local anchors; remove the repository-maintenance section |
 | CLAUDE.md | CLAUDE.md | Optional pointer to the target's root AGENTS.md; preserve existing instructions |
 | AgentsInstructions/CodeStyleGuide/EditorConfig/.editorconfig | .editorconfig | Merge selected rules; the reference copy is not the active configuration |
@@ -77,9 +77,13 @@ copied into `Assets` separately, and only when selected. The table below shows w
 - **Your project wins.** Existing project choices take priority over starter defaults.
 - **Your README stays yours.** The root README belongs to the game; this kit's README lives in the snapshot.
 - **Adapt the stack profile** to your target and record that adaptation for future merges.
+- **Rebase links carefully.** When merging AGENTS.md, prefix only links that point into the snapshot.
+  Leave links to files the installation places at the project root (`AGENTS.md`, `CLAUDE.md`,
+  `.editorconfig`, `.gitignore`, `Documentation/UnityStarterKit-installation.json`) and same-file
+  `#anchor` links as they are. Fill in its "This project" section.
 - **Other instruction-entry tools** can point to your root AGENTS.md.
 - **Inspect conflicts before copying.** Preserve existing metadata, and use Editor APIs for assets that are already imported.
-- **First install of asset and metadata pairs** happens with the Editor closed, following the [resource protocol](AuditInstructions/SetupInstructions/InstallResources.md).
+- **First install of asset and metadata pairs** happens with the Editor closed, or with auto-refresh suspended, following the [resource protocol](AuditInstructions/SetupInstructions/InstallResources.md).
 - **Keep `Tools~/` and documentation** out of the imported selection.
 
 ### Check and record
@@ -92,7 +96,12 @@ install into your game.
 python3 AuditInstructions/Tools/check_installation.py
 ```
 
-If you choose another layout or merge existing instructions, check your target's links separately.
+To check a real installation read-only (root AGENTS.md and CLAUDE.md links and anchors, root
+`.editorconfig`, snapshot presence), pass its project root:
+
+```sh
+python3 AuditInstructions/Tools/check_installation.py --target /absolute/path/to/UnityProject
+```
 After confirmation, record the source revision, selected groups, destination paths and local
 adaptations in `Documentation/UnityStarterKit-installation.json`. The
 [update workflow](AuditInstructions/KitMaintenance/UpdateKit.md) defines that record.

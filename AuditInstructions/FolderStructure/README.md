@@ -15,8 +15,19 @@ conventions and apply them consistently. This layout is one such convention.
 | Review or reorganize a project that already has content | [ReviewFolders.md](ReviewFolders.md) |
 
 Example prompt: *"Set up folders only in my Unity project from this document. Use the existing
-project name and ask only for missing feature choices."* Close the project's Unity Editor first;
-the agent creates plain directories and Unity adds their metadata the next time you open it.
+project name and ask only for missing feature choices."* With the Editor closed, the agent creates
+plain directories and Unity adds their metadata the next time you open it. With the Editor open, it
+creates them through the Editor, for example via a connected Unity CLI.
+
+## Do folders first
+
+Folder setup is the first step of project setup, before `.gitignore`, version control, and packages.
+Moving vendor and sample content into `Assets/ThirdPartyAssets/` first means the kit's
+[`Unity.gitignore`](../VersionControl/README.md) excludes all of it with one rule, with no per-vendor
+lines, and the first commit holds only what you own. In one real project that turned a 12 GB
+`Library` plus about 7 GB of vendor imports into a first commit of 55 files, about 400 KB. The
+ThirdPartyAssets ignore section is optional: drop it if a clean clone or CI cannot re-import those
+sources, and the relocation then only tidies the tree.
 
 ## What happens when you hand it over
 
@@ -38,22 +49,46 @@ Assets/
 ├── ScriptTemplates/      # Selected script templates
 ├── StreamingAssets/      # Optional raw player content
 ├── ThirdPartyAssets/     # Vendor imports
-├── Settings/Presets/     # Selected import presets
+├── Settings/            # Template-created pipeline settings; Presets/ for selected import presets
+├── Editor/Tests/         # Optional: central EditMode tests, when you use no test asmdefs
+├── {CoreName}/           # Optional: a reusable framework layer beside the game
 └── {ProjectName}/
     ├── Scenes/           # Bootstrap and project-wide scenes
-    ├── Settings/         # Project-wide URP, Input Actions, shared UI settings
+    ├── Settings/         # Game configuration: Input Actions, shared UI settings, owned pipeline assets
     ├── Shared/           # Independent shared code and content
-    └── Inventory/        # An example feature
-        ├── Scripts/  Editor/  Tests/  Data/  Prefabs/  Art/
+    ├── SceneTemplates/   # Source scenes for scene templates
+    └── FeatureExample/   # An example feature: copy and rename it
+        ├── Scenes/  Scripts/  Editor/  Data/  Prefabs/  Art/
+        ├── Tests/        # EditMode/ and PlayMode/, only with test asmdefs
         └── UI/           # UXML, USS, C# and Sprites/ for each screen
 ```
 
-The tree is a menu, not a template. A project starts with its owned-content root and gains folders
-the first time a feature needs them.
+The agent offers two modes:
+
+- **Minimal (default).** The tree is a menu. A project starts with its owned-content root and gains
+  folders the first time a feature needs them.
+- **Scaffold.** The whole `{ProjectName}` tree above is created as boilerplate, empty folders
+  included, so the convention is visible from day one. `Art/Audio`, `Animations`, `VFX`, and
+  `UI/Sprites` are still added only when used, and test folders only where tests can run.
+
+Scaffold mode puts an empty `.gitkeep` file in each empty folder. Git stores a folder's `.meta` but
+not the empty folder itself, and when Unity finds `Foo.meta` with no `Foo/` on a fresh clone it
+deletes the `.meta`, so without the marker the scaffold vanishes for everyone else. Unity ignores
+dot-prefixed files, so `.gitkeep` gets no `.meta` and stays out of the Project window.
 
 ## Key ideas
 
-**Feature first.** Group by what something is for (`Inventory`), not by file type (`Scripts`,
+**Core and game, when you have both.** A project with a reusable framework layer can keep it in a
+second owned root (for example `_StrategyCore` beside `_RailroadTycoon`; a leading underscore sorts
+owned roots first). The game may use the core, never the reverse, and a feature name lives in one
+root only. Without asmdefs nothing enforces that, so the review agent searches the core for
+references to the game. Move the core to a package once a second project needs it.
+
+**Game-wide content.** Environment art, terrain data, animation sets, and editor tools that no single
+feature owns sit in plainly named folders under the game root, such as `Environment` or `Tools`.
+They depend on no feature, which is also what keeps them out of `Shared`'s narrower role.
+
+**Feature first.** Group by what something is for (an `Inventory` feature), not by file type (`Scripts`,
 `Prefabs`). A feature's code, data, art, and UI then travel together, and deleting a feature is one
 folder.
 
@@ -66,8 +101,9 @@ references. Keep cross-feature dependencies explicit and free of cycles.
 the project level. A feature's own scenes and configuration stay inside it. Authored configuration
 assets go in the feature's `Data`.
 
-**Start with only what you use.** Empty folders add navigation cost and imply structure that doesn't
-exist yet. The agent asks which real features you have and creates only their folders.
+**Start with only what you use, unless you want a template.** Empty folders add navigation cost and
+imply structure that doesn't exist yet, so minimal mode asks which real features you have and creates
+only their folders. Scaffold mode trades that for a ready-made example a team can copy.
 
 **UI Toolkit screens stay together.** Keep a screen's UXML, USS, and C# in one folder while the
 feature is small. Keep UI sprites in `UI/Sprites` so import presets can tell them from world textures.
@@ -77,16 +113,26 @@ feature is small. Keep UI sprites in `UI/Sprites` so import presets can tell the
 - `StreamingAssets` and the starter's `ScriptTemplates` must be direct children of `Assets`.
 - Create `Resources` or `Plugins` only for a real loading or plugin need, and follow platform-specific
   plugin paths.
-- `Assets/Settings/Presets` is this starter's convention, not a Unity special folder. It is separate
-  from the project's rendering, input, and UI settings under `{ProjectName}/Settings`.
-- Keep guides, build outputs, and validation reports outside `Assets`.
+- `Assets/Settings/Presets` is this starter's convention, not a Unity special folder; an established
+  `Assets/Presets` works as well. Both are separate from game configuration under `{ProjectName}/Settings`.
+- Keep guides, plans, build outputs, and validation reports outside `Assets`, for example in a
+  project-root `Docs/`; text files inside `Assets` are imported. A short README per root or feature
+  is the accepted exception.
+- Everything in a `Resources` folder ships in the player, used or not, so keep them few and known.
 
 See Unity's [reserved folder names](https://docs.unity3d.com/Manual/SpecialFolders.html).
 
 ## Folders are not assemblies
 
 Creating `Tests/EditMode` does not create a test suite, and an `Editor` folder is not isolated by its
-name once an assembly definition (asmdef) covers it.
+name once an assembly definition (asmdef) covers it. So the agent asks where tests live before
+creating any test folder:
+
+- **Per feature**, with test asmdefs (set up separately). Required for PlayMode tests.
+- **Central `Assets/Editor/Tests/<Area>`**, with no asmdefs. Unity's manual says tests need a test
+  assembly, but in practice the Test Framework runs EditMode tests from the predefined Editor
+  assembly: one mature project runs over 1,200 that way. "No asmdefs" is then a recorded choice the
+  agent respects.
 
 - Start with the default assemblies. Add asmdefs for concrete needs: testing, platform isolation,
   reuse, or faster iteration.
@@ -102,6 +148,15 @@ See [assembly definitions](https://docs.unity3d.com/Manual/assembly-definitions-
 Use `ThirdPartyAssets` only when the vendor supports relocating its files. Keep vendor-required
 paths and internal layout, and manage UPM dependencies through Package Manager. Put your own adapters
 beside the feature they serve rather than editing vendor source, and record any unavoidable patch.
+
+In an existing project, vendor folders at the `Assets` root are moved through
+[ReviewFolders.md](ReviewFolders.md) as part of the first setup step, because folder setup itself
+never moves content. Before a vendor folder is ignored, anything your project depends on inside it
+moves out first. The usual surprise is the render pipeline asset: a demo scene's URP asset can be
+the one Graphics and Quality settings use, and ignoring it leaves fresh clones with no pipeline.
+Unity's moves keep GUIDs, so moving that folder under `{ProjectName}/Settings` needs no settings
+edit. Vendor notes or scripts with hard-coded `Assets/` paths break after the move; the agent
+reports them and leaves the vendor files alone.
 
 ## Starting from a Unity template
 
@@ -163,7 +218,8 @@ guide and `.editorconfig`.
 ## Related topics
 
 - **Source control.** `.gitignore`, Git LFS for large binaries, Force Text serialization, and Visible
-  Meta Files are not folder rules. They will live with the Github guide, which is not written yet.
+  Meta Files are not folder rules. They live in the [version control guide](../VersionControl/README.md),
+  which runs after folder setup.
 - **Addressables.** If you adopt them, group assets by how they load, not by folder. Add this when
   Addressables is a selected system.
 
@@ -189,7 +245,9 @@ What makes it safe:
 - **Unity does the moving.** Moves go through the Editor so each `.meta` file and GUID travels
   with its asset. Moving files in Explorer, Finder, or by hand risks breaking references.
 - **Small, checkpointed batches.** Each batch starts from a commit and is verified (GUIDs, compile,
-  scenes and prefabs, tests) before the next. A failed batch is undone.
+  scenes and prefabs, tests) before the next. A failed batch is undone. Content that was never
+  committed, such as gigabytes of fresh vendor imports, has no commit to return to; the agent's move
+  log (old path, new path, GUID) is then the only way back.
 - **Partial adoption is fine.** Keep your own consistent convention and adopt only the parts that help.
 - **Some things stay put.** `Packages/`, `ProjectSettings/`, vendor content with a required layout,
   and Unity template folders are left alone.
@@ -198,4 +256,5 @@ What makes it safe:
 
 It lists each path as Created or Already present, repeats the check to prove a second run adds
 nothing, and marks Unity's metadata generation as *Not verified* until the project has been opened
-in the Editor. Commit the metadata files along with the folders.
+in the Editor. Commit the metadata files along with the folders, and the `.gitkeep` files in
+scaffold mode.

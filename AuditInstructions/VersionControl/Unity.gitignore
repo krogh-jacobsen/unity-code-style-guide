@@ -50,6 +50,8 @@ ExportedObj/
 *.mdb
 *.opendb
 *.VC.db
+# The kit's reference snapshot ships its own Lint.csproj for CI; keep snapshot project files tracked.
+!/Documentation/UnityStarterKit/**/*.csproj
 
 # Unity-generated meta files for the generated files above.
 *.pidb.meta
@@ -78,6 +80,11 @@ crashlytics-build.properties
 # Test Runner generated scenes.
 InitTestScene*.unity*
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+
+# Scenes the Editor recovers after a crash (observed in Unity 6; not documented). Save any you need
+# under owned content first.
+/[Aa]ssets/_Recovery/
+/[Aa]ssets/_Recovery.meta
 
 # Addressables generated content.
 /ServerData

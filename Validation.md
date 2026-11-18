@@ -4,6 +4,55 @@ The intended profile is [Unity 6.7](AgentsInstructions/UnityTechStack/UnityTechS
 that choice from the exact prerelease Editor tested. It is not a guarantee for every 6000.7 patch,
 package upgrade, target platform, or copied project. Date: 2026-10-12.
 
+## Setup learnings P1–P13 — 2026-11-17
+
+Documentation, template, and tool changes drawn from one real setup (Unity 6000.7.0b6, Editor-tooling
+repository, URP only, Editor open and driven through `unity command eval`) at kit revision d803c89.
+The Unity behaviours described (stale `GraphicsSettings` entry, VFX Graph dropping out with HDRP, the
+guarded Editor-open import) were observed in that setup, not re-run for this change.
+
+| Check | Result | Evidence / limit |
+|---|---|---|
+| Full repository validator | Passed | `python3 -B AuditInstructions/Tools/validate_all.py --require-dotnet`: 84 Markdown files, 570 local links/anchors, 76 unique GUIDs, 7 folder validators, 14 workflow tests |
+| Snapshot `Lint.csproj` stays tracked; `*.glb` routes to LFS | Passed | Version control validator, with Git: 40 ignored, 19 tracked, 8 LFS paths |
+| `Lint.csproj` edit point | Passed | CI validator with `dotnet format`: an embedded package is not linted by default and fails the naming gate once its `Compile` line is added |
+| Snapshot exclusion and `--target` | Passed | Installation check: replay archives excluded, links to them accepted only because they exist upstream; `--target` self-check on the staged project; `--target` on a non-project reports 3 failures |
+| AgentsInstructions audit-first preface | Passed | New `validate_all.py` check on 3 documents |
+| CLI Command template | Partial | Tokens, GUID, inventory, and table verified; compile against `com.unity.pipeline` Not verified |
+| `GraphicsSettings.m_RenderPipelineGlobalSettingsMap` cleanup | Not verified | Observed in the real setup only; property name not checked against other Editor versions |
+| Review contract wording (P13) | Pass | Applied to the canonical contract and all 19 copies, including both folder guides; `validate_all.py --require-dotnet` passes |
+| Fresh-agent decision replay | Not verified | Not rerun for these changes |
+
+## Folder guides: rules from a mature project — 2026-11-17
+
+Documentation change drawn from a read-only look at one mature project (Unity-Railroad-Tycoon-Game).
+Unity claims were checked against the Unity 6.6 Manual through a fetch agent.
+
+| Check | Result | Evidence / limit |
+|---|---|---|
+| Full repository validator | Passed | `validate_all.py`: 84 Markdown files, 567 local links/anchors, 75 unique GUIDs, 7 folder validators; version control 40 ignored / 18 tracked paths including `_Recovery` both ways; run without `--require-dotnet` |
+| Hidden-asset import rules, TextAsset import of `.md`/`.txt` | Confirmed | Manual: special folders and Text Asset pages |
+| `Resources` contents ship in the player | Not re-checked | Long-standing Manual statement; not fetched for this change |
+| EditMode tests without an asmdef | Contradicts the Manual; observed working | The Manual requires a test assembly; the mature project runs 1,205 passing EditMode tests from `Assets/Editor/Tests` with no asmdef (Test Framework 1.9). Guides present it as observed behaviour |
+| PlayMode tests need a test asmdef | Confirmed | Manual: Edit Mode vs Play Mode tests |
+| `Assets/_Recovery` from crash recovery | Not documented; observed | Untracked folder of recovered `.unity` scenes in the mature project |
+| Underscore sorts owned roots first | Not verified | Stated as a convention, not a Unity rule |
+| Fresh-agent decision replay | Not verified | Not rerun for these changes |
+
+## Folder guides: folders first and scaffold mode — 2026-11-17
+
+Documentation-only change to the folder guides, their readme, and the setup coordinator, drawn from
+one real project setup (Unity 6000.7.0b6, Editor open, Unity CLI 1.0.1 connected). The behaviors the
+guides now describe (CLI-driven `CreateFolder`/`MoveAsset`, the render pipeline relocation, the
+verification set, and the first-commit size) were observed in that setup, not re-run for this change.
+
+| Check | Result | Evidence / limit |
+|---|---|---|
+| Full repository validator | Passed | `python3 -B -u AuditInstructions/Tools/validate_all.py`: 84 Markdown files, 563 local links/anchors, 75 unique GUIDs, 7 folder validators, 14 workflow tests; run without `--require-dotnet` |
+| Review contract copies | Passed | Contract checks in the same run; the contract text was not edited |
+| Fresh-agent decision replay | Not verified | The archived folder cases predate scaffold mode and vendor relocation; they were not rerun |
+| Clean-clone `.gitkeep` behavior | Not verified | Rationale (orphaned `.meta` deleted on import) not reproduced on a fresh clone for this change |
+
 ## Fresh-agent discipline pressure tests — 2026-10-26
 
 Five fresh agents (`fork_turns=none`, inherited model/reasoning with no overrides) tested frozen copies

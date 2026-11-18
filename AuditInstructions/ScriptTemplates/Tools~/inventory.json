@@ -16,5 +16,6 @@
   "OptionalScriptTemplates/8-Scripting__Property Drawer-NewPropertyDrawer.cs.txt": "d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9",
   "OptionalScriptTemplates/9-Scripting__Unit Test EditMode-NewEditModeTest.cs.txt": "e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0",
   "OptionalScriptTemplates/ReferenceOnly/13-Scripting__State-NewState.cs.txt": "1ed98430f030245d7ada9b9d6121427f",
-  "OptionalScriptTemplates/18-Scripting__Awaitable Operation-NewAwaitableOperation.cs.txt": "406ed49d3c7214eb1a541e7cb061acb1"
+  "OptionalScriptTemplates/18-Scripting__Awaitable Operation-NewAwaitableOperation.cs.txt": "406ed49d3c7214eb1a541e7cb061acb1",
+  "OptionalScriptTemplates/19-Scripting__CLI Command-NewCliCommand.cs.txt": "c2a2d924497d4769a8f346edfa73f828"
 }

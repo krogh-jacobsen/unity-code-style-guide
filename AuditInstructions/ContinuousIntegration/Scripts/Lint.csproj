@@ -6,10 +6,17 @@
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <UnityProject Condition="'$(UNITY_PROJECT_PATH)' != ''">$(UNITY_PROJECT_PATH)</UnityProject>
     <UnityProject Condition="'$(UNITY_PROJECT_PATH)' == ''">$(MSBuildThisFileDirectory)../..</UnityProject>
+    <!-- This file installs at .github/unity-ci/, two levels below the repository root. -->
+    <RepositoryRoot>$(MSBuildThisFileDirectory)../..</RepositoryRoot>
+    <!-- Edit point: vendor, sample, and generated folders you do not own. -->
+    <LintExclude>$(UnityProject)/Assets/ThirdPartyAssets/**;$(UnityProject)/Assets/Plugins/**;$(UnityProject)/Assets/Samples/**;$(UnityProject)/Assets/TextMesh Pro/**;$(UnityProject)/Assets/TutorialInfo/**</LintExclude>
   </PropertyGroup>
   <ItemGroup>
-    <!-- Your own code only. Vendor and sample code is excluded; add folders you do not own. -->
-    <Compile Include="$(UnityProject)/Assets/**/*.cs"
-             Exclude="$(UnityProject)/Assets/ThirdPartyAssets/**;$(UnityProject)/Assets/Plugins/**;$(UnityProject)/Assets/Samples/**;$(UnityProject)/Assets/TextMesh Pro/**;$(UnityProject)/Assets/TutorialInfo/**" />
+    <Compile Include="$(UnityProject)/Assets/**/*.cs" Exclude="$(LintExclude)" />
+    <!-- Edit point: owned code outside Assets. Add one line per root, for example an embedded package
+         or a repository-level code folder:
+    <Compile Include="$(UnityProject)/Packages/com.company.tool/**/*.cs" Exclude="$(LintExclude)" />
+    <Compile Include="$(RepositoryRoot)/Utilities/**/*.cs" Exclude="$(LintExclude)" />
+    -->
   </ItemGroup>
 </Project>

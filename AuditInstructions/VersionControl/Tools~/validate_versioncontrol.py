@@ -20,7 +20,7 @@ IGNORED = [
     "Notes/run.pdata", "Notes/run.snap", "Notes/frame.rdc", "Notes/run.diagsession", "Notes/run.etl",
     "Assets/ThirdPartyAssets/Vendor/Tool.cs", "Assets/ThirdPartyAssets/Vendor/Tool.cs.meta", "Assets/ThirdPartyAssets.meta",
     "Game.sln", "Game.csproj", "Game.slnx", "mono_crash.1.json", "sysinfo.txt", "Assets/InitTestScene123.unity",
-    "Assets/StreamingAssets/aa/catalog.json", ".vs/x", ".idea/workspace.xml", ".vscode/settings.json",
+    "Assets/StreamingAssets/aa/catalog.json", "Assets/_Recovery/0.unity", "Assets/_Recovery.meta", ".vs/x", ".idea/workspace.xml", ".vscode/settings.json",
     ".DS_Store", "Thumbs.db", "Game.apk", "Game.aab", "Game.ipa", "Assets/Plugins/Editor/JetBrains/x.dll",
 ]
 TRACKED = [
@@ -28,11 +28,12 @@ TRACKED = [
     "Assets/Scenes/Main.unity", "Assets/Settings/Build Profiles/Windows.asset", "Assets/Plugins/Native.dll",
     "Assets/StreamingAssets/settings.json", "ProjectSettings/ProjectSettings.asset", "ProjectSettings/ProjectVersion.txt",
     "Packages/manifest.json", "Packages/packages-lock.json", "ArtSource/hero.psd", ".vscode/extensions.json",
-    "Assets/ThirdPartyAssetsExtra/Own.cs", "Assets/Game/ThirdPartyAssets/Own.cs", "Assets/Game/ProfilerNotes.md",
-    ".editorconfig",
+    "Assets/ThirdPartyAssetsExtra/Own.cs", "Assets/Game/ThirdPartyAssets/Own.cs", "Assets/Game/ProfilerNotes.md", "Assets/_Game/Recovery/Note.cs",
+    ".editorconfig", "Documentation/UnityStarterKit/AuditInstructions/ContinuousIntegration/Scripts/Lint.csproj",
 ]
 LFS = ["Assets/Game/Art/a.png", "Assets/Game/Art/a.tga", "Assets/Game/Art/model.fbx", "Assets/Game/Audio/a.wav",
-       "Assets/Game/Video/a.mp4", "ArtSource/hero.psd", "ArtSource/rig.blend"]
+       "Assets/Game/Video/a.mp4", "ArtSource/hero.psd", "ArtSource/rig.blend",
+       "Assets/Game/Art/model.glb"]
 EOL_LF = ["Assets/Game/Scripts/Player.cs", "Assets/Scenes/Main.unity", "Assets/Game/UI/Hud.uxml", "Assets/Game/Player.prefab.meta"]
 NOT_LFS = ["Assets/Game/Scripts/Player.cs", "Assets/Scenes/Main.unity", "Assets/Game/Data/Config.asset", "Packages/manifest.json"]
 

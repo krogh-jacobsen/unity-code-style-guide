@@ -13,5 +13,8 @@
     ".github/workflows/repository-checks.yml",
     ".gitignore"
   ],
+  "snapshot_exclude": [
+    "AuditInstructions/Tools/*replay_results_*.json"
+  ],
   "root_editorconfig_source": "AgentsInstructions/CodeStyleGuide/EditorConfig/.editorconfig"
 }
