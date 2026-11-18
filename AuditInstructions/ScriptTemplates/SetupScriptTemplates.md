@@ -114,13 +114,13 @@ not install groups. All selected files install flat into `Assets/ScriptTemplates
 | 16 | UI Toolkit Editor Window | `OptionalScriptTemplates/16-Scripting__UI Toolkit Editor Window-NewUIToolkitWindow` | Editor-only; choose a unique menu path | `6a9841d6af62642e1a5366591f611729` |
 | 17 | UI Toolkit Property Drawer | `OptionalScriptTemplates/17-Scripting__UI Toolkit Property Drawer-NewUIToolkitDrawer` | Editor-only; supply the target type | `adcf1d46ad9e54b5ea5836c18000a892` |
 | 18 | Awaitable Operation | `OptionalScriptTemplates/18-Scripting__Awaitable Operation-NewAwaitableOperation` | Unity 6 (`Awaitable`, `destroyCancellationToken`); replace the sample wait with real work | `406ed49d3c7214eb1a541e7cb061acb1` |
-| 19 | CLI Command | `OptionalScriptTemplates/19-Scripting__CLI Command-NewCliCommand` | Editor-only; package `com.unity.pipeline` (`Unity.Pipeline.Commands`), `string` arguments only; give the command a unique name. Compile Not verified | `c2a2d924497d4769a8f346edfa73f828` |
+| 19 | CLI Command | `OptionalScriptTemplates/19-Scripting__CLI Command-NewCliCommand` | Editor folder; package `com.unity.pipeline` (`Unity.Pipeline.Commands`, verified 0.6.0-exp.1). Arguments bind to their C# type (`string`, `bool`, `int`, enums); set `Required = true` explicitly. Add a `confirm` argument to a destructive command | `c2a2d924497d4769a8f346edfa73f828` |
 
 Notes on choosing:
 
 - Awaitable Operation is the async pattern: one cancellable operation owned by the component, cancelled on disable, destroy, or restart, with every outcome observed.
 - The five defaults need no package and no project-specific base class. Everything else is opt-in.
-- CLI Command registers a `unity command` entry point and follows the [CLI example](../UnityCLI/CliScriptAndTests/README.md); its compile check has not been run, so report it Not verified until it compiles in the target.
+- CLI Command registers a `unity command` entry point on the next recompile; the [CLI example](../UnityCLI/CliScriptAndTests/README.md) shows a full command. The command name is the class name; built-in commands use snake_case, so rename it if you want to match them. Parameter order and `Required` are the command's public interface: add new parameters as optional ones at the end.
 - Choose one Inspector approach per target: IMGUI (6 to 8) or UI Toolkit (15 to 17). Unity recommends
   UI Toolkit for new Editor UI; IMGUI still works. Drawer and Editor templates are deliberately
   unregistered placeholders: the user adds `[CustomEditor]` or `[CustomPropertyDrawer]` with a real target.
