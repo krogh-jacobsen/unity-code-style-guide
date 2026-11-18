@@ -115,6 +115,23 @@ else
 }
 ```
 
+## Using the guide as a review check
+
+The guide is written to be followed while writing code: about 200 rule bullets interleaved with
+samples and lifecycle explanations. That makes it slow to apply as a checklist to an existing
+codebase. The [Checkable rules](UnityStyleGuide.md#checkable-rules) table near its top restates the
+countable rules as one row each, with a `git grep -P` pattern where one is reliable and an honest
+"candidate" or "read" marker where it is not. Two points matter when you use it for a review:
+
+- **The project's own standard wins.** A rule that only this kit holds is a conflict to record,
+  not drift to fix.
+- **Count runtime and Editor/tooling code separately.** They usually follow different conventions
+  and carry different risk.
+
+`Tools~/check_naming.py` validates this kit's own `.editorconfig` naming rules against two bundled
+fixtures (it needs the .NET SDK). It does not scan your project yet; a `--target` mode is a planned
+follow-up.
+
 ## Using `.editorconfig` to enforce formatting rules
 
 Use an `.editorconfig` file to define and enforce consistent formatting rules across the project. This helps keep your editor, formatters, and AI tools aligned with the same conventions. 

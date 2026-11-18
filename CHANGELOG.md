@@ -1,5 +1,11 @@
 # Change log
 
+## 2026-11-18 — Style guide usable as a review check
+
+- UnityStyleGuide.md opens with a Checkable rules table: 34 rows (14 naming, 6 formatting, 14 class organization), each restating an existing rule with a grep, candidate-grep, or read check and a scope note. A tested PCRE pattern block sits under the table. The table says the project's own standard sets severity, that a kit-only rule is a conflict rather than drift, and that runtime and Editor/tooling code are counted separately.
+- The `Camera.main` rule in Update() is now measured guidance: Unity serves it from an internal cache at about `GetComponent` cost, so caching it is optional. `GetComponent` and `Find*` stay forbidden per frame.
+- The style guide and CodeStyleGuide README state that `check_naming.py` validates the kit's own rules against its fixtures and does not yet scan a target project; a `--target` mode is a planned follow-up.
+
 ## 2026-11-17 — Learnings from a real Editor-tooling setup (P1–P13)
 
 - Non-destructive by default: AGENTS.md now says any change outside the confirmed list, however small, returns to the user before it is made, and that every confirmed item states its undo. The style guide, stack profile, and project rules open with an audit-first preface for existing projects. The canonical review contract and all 19 copies now say the same: stage 4 gives each change its undo, and noting an unconfirmed change in a report is not confirmation.
