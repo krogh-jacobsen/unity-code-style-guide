@@ -7,6 +7,7 @@
 ## 
 ## Architecture
 
+- My coding philosophy is heavily based on the books Clean Code, The Pragmatic Programmer, and A Philosophy of Software Design, but adapted in a pragmatic way for Unity projects. My overarching core principles is to generate that is extremely readable, testable, decoupled, and optimized for visual debugging in the Unity Editor.
 - Before introducing a new manager, service, wrapper, or decorator, ask whether it hides meaningful complexity, provides a distinct responsibility, or simply moves existing code into another class.
 - Use a bootstrap scene. I prefer that over service locator patterns.
 - **Bootstrap scene details:** The bootstrap scene owns startup and global services, loads other scenes additively, and is the one allowed exception to "Prefabs are Truth". Make Play work from any scene in the Editor. ([Scenes and lifecycle lens](../../AuditInstructions/ProjectAuditGuides/UnityScenesAndLifecycleInstructions.md))
