@@ -2,29 +2,25 @@
 
 # The Unity C# Style Guide Rationale
 
-This repo is a practical Unity C# style guide designed to work well with LLM assistants. It combines standard C# and Unity guidance with a few opinionated conventions that are easy to adapt.
+This repo is a practical Unity C# style guide designed to work well with LLM assistants. It combines industry standard C# and Unity guidance with a few opinionated conventions that are easy to adapt to your own.
 
 ## Check out the original guide
 
 This version is inspired by the [Unity C# style guide for Unity 6](https://unity.com/resources/c-sharp-style-guide-unity-6), which I helped create and later update. The companion ebook, [Level up your code with design patterns and SOLID](https://unity.com/resources/design-patterns-solid-ebook), is also relevant for the design patterns material in this repo.
 
-## Why this version differs
+The original guide has and remains popular, but like many other developers code style preferences a subjective flavor and in my own experimentation I wanted something more optimized for AI tools that is easier to tweak to your specific needs. 
 
-The original guide was useful, but many people wanted more concrete examples and clearer explanations. Others wanted to use AI tools to follow the guide consistently, but were unsure how to make that work without extra prompting and setup.
-
-This version is intended to be more LLM-friendly, more approachable, and easier to adapt. The instruction files are written for machines, but they also include short explanations of why each rule exists so you can follow the reasoning as you read.
+Thus this newer version is intended to be more LLM-friendly, more approachable, and easier to adapt. The instruction files are written for machines, but they also include short explanations of why each rule exists so you can follow the reasoning as you read.
 
 This is still grounded in standard C# and Unity practice, while also including a few opinionated preferences. Those are clearly marked with `[opinion]` so you can decide what to keep, remove, or change.
-
-## A living document
-
-Any style guide should evolve over time. This one is no exception. Some choices are based on industry conventions, while others reflect readability and teaching-first decisions. That's intentional: a style guide should support the way your team actually works.
 
 ## There is no single "correct" way
 
 The goal here is not to claim that one format is universally better than every alternative. Instead, the aim is to reduce ambiguity and make collaboration easier.
 
 A good style guide is one that works for your project. That can mean different things for a solo developer, a beginner learning the craft, or a larger team working on a more complex codebase. This repo is meant to be a strong starting point: adapt it, tweak it, and make it your own.
+
+Any style guide should evolve over time. This one is no exception. Some choices are based on industry conventions, while others reflect readability and teaching-first decisions. That's intentional: a style guide should support the way your team actually works.
 
 
 ## What's opinionated here
