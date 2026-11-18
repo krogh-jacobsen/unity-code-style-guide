@@ -1,5 +1,15 @@
 # Change log
 
+## 2026-11-18 — Project review: Unity CLI first, and real-project adoption
+
+- ProjectReview.md has a new **Evidence sources: Unity CLI first** ladder. It runs discovery (`unity commands`, `unity command`), then offline checks (`unity projects verify/info/size`, `unity docs`), then Editor-backed checks (`unity command`, `unity projects audit`), then tests and builds, with greps last. A Not verified result names the missing rung. The integrity pass now uses `unity projects verify --check …`, with the greps kept as the fallback.
+- The router now reads the project's existing review or decision log, so findings it already tracks are labelled Already tracked and options the owner rejected are not proposed again. It also reports drift in vendored lens copies, and reads a target revision with `git show`/`git grep <rev>` when parallel sessions hold uncommitted edits.
+- Base checks: the project's own standard sets severity, and a kit-only rule counts as a conflict, not drift. Naming counts are reported separately for runtime and tooling code.
+- Assemblies detection: having no asmdefs is not a signal; under a no-asmdef policy the test-inclusion row runs in Testing.
+- Outside coverage gains a **Simulation and tick-based gameplay** row.
+- Evidence standard: with no documented budget, measured rows are reported Not verified (no budget). An "unreferenced" claim needs both a GUID search and a path-string search.
+- Integrity pass: a tracked folder `.meta` for an empty folder is an orphan in every clone; rerun verify after removing orphans, because a parent folder's `.meta` can become orphaned next.
+
 ## 2026-11-17 — Learnings from a real Editor-tooling setup (P1–P13)
 
 - Non-destructive by default: AGENTS.md now says any change outside the confirmed list, however small, returns to the user before it is made, and that every confirmed item states its undo. The style guide, stack profile, and project rules open with an audit-first preface for existing projects. The canonical review contract and all 19 copies now say the same: stage 4 gives each change its undo, and noting an unconfirmed change in a report is not confirmation.
