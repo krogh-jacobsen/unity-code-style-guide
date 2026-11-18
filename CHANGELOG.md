@@ -1,5 +1,12 @@
 # Change log
 
+## 2026-11-18 — Runtime lens wording from a real project
+
+- Performance: rows separate the static trigger a code-only run can judge from the measured one; measured rows without a documented budget follow the evidence standard. New rows for per-entity callbacks at scale and time-sliced loops; rendering is Not applicable when visual work is out of scope; `[Conditional]` call sites drop argument evaluation.
+- Scenes and lifecycle: enable lifetime pairs each subscription with the owner's teardown path (cleanup lists included); session reset gains a static comparison against the reset body. New rows for re-registration load order, scene handoff tickets, and `Task.Run` workers. Destroyed-object findings need engine-side access through the detached reference.
+- Design: dependency direction reads namespaces, then serialized GUIDs, then asmdefs; README links are not dependencies. Valid state defers to a binding encapsulation rule; useful abstractions adds the minimum-consumer converse; command checks exercise rollback.
+- Persistence: refuse-other-versions policies check equality, an intact file, and accurate newer/older labels. `File.Replace` and header-last commits count as safe writes; loud asset-name keys are proposals. New row for saves shared across branches, worktrees, and builds.
+
 ## 2026-11-17 — Learnings from a real Editor-tooling setup (P1–P13)
 
 - Non-destructive by default: AGENTS.md now says any change outside the confirmed list, however small, returns to the user before it is made, and that every confirmed item states its undo. The style guide, stack profile, and project rules open with an audit-first preface for existing projects. The canonical review contract and all 19 copies now say the same: stage 4 gives each change its undo, and noting an unconfirmed change in a report is not confirmation.
