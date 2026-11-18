@@ -1,5 +1,12 @@
 # Change log
 
+## 2026-11-18 — UI, input, audio and camera lens wording from a real project
+
+- UI Toolkit: a PanelRenderer reload row (callback registered and unregistered with its owner, cached elements and views rebuilt when the reload version or root changes); the controller/`ClickEvent` case now applies only where controller or keyboard navigation is a supported input.
+- Input System: a pick-based arbitration row (`ScreenToPanel` conversion, pointer capture, text-field focus, hidden elements not pickable) and a declared-but-unused actions/maps row; rebinding rows open with "Where rebinding is a feature"; mixed asset and code-built bindings are a proposal.
+- Audio: the pause/completion row covers `isPlaying`-based idle/completion checks under `AudioListener.pause`, to verify on the installed Editor.
+- Cameras: an inert `CinemachineBrain` with no Cinemachine cameras beside a custom rig is an incidental unused component, not a camera-selection finding; the stale Cinemachine 3.1.7 reference now points at the installed package (6.7.0 on Unity 6.7).
+
 ## 2026-11-17 — Learnings from a real Editor-tooling setup (P1–P13)
 
 - Non-destructive by default: AGENTS.md now says any change outside the confirmed list, however small, returns to the user before it is made, and that every confirmed item states its undo. The style guide, stack profile, and project rules open with an audit-first preface for existing projects. The canonical review contract and all 19 copies now say the same: stage 4 gives each change its undo, and noting an unconfirmed change in a report is not confirmation.
