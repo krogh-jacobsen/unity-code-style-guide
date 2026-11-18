@@ -4,6 +4,15 @@ The intended profile is [Unity 6.7](AgentsInstructions/UnityTechStack/UnityTechS
 that choice from the exact prerelease Editor tested. It is not a guarantee for every 6000.7 patch,
 package upgrade, target platform, or copied project. Date: 2026-10-12.
 
+## Lens detection script — 2026-11-18
+
+| Check | Result | Evidence / limit |
+|---|---|---|
+| Detector self-test | Passed | 7 tests on a synthetic project (vendor exclusion, pointer picking, Editor-only probe, package-only input, no-asmdef policy); run by the folder validator |
+| Mature Unity 6.7 project, read-only | Passed | All 22 rows matched the labels of an earlier manual review: 15 Recommended, Physics and Assemblies Optional, uGUI, Physics2D, Localization, Networking and Entities Not detected; about 7 s with `projects info` and `projects verify` |
+| Editor rung (`find_assets`) | Partial | Command shape and fully qualified type names checked on a connected Editor for another project; not run against a project open in the Editor |
+| Windows paths, embedded packages | Not verified | Run on macOS only; embedded-package scanning covered by code path, not by a real project |
+
 ## Setup learnings P1–P13 — 2026-11-17
 
 Documentation, template, and tool changes drawn from one real setup (Unity 6000.7.0b6, Editor-tooling

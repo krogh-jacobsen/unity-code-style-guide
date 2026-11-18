@@ -1,5 +1,11 @@
 # Change log
 
+## 2026-11-18 — Deterministic lens detection
+
+- New `AuditInstructions/ProjectAuditGuides/Tools~/detect_lenses.py` drafts the project-review lens menu read-only: raw and first-party counts, a Recommended/Optional/Not detected label with its reason, evidence per signal, and representative paths, as Markdown and JSON. Evidence comes from the Unity CLI first (`unity projects info`, `unity projects verify`, and `unity command find_assets` when the project's Editor is connected), then file listing, YAML class IDs, and C# text search for the signals no command exposes.
+- Vendor, sample, and generated folders are excluded by a configurable list. A missing asmdef is never a signal; a documented predefined-assemblies policy makes Assemblies Optional, and `--optional LENS=REASON` records other documented decisions. Physics treats pointer-picking raycasts and undriven bodies as weak.
+- `ProjectReview.md` step 1 says to run the script when it is available. The folder validator runs its self-test on a synthetic project.
+
 ## 2026-11-17 — Learnings from a real Editor-tooling setup (P1–P13)
 
 - Non-destructive by default: AGENTS.md now says any change outside the confirmed list, however small, returns to the user before it is made, and that every confirmed item states its undo. The style guide, stack profile, and project rules open with an audit-first preface for existing projects. The canonical review contract and all 19 copies now say the same: stage 4 gives each change its undo, and noting an unconfirmed change in a report is not confirmation.
