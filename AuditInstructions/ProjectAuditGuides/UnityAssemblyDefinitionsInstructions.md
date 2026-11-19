@@ -5,9 +5,9 @@ Load for compilation boundaries, Editor/player isolation, tests, or package refe
 including an explicit no-asmdef choice. Use `unity:unity-cli` (fallback: the Editor's compile and
 build commands) for validation. **Last verified: October 2026.**
 
-This lens owns test inclusion, normal-player isolation, and Editor folders under an asmdef. Stripping
+This lens owns test inclusion through asmdefs, normal-player isolation, and Editor folders under an asmdef. Stripping
 and AOT belong to [Assets and memory](UnityAssetsAndMemoryInstructions.md); [Testing](UnityTestingInstructions.md)
-links here for inclusion.
+links here for inclusion and owns it for a project without asmdefs.
 
 ## Establish effective boundaries
 
@@ -24,7 +24,7 @@ references and defines. Folder names alone do not establish compilation boundari
 | Platform filters | `includePlatforms` and `excludePlatforms` in every `.asmdef` | Both arrays hold values (the file-format reference requires `includePlatforms` to be empty when `excludePlatforms` has values), or an assembly meant to be Editor-only lists any platform besides the Editor |
 | Reference resolution | `references` in every `.asmdef` and `.asmref`; the `guid:` in each asmdef `.meta` | A `GUID:<hash>` or an assembly name matches no asmdef in the project or its resolved packages, or one `references` list mixes the GUID and name forms (the reference requires one form per list) |
 | Reference direction | The reference graph built from `references`, plus actual source dependencies | A cycle exists in the graph, or a binding project dependency rule is violated |
-| Test inclusion | Test asmdefs, every non-test asmdef's `references`, the output of a normal player build or its build report | A normal player build or build report contains a test assembly, or a non-test asmdef lists a test asmdef, NUnit, or `UnityEngine.TestRunner` in `references`; the build-side half needs a build |
+| Test inclusion | With asmdefs: test asmdefs, every non-test asmdef's `references`, the output of a normal player build or its build report | A normal player build or build report contains a test assembly, or a non-test asmdef lists a test asmdef, NUnit, or `UnityEngine.TestRunner` in `references`; the build-side half needs a build. A no-asmdef project is judged by folder placement and define guards in [Testing](UnityTestingInstructions.md) |
 | Optional packages | `manifest.json` / `packages-lock.json`, asmdef `references`, `versionDefines`, `defineConstraints` | An asmdef references a package assembly that the project treats as optional, with no `versionDefines` plus `defineConstraints` guard, so it cannot compile when the package is absent |
 | Granularity | Editor compile log or `unity:unity-cli` compile timing after a one-file edit | A recorded recompile of one assembly follows an edit that none of its dependents use, and the timing is large enough to matter to the project's iteration goal; report the measurement, never a script count (needs a live compile) |
 
@@ -43,7 +43,9 @@ references and defines. Folder names alone do not establish compilation boundari
   `defineConstraints` value; the manual does not describe what it does. Unity's manual says test assemblies
   are not part of the regular build pipeline and ship only for Play Mode tests run in a Player, but verify
   that in the installed Editor. A missing or present constraint alone proves nothing: decide by a player
-  build or build report.
+  build or build report. Instrumentation and probe code has the analogous `UNITY_INCLUDE_INSTRUMENTATION`
+  define (Managed Code Variants, Unity 6.6+); confirm in the installed Editor that the Release variant
+  omits it before relying on it as a guard.
 - ℹ️ Interfaces can resolve dependency cycles, but moving a type to Core is appropriate only if Core
   owns that contract. Sometimes an artificial boundary should be consolidated.
 

@@ -11,7 +11,8 @@ available; this guide checks the tests that exist.
 ## Establish the baseline
 
 Inventory discovered tests, categories, explicit/expensive exclusions, runner configuration, and
-existing failures. Follow current test authorization and any required test-runner subagent. Record
+existing failures. Read the project's test-authorization rules and any required test-runner subagent
+before running anything; record categories that policy excludes as "Not run (policy)", not as gaps. Record
 the revision, working-tree changes, engine/package versions, invocation/filter, and result artifacts.
 Run the agreed suite; an exit code or "runner started" message alone is insufficient evidence.
 
@@ -20,13 +21,14 @@ Run the agreed suite; an exit code or "runner started" message alone is insuffic
 | Check | Evidence to inspect | Finding when |
 |---|---|---|
 | Real behavior boundary | Public command, production wiring, assertions | Tests exercise a helper while the broken command path bypasses it |
-| Independent expectations | Expected values and fixtures | An assertion's expected value is computed by the production function under test, or a test body contains no assertion (`Assert.*`, `Is.*`, `LogAssert.*`) and calls no helper that throws on failure |
+| Independent expectations | Expected values and fixtures | An assertion's expected value is computed by the production function under test, or a test body contains no assertion (`Assert.*`, `Is.*`, `LogAssert.*`) and calls no helper that throws on failure. An `[Explicit]` measurement probe whose helpers throw on failure is not assertion-free |
 | Failure-sensitive tests | Original bug/rejected operation and asserted consequence | Reverting or breaking the behavior under test leaves the test green. A test with no `Assert` text may assert through a helper: read the helper and confirm it throws on failure before reporting a missing assertion |
 | High-value cases | Public commands, state transitions, saves, and lifecycle paths in the reviewed scope | An important supported scenario or prior regression has no failure-sensitive coverage; propose the smallest useful success/rejection/repeat cases where those semantics apply, rather than requiring three tests for every public method |
 | Fixture isolation | Objects, scenes, statics, assets, delegates, clocks, randomness | The result changes when the suspect tests run alone, in reverse order, or shuffled (state leaks); list the tests explicitly when the runner has no ordering option |
 | Unexpected errors | Console/log handling and allowed messages | Broad suppression hides failures or expected errors are never asserted specifically |
-| Asynchronous completion | Timeouts, cancellation, polling conditions, cleanup | A hang is unbounded or success is inferred from a fixed sleep |
-| Test discovery | Source inventory of `[Test]`/`[UnityTest]` methods versus the runner's discovered list | A test method in scope is absent from the runner list. Inclusion in a normal player build is owned by [Assemblies](UnityAssemblyDefinitionsInstructions.md); apply its test-inclusion check rather than repeating it here |
+| Asynchronous completion | Timeouts, cancellation, polling conditions, cleanup | A hang is unbounded, or a fixed sleep is followed by no assertion of resolved state; a bounded settle then a state assertion is valid where no awaitable completion exists (Editor UI Toolkit layout) |
+| Test discovery | Source inventory of `[Test]`/`[UnityTest]` methods versus the runner's discovered list | A test method in scope is absent from the runner list. With asmdefs, inclusion in a normal player build is owned by [Assemblies](UnityAssemblyDefinitionsInstructions.md); apply its test-inclusion check rather than repeating it here |
+| Test inclusion without asmdefs | Test file locations, NUnit/`UnityEngine.TestTools` usings outside `Editor` folders, runtime probe guards, Release code-variant defines | A test lives outside an `Editor` folder, a runtime file references NUnit or `UnityEngine.TestTools`, or a runtime-side probe is not `#if`-guarded by a define absent from Release code variants; confirm with a Release build (needs a build) |
 
 ## Choose the cheapest meaningful mode
 
@@ -46,6 +48,9 @@ signatures and yield instructions; see the [UnityTest API](https://docs.unity3d.
   Assert related effects together when they define one invariant, such as no state change on rejection.
 - Clean up even when an assertion fails. Restore changed global settings, detach delegates, destroy
   test-created objects/runtime assets, and dispose handles/token sources using the runner's mode.
+- Without asmdefs, tests compile into `Assembly-CSharp-Editor`, so `[assembly: InternalsVisibleTo("Assembly-CSharp-Editor")]`
+  can expose internals. Heavy `BindingFlags.NonPublic` reflection in tests is a maintenance-cost
+  candidate: a signature change fails at test run time, not compile time.
 - Test temporary save fixtures without touching real player data. For relevant failures, test
   cancellation, re-enable, pool reuse, stale request completion, and a second Play session.
 - Report behavioral coverage by important scenario. Passing test count and code coverage percentages

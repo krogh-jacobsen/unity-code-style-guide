@@ -1,5 +1,14 @@
 # Change log
 
+## 2026-11-18 — World and tooling lens wording from a real project
+
+- Terrain: new Authored-asset isolation row (runtime edits on a private `TerrainData` copy, restore rebinds renderer and collider and destroys the copy); tile and stream rows are marked Not applicable for single-terrain scenes.
+- Navigation: new Custom graph search row (failure result handled, bounded cost, invalidation on graph edits); Route lifetime now covers a runtime bake source (terrain, colliders) changing without a surface rebuild.
+- Testing: new Test inclusion without asmdefs row (Editor-folder placement, no NUnit in runtime code, probes guarded by a define absent from Release variants); policy-excluded categories are recorded as "Not run (policy)"; a bounded settle followed by a state assertion is valid; `[Explicit]` probes with throwing helpers are not assertion-free; `InternalsVisibleTo("Assembly-CSharp-Editor")` noted as the alternative to heavy private reflection.
+- Assemblies: the test-inclusion row covers asmdef projects and points no-asmdef projects to Testing; the define caveat adds `UNITY_INCLUDE_INSTRUMENTATION` for probe code.
+- Editor tooling (Tool authoring): a tool that refuses dirty scenes and Play Mode and saves before returning may rely on version control instead of Undo.
+- Assets and memory: new Unused content row requiring both a GUID search and a path-string search before calling an asset unreferenced.
+
 ## 2026-11-18 — Deterministic lens detection
 
 - New `AuditInstructions/ProjectAuditGuides/Tools~/detect_lenses.py` drafts the project-review lens menu read-only: raw and first-party counts, a Recommended/Optional/Not detected label with its reason, evidence per signal, and representative paths, as Markdown and JSON. Evidence comes from the Unity CLI first (`unity projects info`, `unity projects verify`, and `unity command find_assets` when the project's Editor is connected), then file listing, YAML class IDs, and C# text search for the signals no command exposes.
