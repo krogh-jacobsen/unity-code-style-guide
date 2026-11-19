@@ -31,6 +31,34 @@ Editor's documentation before reporting them.
   is selected. These lenses win over any older copies in the project; a project's own audit guide
   runs alongside them only when the user names it. Cross-links between lenses name the owner of a
   check: follow one only when the finding needs it.
+- Read the project's existing review record, decision log, or plan register when one exists. Label a
+  finding it already tracks **Already tracked**, cite the owner decision behind a rejected or deferred
+  option instead of proposing it again, and keep new findings separate.
+- If the project holds its own copy of these lenses (matching filenames, or the `> How it works:`
+  opening), state which copy governs this review and report the copy's drift: missing lenses, missing
+  `Last verified` lines, and no recorded source revision. Drift is a recommendation, not a blocker.
+
+## Evidence sources: Unity CLI first
+
+Structured CLI output is cheaper and more reliable than reconstructing the same facts from text
+searches. For each check, use the highest rung available, and when you drop a rung, record which one and why:
+
+1. **Discover.** `unity commands` lists the CLI's commands as a machine-readable manifest. With an
+   Editor connected, `unity command` lists the Editor-registered commands (from the
+   `com.unity.pipeline` package). Discover rather than recall names. Prefer `--format json` or
+   `--format tsv` with `--no-banner --no-pager`, and batch many calls through `unity shell`.
+2. **Offline project checks.** `unity projects verify` (missing or orphan metadata, duplicate GUIDs,
+   conflict markers, manifest validity, Editor-version drift), `unity projects info`,
+   `unity projects size`, and `unity docs` for documentation matched to the installed Editor version.
+3. **Editor-backed checks.** `unity command` queries for console state and compile errors, missing
+   scripts and references, and asset queries; `unity recompile`; and `unity projects audit`
+   (Project Auditor) as a candidate source for performance, asset, and settings rows.
+4. **Tests and builds.** `unity test` (including `--affected`) and `unity build`, through the project's
+   test-authorization route.
+5. **Fallback.** `git grep` and YAML reads, only for rows that no command covers.
+
+A check reported **Not verified** names the missing rung, for example "Not verified (no connected
+Editor)". The [Unity CLI cheatsheet](../UnityCLI/UnityCLI.md) has worked examples.
 
 ## Review, recommend, confirm
 
@@ -86,8 +114,12 @@ inventory of staged, unstaged, and untracked files (or the available non-Git sou
 engine and package versions, platform, and selected stack. First-party means everything under `Assets` except
 vendor, sample, and generated folders (include project folders such as `Assets/Settings` and
 `Editor`), plus embedded packages the team owns; read the folder names and `AGENTS.md` to decide, and
-state the result. Check whether an Editor has the project open (`Temp/UnityLockfile`) and say so,
-because unsaved scenes must be preserved. Ask only when an unresolved choice materially changes the
+state the result. Check whether an Editor has the project open (`unity editors running` or
+`unity status`, otherwise `Temp/UnityLockfile`) and say so, because unsaved scenes must be preserved.
+Run `unity projects verify` and `unity projects info` once here; the integrity pass reuses that output.
+When the review targets a revision (a commit, a branch, or "committed work only" while parallel
+sessions hold uncommitted edits), read and search that revision with `git show <rev>:<path>` and
+`git grep <pattern> <rev>`. Report uncommitted edits only as notes. Ask only when an unresolved choice materially changes the
 review.
 
 Then detect what the project contains, using the signals in the [lens table](#2-choose-the-reviews).
@@ -141,7 +173,7 @@ which is read-only, and stop after stage 2.
 | [Physics](UnityPhysicsInstructions.md) | In first-party content (vendor colliders do not count). Strong: `Rigidbody` (YAML class 54) or `CharacterController` (143), `OnCollision*`/`OnTrigger*`, `Physics.Raycast`/`Physics.Overlap*` in runtime code. Weak: collider components alone (`BoxCollider` 65, `MeshCollider` 64, `SphereCollider` 135, `CapsuleCollider` 136) or a `Collider` type used as data; 3D PhysX only | `unity:physics-3d-collision` |
 | [Animation](UnityAnimationInstructions.md) | `.controller` or `.overrideController` assets and Animator API use in runtime code; `Animator` components (class 95) only on imported model prefabs are a weak signal | `unity:unity-cli` |
 | [Audio](UnityAudioInstructions.md) | `.mixer` assets, `AudioSource` components (class 82), `AudioMixer` or `AudioSource` use in runtime code, volume sliders; one lone signal is Optional, two or more are Recommended | `unity:audio-setup-mixers`, `unity:optimize-audio` |
-| [Assemblies](UnityAssemblyDefinitionsInstructions.md) | First-party `.asmdef` or `.asmref` files, or test code (for the test-inclusion row); a project that documents relying on the predefined assemblies is Optional | `unity-project-review` |
+| [Assemblies](UnityAssemblyDefinitionsInstructions.md) | First-party `.asmdef` or `.asmref` files. Their absence is not a signal. A project that documents relying on the predefined assemblies is Optional, and its test-inclusion row runs inside Testing | `unity-project-review` |
 | [Testing](UnityTestingInstructions.md) | Test code: `com.unity.test-framework` plus `[Test]`/`[UnityTest]` (not scene or documentation folders named Test); a whole-project review also reports "no tests" as a scope fact | `unity:unity-cli` |
 | [Editor tooling, Part B](UnityEditorToolingInstructions.md#tool-authoring) | Owned `Editor/` code with the attributes `[MenuItem`, `[InitializeOnLoad`, or `[CustomEditor`, or editor base classes, plus migration tools (match the attribute, not the word) | `unity:unity-cli`, `unity:ui-uitk`, `unity:ui-imgui` |
 | [Navigation](UnityNavigationInstructions.md) | Owned NavMeshAgent/NavMesh requests, NavMeshSurface/Link/Obstacle content, or custom pathfinding; package alone Optional | `unity:initialize-ai-navigation` |
@@ -164,6 +196,7 @@ installed capability from first-party usage. This inventory does not add or load
 | DOTS Physics | Unity Physics/Havok packages plus owned physics-world, collision-event or solver code | Entities covers generic ECS ordering/ECB safety; no DOTS contact/solver lens |
 | Netcode for Entities | Ghosts, prediction/rollback, Netcode for Entities packages and owned systems | Networking covers stated authority/lifetime checks; no prediction/ghost-baking correctness lens |
 | Specialist services/content | Backend/economy/IAP, XR, custom AI, procedural generators or third-party systems beyond stated rows | Name the actual system and specialist security, platform or authoring checks not performed |
+| Simulation and tick-based gameplay | An owned simulation clock, fixed-step or tick scheduling, seeded or rebuild-from-seed generation, and reservation or allocation invariants (track blocks, slots, queues, economies) | Performance owns frame cost and Design owns command ownership. No lens checks tick ordering, determinism, or whether invariants survive save and load |
 | Other first-party systems | Content/code with no matching lens, found while inventorying the project | Name the system and the absent review; do not infer exhaustive coverage from the menu |
 
 For each detected uncovered system, list the owning files/assets, applicable generic checks, and the
@@ -193,6 +226,11 @@ health check:
 | Class organization | Project and style guide | Member order, MonoBehaviour and file identity, approved region usage |
 | API and stack compatibility | Project tech stack and installed source or official docs | Actual versions, obsolete API availability, selected input, UI, and pipeline |
 | Structure and settings | Project rules, [folder review](../FolderStructure/ReviewFolders.md), [project settings](../ProjectSettings/ProjectSettings.md) | Intended folder and settings policy versus actual state |
+
+The project's own standard sets severity. Where the kit's style guide and a documented project rule
+disagree (line length, import style, member order, field prefixes), record a **conflict** citing both,
+not drift. Report naming counts separately for runtime code and for Editor, tooling, and test code,
+because tooling conventions often differ and drift tends to concentrate there.
 
 ⚠️ Every search pattern is a candidate. Read the enclosing code and the callers, and honor documented
 project choices. Do not report every lambda, every static, a missing asmdef, any `Resources` folder,
@@ -301,6 +339,10 @@ violation; otherwise label a justified improvement as a proposal with its tradeo
 semantics support technical claims; architecture preferences and starting budgets remain project
 choices. Record source/version and the limits of the evidence rather than treating an official
 recommendation as universally optimal. Follow per-frame helper calls; inspect release, cancellation, and failure paths.
+When the project documents no budget, measured rows are **Not verified (no budget)**, and only
+binding-rule violations count as findings. "Unreferenced" needs both a GUID search and a path-string
+search (`AssetDatabase.LoadAssetAtPath`, `Resources.Load`, Addressables keys, and menu or authoring
+tools), because Editor tools often load assets by path.
 Exclude generated and vendor code from style review unless scoped in. Vendor metadata may still
 matter to a project-wide GUID integrity check.
 

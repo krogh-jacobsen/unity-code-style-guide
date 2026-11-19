@@ -17,13 +17,16 @@ A bootstrap scene is one valid choice; it is not mandatory for every game.
 | Check | Evidence to inspect | Finding when |
 |---|---|---|
 | Readiness | Bootstrap/composition path, required services, inactive and spawned objects | A consumed value depends on initialization that is not guaranteed to precede the read, leaving an inspected failure path or a reproduced wrong value. Serialized/default state independent of the other object’s callbacks need not have explicit execution ordering |
-| Enable lifetime | Publisher/delegate identity and cleanup paths | A subscription made in `OnEnable`/`Start` has no matching unsubscribe in `OnDisable`/`OnDestroy`, or a Play-toggle of `enabled` doubles a callback count (live run) |
+| Enable lifetime | Publisher/delegate identity and the owner's teardown path (`OnDisable`, `OnDestroy`, `Dispose`, or a cleanup list such as `Own(() => X -= h)`) | The teardown path does not remove the same delegate instance the subscription added, or a Play-toggle of `enabled` doubles a callback count (live run). Raw `+=`/`-=` counts mislead with multi-statement lines and cleanup lists; pair each subscription by reading |
 | Registration ownership | Registry entries on disable, destroy, scene exit, and replacement | A registry still holds an entry after its owner's disable/destroy (count before and after), or a removal keyed by type/name rather than owner identity can delete a newer owner's entry |
-| Session reset | Mutable statics, static events, caches, SO channels, reload settings | A static field, static event, cache, or SO channel holds state that survives into the next Play and no documented reset policy covers it (see the policy below); confirm with a second Play where a counter or subscriber from the first run is still present |
+| Session reset | Mutable statics, static events, caches, SO channels, reload settings | A static field, static event, cache, or SO channel holds state that survives into the next Play and no documented reset policy covers it (see the policy below). Static check: compare the declared mutable statics, static events, and static auto-properties with the reset method body. Confirm with a second Play where a counter or subscriber from the first run is still present |
+| Re-registration order | Registries cleared by a reset and repopulated by `[RuntimeInitializeOnLoadMethod]` or `[InitializeOnLoadMethod]` | Repopulation runs at the same or an earlier `RuntimeInitializeLoadType` than the reset, so the reset wipes it; `[InitializeOnLoadMethod]` also populates in Edit mode, so Edit-mode state must survive the Play reset path |
 | Persistence scope | Persistent roots and scene reload behavior | Reloading a scene creates a second instance of a service marked persistent (`DontDestroyOnLoad` with no duplicate guard), or a persistent object keeps references to objects of an unloaded scene |
+| Scene handoff tickets | Static load/launch tickets passed between scenes | A ticket can be consumed twice, read by a scene it was not meant for, survive a competing launch, or fail without a path back to the caller |
 | Scene transitions | Load/activation/unload order, failure and overlapping requests | An overlapping request or unload/activation ordering loses required scene state, deadlocks a queued operation, or leaves loading/input-block flags set. Unloading first to fit a memory budget is valid with a defined recovery path |
 | Active scene | Instantiation and lighting expectations after additive loads | Actual object scene ownership or effective lighting differs from the intended additive-scene contract. Inspect supported explicit destination-scene instantiation, parent placement, SetActiveScene and MoveGameObjectToScene paths; absence of one API alone is not a finding |
 | Async ownership | Every await and operation start, cancellation and error observation | Pending work can outlive its consumer with an unsafe continuation or unreleased result, or an operation error has no observing owner. Bounded or intentionally application-owned work need not accept a cancellation token merely because it awaits |
+| Worker threads | `Task.Run` bodies, the token they capture, and exit-Play handling | The worker captures a token from a source cancelled or disposed while it runs, calls Unity API on the worker thread, or keeps running after exiting Play mode with domain reload off |
 
 ## Async cases that basic null checks miss
 
@@ -55,7 +58,7 @@ an application-exit owner when component destruction alone does not end it.
 
 | Check | Evidence to inspect | Finding when |
 |---|---|---|
-| Destroyed-object null check | Fields typed `UnityEngine.Object` or a subclass (`GameObject`, `Component`, `ScriptableObject`); callbacks after `OnDestroy`; pooled and async results | `?.`, `??`, `??=` or `is null` is applied to such a field and the guarded access can run after the object is destroyed (grep `\?\.`, `\?\?`, `is null`, then read the caller) |
+| Destroyed-object null check | Fields typed `UnityEngine.Object` or a subclass (`GameObject`, `Component`, `ScriptableObject`); callbacks after `OnDestroy`; pooled and async results | `?.`, `??`, `??=` or `is null` is applied to such a field, the guarded access can run after the object is destroyed, and it reaches engine-side members (`transform`, `gameObject`, native API) through the detached reference (grep `\?\.`, `\?\?`, `is null`, then read the caller). Managed field/property access on a destroyed `MonoBehaviour` alone is not a finding |
 
 Unity's `Object` reference says `?.` and `??` are not supported with Unity Objects because they cannot
 be overridden to treat detached objects as null, and are safe only when the checked object is
@@ -71,7 +74,8 @@ lifetime can be shorter than its holder's (a scene object held by a longer-lived
 spawned object, an object another system destroys). Scene membership alone does not prove equal
 lifetime: a component can be destroyed while its holder
 survives. For `GetComponent<T>() ?? AddComponent<T>()`, establish the actual returned reference and
-failure path; an Editor allocation observation alone does not establish a detached-object bug.
+failure path; an Editor allocation observation alone does not establish a detached-object bug. When
+static reading cannot establish it, record Not verified (live probe).
 
 ## Interpret with care
 
