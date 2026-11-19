@@ -21,16 +21,17 @@ required setup and ordering, rather than by file size or interface count.
 |---|---|---|
 | One policy owner | The same rule in UI, simulation, preview, and save/load | Two implementations of the rule return different results for the same input, or one fix must be repeated in 2+ callers |
 | Complete command | Validation, mutation, resource charging, registration, and events | A rejected operation leaves partial state, charges twice, or publishes success before commit |
-| Valid state | Collection exposure and every mutation entry point | External mutation bypasses an invariant, or required setter ordering permits invalid observable state; public mutability alone is a proposal under the project policy |
+| Valid state | Collection exposure and every mutation entry point | External mutation bypasses an invariant, or required setter ordering permits invalid observable state; public mutability alone is a proposal unless the project documents a binding encapsulation rule |
 | State transitions | Allowed transitions, entry/exit effects, pending work | Re-entry, repeated requests, or interruption produces stale effects or an impossible state |
 | Explicit dependencies | Constructors, serialized wiring, bootstrap, discovery calls | A hidden dependency or required initialization order causes an inspected failure, violates a binding dependency policy, or makes a scoped test require unrelated global setup; discovery/static access alone is a design candidate |
-| Dependency direction | `.asmdef` reference lists, `using` directives, and serialized asset references of reusable (Core) code | A reusable assembly or namespace references game-specific content or presentation (count the references; each one is a candidate) |
-| Useful abstractions | Callers and actual implementations | A forwarding abstraction adds demonstrated caller/setup or maintenance cost without hiding a volatile boundary; one implementation alone is not evidence that an interface is unnecessary |
+| Dependency direction | Reusable (Core) code's namespaces and `using` directives first, then serialized GUID references checked against the target folder's `.meta` files, then `.asmdef` references where present (a project may document a no-asmdef policy); README links are not dependencies | A reusable assembly or namespace references game-specific content or presentation (count the references; each one is a candidate) |
+| Useful abstractions | Callers and actual implementations | A forwarding abstraction adds demonstrated caller/setup or maintenance cost without hiding a volatile boundary; one implementation alone is not evidence that an interface is unnecessary. Conversely, an interface with one implementation and one caller that holds the concrete type violates a documented minimum-consumer rule |
 | Observable contracts | Return results, units, valid inputs, failure meanings | An operation returns `void` or a bare `bool` and N call sites read a field, catch an exception, or re-query state to learn whether it succeeded |
 
 For a command that spends a resource and changes world state, trace the real entry point: a rejected
 request must leave the resource, world state, and success events unchanged; a success must apply the
-agreed effects exactly once. Adapt that check to the project's actual rules rather than introducing
+agreed effects exactly once. Exercise the rollback path by injecting a failure after a partial
+apply. Adapt that check to the project's actual rules rather than introducing
 a generic transaction framework.
 
 ## Interpret with care
