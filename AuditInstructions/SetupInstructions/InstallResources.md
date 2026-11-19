@@ -67,9 +67,8 @@ partial pair:
 2. Call `AssetDatabase.DisallowAutoRefresh()`.
 3. Copy each pair, the `.meta` file before its asset, creating only required missing directories.
 4. Call `AssetDatabase.AllowAutoRefresh()` once per `DisallowAutoRefresh()`, then `AssetDatabase.Refresh()`.
-5. Read back `GUIDToAssetPath` for every GUID (it must name the intended path, and
-   `AssetPathExists` must be true for it) and compare each
-   installed file's bytes with the staged copy.
+5. Read back `AssetDatabase.GUIDToAssetPath` for every GUID (it must name the intended path, and
+   `AssetDatabase.AssetPathExists` must be true for it) and compare each installed file's bytes with the staged copy.
 
 With neither route, ask the user to close that Editor when ready. Preserve dirty work; install no
 bridge or package to make this workflow run.
