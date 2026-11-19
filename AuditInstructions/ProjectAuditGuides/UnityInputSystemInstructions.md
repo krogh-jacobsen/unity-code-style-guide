@@ -22,8 +22,10 @@ universal requirement; the key is intentional ownership and consumption.
 | Interaction semantics | Action type (Button/Value/PassThrough) against its binding interactions and processors | An interaction is configured on an action whose type the installed package does not apply it to (list each action type against its interactions in the asset, then confirm in the package manual), or cached input is read without handling the canceled/neutral phase |
 | Timing | Configured update mode (Dynamic, Fixed, Manual) and where each action is read | The installed package reports an unsupported direct action read for the configured update mode, or the capture/latch/consume path loses or repeats a one-shot (live run: frames with zero and multiple fixed steps). Capturing in Update and consuming a latched value in FixedUpdate is valid when each input is consumed exactly once |
 | UI/world arbitration | Action maps/modes, focus, UI input integration, input consumers | A menu, text field, or modal interaction also triggers a gameplay action (live run), or UI integration deviates from the checks below. Element-side picking/focus: [UI Toolkit](UnityUIToolkitInstructions.md) or [uGUI](UnityUGUIInstructions.md) |
+| Pick-based arbitration | Pointer-over-UI code using `RuntimePanelUtils.ScreenToPanel` and `IPanel.Pick`, pointer capture, focused element, hidden-element styles | Where arbitration picks the panel (normal for PanelRenderer without a UI input module): screen positions reach `Pick` without `ScreenToPanel`, or a hand-rolled conversion misses the Y flip or panel scaling, a captured pointer or a focused text field does not block world input, or a hidden element still blocks picks (`Pick` skips invisible, `display: none` and `PickingMode.Ignore` elements; opacity is not in that list) |
 | Device scope | PlayerInput copies, control scheme, InputUser pairing | A global device read serves the wrong player/device or violates the documented pairing contract; an intentional global shortcut or diagnostic read is valid |
-| Rebinding | Completion/cancel/error, enable-state restoration, persistence | A `RebindingOperation` is not disposed on every exit, gameplay actions fire during rebinding, or the action's pre-rebind enable state is not restored |
+| Rebinding | Completion/cancel/error, enable-state restoration, persistence | Where rebinding is a feature (otherwise Not applicable): a `RebindingOperation` is not disposed on every exit, gameplay actions fire during rebinding, or the action's pre-rebind enable state is not restored |
+| Declared but unused actions/maps | Each map/action in the asset against its consumers: name lookups, action IDs held by `InputActionReference` assets, generated-wrapper properties | A map or action has no consumer; a dead map that is ever enabled can handle the same keys twice. Report it as a removal candidate |
 | Generated code | Source asset/generation settings and owned wrapper disposal | The generated wrapper differs from the action asset, or an owned wrapper instance has no `Dispose` at its owner's end |
 
 ## UI integration checks
@@ -57,8 +59,10 @@ manual (checked against package version 1.14); confirm against the installed pac
 - ⚠️ Dispose owned generated action instances and rebinding operations (Unity's manual says to dispose
   each `RebindingOperation` so it does not leak unmanaged memory). Shared assets need a shared owner's
   policy; a consumer should not blindly dispose or disable them.
-- ⚠️ Restore the pre-rebind mode/enable state on all exits rather than always enabling the action.
+- ⚠️ Where rebinding is a feature, restore the pre-rebind mode/enable state on all exits rather than always enabling the action.
   Persistence of overrides and settings belongs in [Persistence](UnityPersistenceInstructions.md).
+- ℹ️ Mixed binding styles (an action asset beside code-built `InputActionMap`s with hard-coded bindings)
+  are a proposal, not a finding: code-built maps sit outside the asset's rebinding and overview.
 - ⚠️ Do not infer duplicate events merely from two subscribers or PlayerInput plus custom code; verify
   action-instance identity and whether they both execute the same effect.
 
