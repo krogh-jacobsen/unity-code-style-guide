@@ -18,9 +18,10 @@ Detection and sampling count first-party runtime code, not Editor tools.
 | Check | Evidence to inspect | Finding when |
 |---|---|---|
 | Complete snapshot | Saved fields versus player-visible authoritative state | Authoritative state required to reconstruct supported behavior is absent, or transient UI/cache state is treated as authoritative; values recomputed correctly on load need not be stored |
-| Stable identity | Entity/content references and reconstruction maps | Runtime instance IDs, list positions, names, or cached hashes silently point at different content later |
-| Schema evolution | Version dispatch, prior fixtures, unknown/missing fields | Old data is misread, silently overwritten, or accepted with invalid semantics |
-| Write failure | Temporary write, replacement strategy, backup and error handling | Partial I/O can destroy the only good save or report success before durable completion |
+| Stable identity | Entity/content references and reconstruction maps | Runtime instance IDs, list positions, names, or cached hashes silently point at different content later. Asset-`name` keys that fail loudly on rename are a proposal |
+| Schema evolution | Version dispatch, prior fixtures, unknown/missing fields | Old data is misread, silently overwritten, or accepted with invalid semantics. Under a documented refuse-other-versions policy: the version is not compared for equality, refusal modifies the file, or the UI mislabels newer versus older saves |
+| Write failure | Temporary write, replacement strategy, backup and error handling | Partial I/O can destroy the only good save or report success before durable completion. `File.Replace` and a header written last as the commit point are safe designs |
+| Shared save location | Saves written by other branches, worktrees, or builds into the same `persistentDataPath` | An other-format save is loaded instead of refused, or is listed without a label saying why it cannot load |
 | Consistent capture | Concurrent mutations and async snapshot/write requests | Live state can mutate after the first `await` of a snapshot, or two overlapping writes can complete in either order and the older one wins |
 | Safe reconstruction | Validation, references, registries, dependency order, events | A failed load partly replaces the live session or reconstructed entities register/apply effects twice |
 | Missing content | Removed IDs, absent DLC/mods, corrupt/truncated input | Load crashes or silently assigns unrelated defaults without the agreed recovery behavior |
