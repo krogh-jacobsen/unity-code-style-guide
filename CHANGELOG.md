@@ -1,5 +1,11 @@
 # Change log
 
+## 2026-11-18 — Style guide usable as a review check
+
+- UnityStyleGuide.md opens with a Checkable rules table: 34 rows (14 naming, 6 formatting, 14 class organization), each restating an existing rule with a grep, candidate-grep, or read check and a scope note. A tested PCRE pattern block sits under the table. The table says the project's own standard sets severity, that a kit-only rule is a conflict rather than drift, and that runtime and Editor/tooling code are counted separately.
+- The `Camera.main` rule in Update() is now measured guidance: Unity serves it from an internal cache at about `GetComponent` cost, so caching it is optional. `GetComponent` and `Find*` stay forbidden per frame.
+- The style guide and CodeStyleGuide README state that `check_naming.py` validates the kit's own rules against its fixtures and does not yet scan a target project; a `--target` mode is a planned follow-up.
+
 ## 2026-11-18 — World and tooling lens wording from a real project
 
 - Terrain: new Authored-asset isolation row (runtime edits on a private `TerrainData` copy, restore rebinds renderer and collider and destroys the copy); tile and stream rows are marked Not applicable for single-terrain scenes.
