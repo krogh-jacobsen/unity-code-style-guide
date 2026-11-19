@@ -124,7 +124,8 @@ Apply only the items confirmed in stage 4; every other row is reported. Mark eac
 Removing a render pipeline package (for example HDRP from a URP project) leaves its entry in
 `GraphicsSettings`' `m_RenderPipelineGlobalSettingsMap`, an array of pairs whose `first` is the
 pipeline's full type name and whose `second` is its global settings asset. Saving does not clean it
-(observed on 6000.7.0b6). When a confirmed change removes a pipeline:
+(observed on 6000.7.0b6; the array shape read back through `SerializedObject` on 6000.7.0b9). When
+a confirmed change removes a pipeline:
 
 1. Open `new SerializedObject(GraphicsSettings.GetGraphicsSettings())` and find
    `m_RenderPipelineGlobalSettingsMap`.
