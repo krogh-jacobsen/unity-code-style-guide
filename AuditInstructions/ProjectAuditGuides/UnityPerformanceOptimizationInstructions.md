@@ -14,6 +14,10 @@ Identify the target platform, representative scene/action, scale, frame/memory b
 captures. Trace hot paths transitively: frame/physics/render callbacks, per-frame async/coroutine
 loops, UI refreshes, and their helpers. A method name or API occurrence alone does not establish cost.
 Separate a project rule violation from a measured bottleneck and from an unmeasured risk.
+Most rows below pair a static trigger (code shape, a binding rule) with a measured one (a capture
+against a budget). A static-only run judges the static half and records the measured half Not
+verified. Without a documented budget, measured halves are Not verified (no budget) and only
+binding-rule violations are findings ([evidence standard](ProjectReview.md#evidence-standard)).
 
 ## Audit checks
 
@@ -24,8 +28,10 @@ Separate a project rule violation from a measured bottleneck and from an unmeasu
 | Cache validity | Invalidation and replacement paths | A dirty flag, cached camera/component, or derived value is read after the state it derives from changed without the cache being invalidated (trace each write to the cached source) |
 | Query cost | Query volume, masks, ranges, hit needs | Measured unnecessary query scope/result collection breaks a budget or project rule; all-layer masks and collecting multiple hits can be intentional even when one result is ultimately chosen |
 | Collection use | Capacity, clearing, iteration, ordering assumptions | Lookup/growth/recreation cost is material at the measured scale or violates a binding rule; a linear scan over a small collection is not automatically an optimization finding |
+| Per-entity callbacks | Entity types with their own `Update`/`LateUpdate` versus a central tick; active instance count at target scale | Active instances × per-call work at target scale breaks a measured budget or a binding rule; per-entity callbacks alone are a design choice |
+| Time-sliced loops | Loops bounded by elapsed time, such as `do { Advance(); } while (elapsed < N ms)` | A slice can complete with zero progress and repeat forever, or an exception escapes the slice and stalls the work for every later frame |
 | Pool cost | Creation bursts, retained objects, reset and active counts | Reuse fails (a new instance per `Get`), retained inactive count grows past `maxSize` expectations, or required concurrency exceeds an explicit cap |
-| Rendering | Captures, batching/instancing, overdraw, camera/pass count | A Profiler or Frame Debugger capture (live run required) shows a draw/submission/fill cost with a verified cause |
+| Rendering | Captures, batching/instancing, overdraw, camera/pass count | A Profiler or Frame Debugger capture (live run required) shows a draw/submission/fill cost with a verified cause. Not applicable when the owner excluded visual work from scope |
 | Jobs/native containers | Dependencies, completion, allocator lifetime, disposal | A `Complete()` call stalls the main thread longer than the work it offloads (capture), or a container is disposed while a scheduled job still uses it |
 | Frame pacing | Platform's vSync/frame-cap behavior and frame-time distribution | A device capture shows frame time above the target (1000 / target fps ms) in the representative scene, or `Application.targetFrameRate` and `QualitySettings.vSyncCount` are set so the cap cannot reach the target |
 | Bottleneck attribution | CPU active versus waiting time, render thread, GPU timing, loading and frame caps | A performance conclusion attributes a wait/present marker to CPU overload without establishing the limiting work, or measured active work exceeds the target budget |
@@ -36,6 +42,8 @@ Separate a project rule violation from a measured bottleneck and from an unmeasu
   collections differ from fresh closures and expanding buffers. Confirm type and call context.
 - ⚠️ A reused `StringBuilder` can grow; `ToString()` still allocates. Changing displayed values only
   when needed can be sufficient without complicated zero-allocation formatting.
+- ⚠️ The compiler removes calls to a `[Conditional]` method, argument evaluation included, when the
+  symbol is undefined. String building passed to such a method costs nothing in builds without it.
 - ⚠️ Prefer a single-hit query when the caller needs one hit, and use collection overloads only when the
   result contract needs them; check completeness in [Physics](UnityPhysicsInstructions.md). Confirm
   allocation behavior with a capture rather than the overload name, and note that moving a query to
