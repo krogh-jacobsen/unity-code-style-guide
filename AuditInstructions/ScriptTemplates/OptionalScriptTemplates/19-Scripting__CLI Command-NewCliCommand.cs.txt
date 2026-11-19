@@ -1,15 +1,22 @@
+using System;
 using Unity.Pipeline.Commands;
 
     #ROOTNAMESPACEBEGIN#
-/// <summary>Unity CLI command. Editor-only: place it in an Editor folder or an Editor-only assembly.</summary>
+/// <summary>Unity CLI command: `unity command #SCRIPTNAME# --target value`. Registers on the next recompile.</summary>
 public static class #SCRIPTNAME#
 {
-    /// <summary>Runs the command; arguments arrive as strings, so parse and validate them here.</summary>
-    [CliCommand("#SCRIPTNAME#", "Describe what this command does.", MainThreadRequired = true)]
-    public static string Run(
-        [CliArg("target", "Describe what this argument selects.")] string target)
+    /// <summary>Set Required explicitly; it is not inferred. Append new parameters as optional ones at the end.</summary>
+    [CliCommand("#SCRIPTNAME#", "Describe what this command does.")]
+    public static object Run(
+        [CliArg("target", "Describe what this argument selects.", Required = true)] string target,
+        [CliArg("dry_run", "Report what would change without changing it.")] bool dryRun = false)
     {
-        return $"#SCRIPTNAME# ran for '{target}'.";
+        if (string.IsNullOrWhiteSpace(target))
+        {
+            throw new ArgumentException("Pass --target with a value.");
+        }
+
+        return new { target, dryRun };
     }
 }
 #ROOTNAMESPACEEND#

@@ -7,3 +7,7 @@
 # Local validation tool bytecode
 __pycache__/
 *.py[cod]
+
+# .NET build output from the lint project and any other local dotnet builds
+bin/
+obj/

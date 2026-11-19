@@ -7,14 +7,19 @@
 - Design: dependency direction reads namespaces, then serialized GUIDs, then asmdefs; README links are not dependencies. Valid state defers to a binding encapsulation rule; useful abstractions adds the minimum-consumer converse; command checks exercise rollback.
 - Persistence: refuse-other-versions policies check equality, an intact file, and accurate newer/older labels. `File.Replace` and header-last commits count as safe writes; loud asset-name keys are proposals. New row for saves shared across branches, worktrees, and builds.
 
+## 2026-11-18 — Repository hygiene
+
+- Removed the committed .NET build output under `AuditInstructions/ContinuousIntegration/Scripts/obj/` and ignored `bin/` and `obj/`, so local lint builds no longer show as modified files.
+- README: fixed typos and an unclosed link in the introduction.
+
 ## 2026-11-17 — Learnings from a real Editor-tooling setup (P1–P13)
 
 - Non-destructive by default: AGENTS.md now says any change outside the confirmed list, however small, returns to the user before it is made, and that every confirmed item states its undo. The style guide, stack profile, and project rules open with an audit-first preface for existing projects. The canonical review contract and all 19 copies now say the same: stage 4 gives each change its undo, and noting an unconfirmed change in a report is not confirmation.
 - Setup workflow: an up-front project profile (game, Editor tooling or package repository, other) skips presets, scene templates, build guides, and runtime templates by default for tooling repositories. Recommendations are grouped in four dependency-ordered tiers with optional commit checkpoints, and a pre-first-commit check flags files over GitHub's 100 MB limit and vendor content that must not be redistributed.
 - Silent failures fixed: `Unity.gitignore` keeps `Lint.csproj` in the kit snapshot tracked; package removal keeps dependencies that only the removed package pulled in when any project content (vendor assets included) uses them; removing a render pipeline now includes cleaning its stale `GraphicsSettings` entry; `Lint.csproj` has documented edit points for owned code outside `Assets`.
-- Resource installation gained a guarded Editor-open route (auto-refresh suspended, `.meta` copied first, GUIDs read back). UpdateKit.md shows a complete example installation record.
+- Resource installation gained a guarded Editor-open route (auto-refresh suspended, `.meta` copied first, GUIDs read back with `AssetPathExists`, because a running Editor still maps a deleted asset's GUID to its old path). UpdateKit.md shows a complete example installation record.
 - AGENTS.md has a "This project" placeholder section; install rules say which links not to rebase. `check_installation.py --target <project>` checks a real installation read-only.
-- Smaller: `*.glb` routes to LFS; the replay evidence archives (about 5 MB) are excluded from the reference snapshot (7.2 → 1.9 MB) and stay upstream; new optional CLI Command script template (Editor-only, needs `com.unity.pipeline`, compile not yet verified).
+- Smaller: `*.glb` routes to LFS; the replay evidence archives (about 5 MB) are excluded from the reference snapshot (7.2 → 1.9 MB) and stay upstream; new optional CLI Command script template (needs `com.unity.pipeline`; typed arguments, explicit `Required`, a `dry_run` flag, and a structured result, compiled and called in a Unity 6000.7.0b9 project).
 
 ## 2026-11-17 — Folder rules from a mature project
 
