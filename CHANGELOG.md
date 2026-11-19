@@ -1,5 +1,10 @@
 # Change log
 
+## 2026-11-18 — Repository hygiene
+
+- Removed the committed .NET build output under `AuditInstructions/ContinuousIntegration/Scripts/obj/` and ignored `bin/` and `obj/`, so local lint builds no longer show as modified files.
+- README: fixed typos and an unclosed link in the introduction.
+
 ## 2026-11-17 — Learnings from a real Editor-tooling setup (P1–P13)
 
 - Non-destructive by default: AGENTS.md now says any change outside the confirmed list, however small, returns to the user before it is made, and that every confirmed item states its undo. The style guide, stack profile, and project rules open with an audit-first preface for existing projects. The canonical review contract and all 19 copies now say the same: stage 4 gives each change its undo, and noting an unconfirmed change in a report is not confirmation.
