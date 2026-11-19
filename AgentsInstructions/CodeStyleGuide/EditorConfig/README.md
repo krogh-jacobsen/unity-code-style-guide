@@ -18,6 +18,7 @@ IDE1006, and verify representative intersections. Use
 `python3 CodeStyleGuide/Tools~/check_naming.py` in this kit checkout for good/bad fixtures against the installed
 .NET SDK's Roslyn through `dotnet format`; record its version in [Validation](../../../Validation.md).
 This is separate from Unity CLI compilation/testing, which verifies Unity code and dependencies.
+Add `--target <project>` to count violations in a project's owned C# without changing it.
 
 Unity serialized formats, including `.preset`, are excluded from whitespace rewrites. Binary files
 also retain their original bytes. These settings guide compatible formatters; still scope formatting

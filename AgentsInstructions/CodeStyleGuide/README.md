@@ -128,9 +128,12 @@ countable rules as one row each, with a `git grep -P` pattern where one is relia
 - **Count runtime and Editor/tooling code separately.** They usually follow different conventions
   and carry different risk.
 
-`Tools~/check_naming.py` validates this kit's own `.editorconfig` naming rules against two bundled
-fixtures (it needs the .NET SDK). It does not scan your project yet; a `--target` mode is a planned
-follow-up.
+`Tools~/check_naming.py` needs the .NET SDK. Run without arguments, it validates this kit's own
+`.editorconfig` naming rules against two bundled fixtures. With `--target <project>` it counts naming
+violations in your owned C# per rule, split into runtime, Editor, and test code, and names the folders
+where most of them are. It reads the project only. Pass `--editorconfig <file>` to apply your
+project's own rules instead of the kit's. The Unity CLI reports compile errors but not IDE analyzer
+diagnostics, so the script runs `dotnet format` on a temporary copy of the files.
 
 ## Using `.editorconfig` to enforce formatting rules
 

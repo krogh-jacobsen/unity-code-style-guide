@@ -4,6 +4,15 @@ The intended profile is [Unity 6.7](AgentsInstructions/UnityTechStack/UnityTechS
 that choice from the exact prerelease Editor tested. It is not a guarantee for every 6000.7 patch,
 package upgrade, target platform, or copied project. Date: 2026-10-12.
 
+## Naming check `--target` — 2026-11-18
+
+| Check | Result | Evidence / limit |
+|---|---|---|
+| Fixture self-test | Passed | Good 0, Bad 6 IDE1006 diagnostics, each mapped to its rule; .NET SDK 10.0.302 |
+| Mature Unity 6.7 project, kit `.editorconfig`, read-only | Passed | 756 owned files (412 runtime, 209 Editor, 135 tests) in about 5 s. Runtime 0. Editor: 113 constants without `k_`, 63 statics without `s_`; tests: 27 and 12. A manual line-based count had about 105 and 56 in the Editor folder; Roslyn counts each declarator of a multi-declaration line |
+| Unity CLI analyzer route | Not available | `unity command` and `unity recompile` report compile errors only; no command runs IDE analyzers (Unity CLI 1.0.1, `com.unity.pipeline` 1.0.0-pre.1) |
+| Windows | Not verified | Run on macOS only |
+
 ## Lens detection script — 2026-11-18
 
 | Check | Result | Evidence / limit |
