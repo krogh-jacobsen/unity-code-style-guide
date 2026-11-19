@@ -1,5 +1,12 @@
 # Change log
 
+## 2026-11-18 — UI, input, audio and camera lens wording from a real project
+
+- UI Toolkit: a PanelRenderer reload row (callback registered and unregistered with its owner, cached elements and views rebuilt when the reload version or root changes); the controller/`ClickEvent` case now applies only where controller or keyboard navigation is a supported input.
+- Input System: a pick-based arbitration row (`ScreenToPanel` conversion, pointer capture, text-field focus, hidden elements not pickable) and a declared-but-unused actions/maps row; rebinding rows open with "Where rebinding is a feature"; mixed asset and code-built bindings are a proposal.
+- Audio: the pause/completion row covers `isPlaying`-based idle/completion checks under `AudioListener.pause`, to verify on the installed Editor.
+- Cameras: an inert `CinemachineBrain` with no Cinemachine cameras beside a custom rig is an incidental unused component, not a camera-selection finding; the stale Cinemachine 3.1.7 reference now points at the installed package (6.7.0 on Unity 6.7).
+
 ## 2026-11-18 — Runtime lens wording from a real project
 
 - Performance: rows separate the static trigger a code-only run can judge from the measured one; measured rows without a documented budget follow the evidence standard. New rows for per-entity callbacks at scale and time-sliced loops; rendering is Not applicable when visual work is out of scope; `[Conditional]` call sites drop argument evaluation.

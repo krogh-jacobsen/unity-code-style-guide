@@ -18,6 +18,7 @@ layout, picking, focus, or propagation (`unity-cli` tree dump, or a live run). E
 | Check | Evidence to inspect | Finding when |
 |---|---|---|
 | Tree lifetime | Creation/rebuild, query timing, cached references | After a re-enable or source replacement, a cached `VisualElement` or query result is not in the current tree (live run: reopen and compare the tree dump) |
+| PanelRenderer reload | `RegisterUIReloadCallback`/`UnregisterUIReloadCallback` sites, the callback's `version` and `root` handling, cached elements and views | The reload callback is not unregistered at its owner's end, or cached elements/views are not rebuilt when the callback's version or root changes (live run: reload the UI and compare the tree dump). Unity's sample registers in `Awake`, unregisters in `OnDestroy`, and skips an unchanged version |
 | Wiring | UXML names/classes, query type/scope, required references | A name/class the code queries is absent from the UXML and from every builder that creates elements or class names at runtime (the grep is a candidate only: read the helper functions and string-built names first), or an unscoped `Q` returns the first match from a repeated template instance |
 | Callback lifetime | `RegisterCallback`, manipulators, `schedule` items | A registration made in bind/enable has no matching unregister/pause on rebind or detach; count registrations after two reopen cycles. Delegate-identity rules: [Scenes](UnityScenesAndLifecycleInstructions.md) |
 | Command ownership | Click/navigation handler path | A handler changes domain state without going through the domain command. Ownership rule: [Design](UnityDesignPatternsInstructions.md) |
@@ -43,7 +44,8 @@ layout, picking, focus, or propagation (`unity-cli` tree dump, or a live run). E
 - ⚠️ Runtime binding can poll without `INotifyBindablePropertyChanged`. If notifications/versioning
   are used, verify invalidation of derived properties and source replacement. See
   [runtime data sources](https://docs.unity3d.com/Manual/UIE-runtime-binding-define-data-source.html).
-- ⚠️ Test pointer, keyboard, and controller paths where supported. A `ClickEvent` callback does not
+- ⚠️ Where controller or keyboard navigation is a supported input, test those paths beside the pointer
+  path; a mouse-only project marks this case Not applicable. A `ClickEvent` callback does not
   fire for a gamepad Submit, while `Button.clicked` is invoked for both; a handler on `ClickEvent`
   alone leaves controller users unable to press the button. Closing a modal should restore focus and
   input ownership; opacity alone does not establish that hidden content cannot interact. See the
