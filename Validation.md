@@ -4,12 +4,35 @@ The intended profile is [Unity 6.7](AgentsInstructions/UnityTechStack/UnityTechS
 that choice from the exact prerelease Editor tested. It is not a guarantee for every 6000.7 patch,
 package upgrade, target platform, or copied project. Date: 2026-10-12.
 
+## Lens detection script — 2026-11-18
+
+| Check | Result | Evidence / limit |
+|---|---|---|
+| Detector self-test | Passed | 7 tests on a synthetic project (vendor exclusion, pointer picking, Editor-only probe, package-only input, no-asmdef policy); run by the folder validator |
+| Mature Unity 6.7 project, read-only | Passed | All 22 rows matched the labels of an earlier manual review: 15 Recommended, Physics and Assemblies Optional, uGUI, Physics2D, Localization, Networking and Entities Not detected; about 7 s with `projects info` and `projects verify` |
+| Editor rung (`find_assets`) | Partial | Command shape and fully qualified type names checked on a connected Editor for another project; not run against a project open in the Editor |
+| Windows paths, embedded packages | Not verified | Run on macOS only; embedded-package scanning covered by code path, not by a real project |
+
+## Project review pressure test — 2026-11-18
+
+A full review of a large, mature Unity 6000.7.0b9 tycoon/strategy game (URP, Input System, UI Toolkit through PanelRenderer, no asmdefs, domain reload off), using upstream lenses at `9b2ed98`. The review was static, with a headless Unit baseline. Unity CLI 1.0.1.
+
+| Check | Result | Evidence / limit |
+|---|---|---|
+| `unity projects verify` as integrity pass | Passed | Found 10 orphan folder metas in about 1 s, where a hand-built grep pipeline double-counted them as 20. After removal it surfaced one more cascaded parent orphan; `--strict` was then clean |
+| Assemblies detection wording | Fixed | A fresh agent labelled Assemblies "Recommended because none exist" under a documented no-asmdef policy |
+| Unreferenced-asset rule | Fixed | An animator controller pair had zero GUID references but was loaded by path in an authoring tool; the proposed deletion was withdrawn |
+| Editor-backed rungs (`unity command`, `projects audit`) | Not verified | No Editor was connected during the review |
+| Repository validator | Passed | `python3 AuditInstructions/Tools/validate_all.py` |
+| Fresh-agent decision replay | Not verified | Not rerun for these changes |
+
 ## Setup learnings P1–P13 — 2026-11-17
 
 Documentation, template, and tool changes drawn from one real setup (Unity 6000.7.0b6, Editor-tooling
 repository, URP only, Editor open and driven through `unity command eval`) at kit revision d803c89.
 The Unity behaviours described (stale `GraphicsSettings` entry, VFX Graph dropping out with HDRP, the
-guarded Editor-open import) were observed in that setup, not re-run for this change.
+guarded Editor-open import) were observed in that setup. On 2026-11-18 the template, map shape,
+import route, and `--target` were re-checked in a second project on 6000.7.0b9, as the rows below say.
 
 | Check | Result | Evidence / limit |
 |---|---|---|
@@ -18,8 +41,10 @@ guarded Editor-open import) were observed in that setup, not re-run for this cha
 | `Lint.csproj` edit point | Passed | CI validator with `dotnet format`: an embedded package is not linted by default and fails the naming gate once its `Compile` line is added |
 | Snapshot exclusion and `--target` | Passed | Installation check: replay archives excluded, links to them accepted only because they exist upstream; `--target` self-check on the staged project; `--target` on a non-project reports 3 failures |
 | AgentsInstructions audit-first preface | Passed | New `validate_all.py` check on 3 documents |
-| CLI Command template | Partial | Tokens, GUID, inventory, and table verified; compile against `com.unity.pipeline` Not verified |
-| `GraphicsSettings.m_RenderPipelineGlobalSettingsMap` cleanup | Not verified | Observed in the real setup only; property name not checked against other Editor versions |
+| CLI Command template | Passed | Tokens, GUID, inventory, and table verified. Instantiated in a Unity 6000.7.0b9 project with `com.unity.pipeline` 0.6.0-exp.1: compiled, registered, `--target hero --dry_run true` returned `{target, dryRun: true}`, and a missing `--target` was refused with `Required = true` (without it the listing reports the argument optional). Template removed afterwards |
+| `GraphicsSettings.m_RenderPipelineGlobalSettingsMap` cleanup | Partial | Read-only on 6000.7.0b9: the property exists and `SerializedObject` exposes it as an array of `first` (type name) / `second` (asset) pairs. The delete step was not run; that project has no stale entry |
+| Guarded Editor-open import (P5) | Passed | On 6000.7.0b9: a probe pair copied `.meta` first while auto-refresh was suspended imported at the intended path with its GUID and bytes intact; the GUID stayed unresolved until `AllowAutoRefresh` + `Refresh` (no control run without suspension). After deleting it, `GUIDToAssetPath` still returned the old path while `AssetPathExists` was false, so preflight and read-back now check both. Probe removed |
+| `--target` on a real project | Partial | Run against a real Unity project without the kit: root AGENTS.md and CLAUDE.md links resolved, `.editorconfig` found, the missing snapshot reported. Not yet run on a project with the kit installed |
 | Review contract wording (P13) | Pass | Applied to the canonical contract and all 19 copies, including both folder guides; `validate_all.py --require-dotnet` passes |
 | Fresh-agent decision replay | Not verified | Not rerun for these changes |
 

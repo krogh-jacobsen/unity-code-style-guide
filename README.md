@@ -4,13 +4,13 @@ There may be no single right way to write C#, but agreeing on one removes the gu
 
 This [Unity C# style guide](AgentsInstructions/CodeStyleGuide/README.md) is built to work well with LLM assistants and focus on Unity 6.7 and newer projects. It combines industry standard C# and general Unity best practices with a few opinionated conventions that are easy to adapt to your own.
 
-Originally an appendix to a popular ebook [Unity C# style guide for Unity 6, I co-authored, the repo now also includes LLM agent instructions and audit files. 
+Originally an appendix to the popular ebook *Unity C# style guide for Unity 6*, which I co-authored, the repo now also includes LLM agent instructions and audit files.
 
-Use, copy and cherrypick what is helpfulfor your rpoject your own Unity Project needs. More info in below.
+Use, copy and cherry-pick whatever is helpful for your own Unity project. More info below.
 
 # Unity Audit & Project Start files
 
-Besides the Code Style instructions, this repo also a selection of tools, instructions and audit files which I found helpful and use in my Unity projects. You can use them for setting up new projects, or to audit or optimize an exsiting. You can pick and choose what is helpful for you and leave the rest. 
+Besides the code style instructions, this repo also includes a selection of tools, instructions and audit files that I find helpful and use in my Unity projects. You can use them to set up new projects, or to audit or optimize an existing one. Pick what is helpful and leave the rest.
 
 ## Overview
 
