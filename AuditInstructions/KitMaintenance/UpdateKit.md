@@ -55,31 +55,91 @@ one old commit and one proposed new commit. Locate the reference snapshot (defau
 and presets. Resolve any missing source or path before planning replacement.
 
 Compare baseline → local and baseline → upstream for every selected file. Classify each as unchanged,
-upstream-only, local-only, overlapping, added, removed, or unknown baseline. Include moved files and
+upstream-only, local-only, overlapping, added, removed, local fork, or unknown baseline. When kit
+material is present but no installation record names its source revision (an adapted copy), run
+step 2 first and classify against the reconstructed baseline. Include moved files and
 inbound links. Match imported resources by destination GUID as well as path. An upstream deletion is
 not automatic permission to delete a local asset.
 
 **Done:** every selected destination has a classification, source revisions, and recovery/validation needs.
 
-## 2. Ask and recommend
+## 2. Reconstruct a missing baseline
+
+Run this step, read-only, when kit material sits in the project without a recorded source revision:
+files copied by hand, renamed folders (for example lenses under `Docs/AgentGuides/AuditGuides/`),
+or a record that lacks the revision for a group. Recognize kit files by name, by the
+`> How it works:` opening, or by the project's own mention of the kit. Without a baseline every file
+classifies as unknown, and the copy can never be updated safely, so reconstruct one.
+
+1. **Inventory the copy.** List each local file and its upstream candidates. Upstream paths move
+   between revisions, so match on file name across the upstream history (`git ls-tree -r <commit>`),
+   not on the current path. For a name that occurs in several upstream folders (`README.md`), compare
+   every candidate and keep the best match.
+2. **Bound the search.** If the project's history shows when the copy arrived
+   (`git log --diff-filter=A --format=%cs -- <copied path>`), upstream commits after that date
+   cannot be the source; skip them.
+3. **Score every candidate commit.** For each upstream commit on the default branch
+   (`git rev-list --first-parent <default branch>`), compute a line similarity between each local
+   file and its upstream candidate at that commit (for example Python
+   `difflib.SequenceMatcher(None, upstream_lines, local_lines, autojunk=False).ratio()`; cache by
+   blob ID, since most files are unchanged between commits). The baseline is the commit with the
+   highest mean similarity over the matched files. Commits with identical content tie; record the
+   newest commit of the tie. When one file's best commit differs from the group's and scores
+   clearly higher there, record a per-file baseline.
+4. **Classify each file against its baseline.** These thresholds are starting values; report the
+   scores so the user can move them.
+
+| Similarity to baseline | Class | Update method |
+|---|---|---|
+| 0.95 or more | Near-pristine | Normal three-way merge; local edits are small |
+| 0.60 to 0.95 | Adapted | Three-way merge, each overlapping hunk reviewed |
+| Below 0.60, or no upstream match | Local fork | No automatic merge. Upstream changes since the baseline become proposals read by hand; a file with no upstream match is a local addition |
+
+5. **Recommend a layout that stays updatable.** For forks and heavily adapted files, recommend the
+   overlay pattern: a pinned, unmodified snapshot of upstream at one revision, plus one short local
+   overrides file (for example `LocalOverrides.md` beside the snapshot) that lists each deliberate
+   deviation as a rule with its reason, referenced from `AGENTS.md` as "the snapshot governs except
+   where the overrides file says otherwise". Future updates then replace the snapshot and only the
+   overrides need review. A fork the user keeps stays a declared fork that updates skip.
+6. **Recommend the installation record.** Propose writing `Documentation/UnityStarterKit-installation.json`
+   (step 4) with the reconstructed revision, the method and scores, and every fork, so the next update
+   starts from a known baseline:
+
+```json
+{
+  "installed_revision": "1bceb25",
+  "baseline_method": "reconstructed: mean line similarity 0.99 over 17 files; copy added 2026-10-12",
+  "snapshot_path": "Docs/AgentGuides/AuditGuides",
+  "local_forks": [ { "path": "Docs/AgentGuides/AuditGuides/ProjectReview.md", "reason": "project router" } ]
+}
+```
+
+Report a reconstructed baseline as reconstructed, with its scores, never as a recorded fact.
+
+**Done:** every copied file has a baseline commit (or "no upstream match"), a similarity score, and a
+class, and the overlay and installation-record recommendations are listed for step 3.
+
+## 3. Ask and recommend
 
 Ask one batch: target revision, groups to update, local decisions to retain, and acceptable validation
 scope. Defaults: retain local decisions; merge upstream-only documentation; skip overlapping or
-unknown-baseline changes until individually resolved; preserve removed resources pending reference review.
+unknown-baseline changes until individually resolved; offer local forks upstream changes as proposals
+only, plus the overlay conversion; preserve removed resources pending reference review.
 For each recommendation state the exact source/destination, merge strategy, expected values, commands,
 risk, and default. A missing old snapshot means manual comparison, never an assumed clean baseline.
 
 **Done:** all differences have a recommendation or no-change result, and the exact selected edits are confirmed.
 
-## 3. Apply selected merges
+## 4. Apply selected merges
 
 | Material | Target | How to set it | Condition |
 |---|---|---|---|
 | Reference snapshot | Recorded snapshot path | Merge selected new source files and fix inbound links; keep local adaptations | Confirmed document/source changes |
 | Root instructions and EditorConfig | Existing active paths | Merge selected rules; rebase file links to the snapshot; preserve project-specific instructions | Confirmed rules only |
 | Imported assets | Existing GUID-owned destinations | Edit through Unity APIs, preserving metadata, references, and importer customizations; import new pairs only after conflict preflight | Confirmed asset update with a safe Editor route |
+| Local fork kept as an overlay | Snapshot path plus a local overrides file | Restore the selected file to the pinned upstream revision; move each deliberate local difference into the overrides file as a rule with its reason; reference the overrides file from `AGENTS.md` | Confirmed overlay conversion for that file |
 | Removed/moved files | Confirmed paths | Fix references; use AssetDatabase for imported moves/deletes | Explicitly selected removal/move |
-| Installation record | Documentation/UnityStarterKit-installation.json | Record upstream repository URL, old/new immutable commits, snapshot path, selected groups, source-to-destination mappings, local adaptations, per-group revisions, and validation results | After selected updates are accounted for |
+| Installation record | Documentation/UnityStarterKit-installation.json | Record upstream repository URL, old/new immutable commits (and `baseline_method` with scores and `local_forks` when step 2 reconstructed them), snapshot path, selected groups, source-to-destination mappings, local adaptations, per-group revisions, and validation results | After selected updates are accounted for |
 
 A compact record looks like this; keep the keys, add groups as installed:
 
@@ -114,7 +174,7 @@ records the actual per-file/group outcome; it does not advance the whole install
 
 **Done:** every confirmed item is merged, unchanged, or explicitly failed; unrelated content is preserved.
 
-## 4. Verify the installed result
+## 5. Verify the installed result
 
 Check all local links and anchors in changed instructions at their actual destinations. Confirm the
 active .editorconfig and root routing agree with the chosen layout. Compare installed bytes and GUIDs
@@ -128,7 +188,7 @@ affect runtime or test isolation. Missing tools/devices leave those checks Not v
 
 **Done:** every changed group has observed validation results, and the installation record reflects them.
 
-## 5. Report
+## 6. Report
 
 Report source revisions, changed and retained paths, local adaptations, test/build counts, skipped
 and unavailable checks, recovery location, and proposals not selected. Put unresolved choices in a

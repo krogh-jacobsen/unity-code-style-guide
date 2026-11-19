@@ -1,5 +1,11 @@
 # Change log
 
+## 2026-11-18 — Updating an adapted copy with no installation record
+
+- UpdateKit.md has a new read-only step 2 for kit material copied without a recorded source revision: match files by name across upstream history, bound the search by the date the copy arrived, score each upstream commit by line similarity, and take the best as a reconstructed baseline. Each file is classified near-pristine, adapted, or local fork (thresholds 0.95 and 0.60, reported with the scores).
+- Forks get proposals only. The workflow recommends an overlay (a pinned unmodified snapshot plus a short local overrides file referenced from `AGENTS.md`) and writing `UnityStarterKit-installation.json` with `baseline_method` and `local_forks`. The apply table has a matching overlay row; later steps are renumbered.
+- The KitMaintenance README explains why a copy can look rewritten against today's upstream while being an old untouched snapshot.
+
 ## 2026-11-18 — Naming check for a real project
 
 - `check_naming.py --target <project> [--editorconfig <file>]` counts IDE1006 naming violations in a Unity project's owned C# per rule, split into runtime, Editor, and test code, with the folders where most of them are. It reads the project only: the Unity CLI exposes compile errors but not IDE analyzers, so the script copies the owned files under the chosen `.editorconfig` into a temporary SDK project and runs `dotnet format style --verify-no-changes`. Vendor folders are excluded by a configurable list.
