@@ -61,8 +61,11 @@ scene lifecycle."*
 
 ## Good to know
 
+- **Unity CLI first.** The agent prefers structured `unity` CLI output over hand-built searches: `unity projects verify` for the integrity pass, `unity projects audit` for Project Auditor candidates, and `unity command` queries when an Editor is connected. Searches are the fallback, and each one says why.
 - **Detection decides the menu, not the verdict.** A lens that finds nothing to review is recorded as
-  Not applicable. You can still run one the agent did not recommend.
+  Not applicable. You can still run one the agent did not recommend. A
+  [detection script](Tools~/README.md#lens-detection) produces the same labels deterministically, so
+  two runs on the same commit offer the same menu.
 - **A finding is evidence, not a search hit.** The agent must read the enclosing code, follow callers,
   and honor your project's documented choices before it reports anything.
 - **Static review has limits.** Without the Editor, a device, or a build, runtime and saved-scene
@@ -100,5 +103,5 @@ The [research record](../../AuditResearch.md) maps every existing discipline to 
 verdict, sources and verification limits. It is maintenance evidence, not another checklist to load.
 New lenses are read-only router references and retain the router's selection/confirmation workflow.
 
-[Local maintenance checks](Tools~/README.md) validate checklist table structure; fresh-agent replay
+[Local tools](Tools~/README.md) detect lenses and validate checklist table structure; fresh-agent replay
 results are recorded separately from static validation.

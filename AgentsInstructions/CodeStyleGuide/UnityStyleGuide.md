@@ -7,6 +7,7 @@
 Use the following conventions.  
 
 ## Table of contents:
+- [Checkable rules](#checkable-rules)
 - [General Guidelines](#general-guidelines)
   - [Formatting](#formatting)
     - [Spacing](#spacing)
@@ -46,6 +47,100 @@ Use the following conventions.
   - [Debugging](#debugging)
   - [Using try-catch & debugger breaks](#using-try-catch--debugger-breaks)
 - [Where to go deeper](#where-to-go-deeper)
+
+## Checkable rules
+
+Use this table when the guide is a review check rather than a writing aid. Each row restates a rule
+from the sections below; the sections stay the owner of the rule and its rationale.
+
+- **Severity comes from the project.** The project's own standard decides what counts. Where it
+  differs from this guide, a kit-only rule is a conflict to record, not drift to fix.
+- **Count separately:** runtime code, Editor/tooling code (`Editor/` folders, Editor-only
+  assemblies), and tests. Exclude vendor and generated code.
+- **Grep** rows have a line-based PCRE pattern below. **Candidate** means the pattern
+  over-approximates (comments, strings, locals, legitimate exceptions); read each hit before
+  counting it. **Read** rows have no reliable pattern.
+- With the .NET SDK, `python3 Tools~/check_naming.py --target <project> [--editorconfig <file>]`
+  counts IDE1006 naming violations in owned C# (vendor folders excluded) per rule, split into runtime,
+  Editor, and test code. It covers the prefix and capitalization rows; use the remaining N rows for
+  the rest. Without arguments it validates the kit's rules against its bundled fixtures.
+
+| ID | Rule | Check | Scope note |
+|---|---|---|---|
+| N1 | Private instance fields use `m_` + camelCase | Grep | Fields only; the shipped `.editorconfig` also applies `m_` to protected fields |
+| N2 | Private static fields use `s_` + camelCase | Grep | Includes `static readonly`; static events excluded |
+| N3 | Private constants use `k_` + camelCase | Grep | |
+| N4 | `public`/`internal` constants use PascalCase, no prefix | Grep | Static lookup classes |
+| N5 | Interfaces use `I` + PascalCase | Grep | |
+| N6 | Properties use PascalCase | Grep | Declarations with an access modifier |
+| N7 | Write `private` explicitly | Candidate | Methods only (`void`/`IEnumerator`/`Awaitable` without modifier); read for fields; local functions also hit |
+| N8 | Boolean fields start with `is`, `has` or `can` | Candidate | Private prefixed fields; the guide says "verbs like", so read other verbs |
+| N9 | Enums have no `Enum`/`Type` suffix or `E_` prefix | Grep | Singular names are a read |
+| N10 | ScriptableObject types end in `DataSO` | Grep | [opinion]; direct subclasses only |
+| N11 | Async methods end in `Async`, coroutines in `Co` | Candidate | `IEnumerator Start()` and `[UnityTest]` methods also hit |
+| N12 | Events are past-tense, not `On`-prefixed | Candidate | Catches the `On` prefix only; tense is a read |
+| N13 | Namespaces are PascalCase without underscores | Grep | |
+| N14 | File and folder names are PascalCase without spaces | Grep | Shell command below; `_` separators are allowed |
+| F1 | Allman braces | Candidate | Object and collection initializers also hit |
+| F2 | Lines stay within 140 characters | Grep | The `.editorconfig` value; a tab counts as one |
+| F3 | One space between a flow keyword and `(` | Grep | |
+| F4 | No space between a method name and `(` | Candidate | Strings and trailing comments also hit |
+| F5 | No padding inside parentheses or brackets | Candidate | Strings and trailing comments also hit |
+| F6 | Spaces around `==`, `!=`, `<=`, `>=` | Candidate | `<`/`>` are not checked (generics) |
+| O1 | `using` order: System, Unity, project; none unused | Read | IDE0005 reports unused directives |
+| O2 | Member order: fields, properties, events, Unity messages, public, private, nested types | Read | Pattern lists Unity message positions per file to compare |
+| O3 | One MonoBehaviour per file | Grep | Use `-c`; files with a count above 1. Direct subclasses only |
+| O4 | `#region` only for animation or input event handlers | Candidate | Read each hit |
+| O5 | Classes are `sealed` unless designed for inheritance | Candidate | Starter default; a project may not adopt it |
+| O6 | No `throw new NotImplementedException()` stubs | Grep | |
+| O7 | Fields are private; use `[SerializeField]` and properties | Candidate | Public non-const, non-readonly fields; `[Serializable]` data structs are a read |
+| O8 | No lambda or anonymous-method subscriptions | Grep | |
+| O9 | Every `+=` in `OnEnable` has its `-=` in `OnDisable` | Candidate | Compare `+=`/`-=` counts per file with `-c`, then read |
+| O10 | No `GetComponent`, `Find*` or new collections per frame | Candidate | Lists every call; read whether it runs per frame. `Camera.main` is excluded (see [Update()](#update)) |
+| O11 | Animator parameters, tags and layers are constants or hashes | Candidate | `LayerMask` calls in a static lookup class are the intended form |
+| O12 | No attribution comments | Grep | |
+| O13 | Mutable statics are reset for disabled domain reload | Candidate | Lists static fields, events and settable properties; read for `[AutoStaticsCleanup]`, `[NoAutoStaticsCleanup]` or a `SubsystemRegistration` reset |
+| O14 | No redundant default initializers | Grep | `0`, `0f`, `false`, `null`, `default` on fields |
+
+Run each pattern over owned C#: `git grep -nP '<pattern>' -- '*.cs'` (or `rg -nP`), adding pathspecs
+for the runtime/Editor split and vendor exclusions. Patterns were tested against the naming fixtures in
+`Tools~/NamingFixture` and the code samples in this guide.
+
+```text
+N1   ^\s*(?:\[[^\]]*\]\s*)*private\s+(?:readonly\s+)?(?!(?:static|const|readonly|event)\b)[\w.]+(?:<[^;=()]*>)?(?:\[[,\s]*\])*\??\s+(?!m_[a-z])\w+\s*(?:;|=(?!>))
+N2   \bprivate\s+static\s+(?:readonly\s+)?(?!(?:class|void|event|async|extern)\b)[\w.]+(?:<[^;=()]*>)?(?:\[[,\s]*\])*\??\s+(?!s_[a-z])\w+\s*(?:;|=(?!>))
+N3   \bprivate\s+const\s+[\w.]+\??\s+(?!k_[a-z])\w+\s*=
+N4   \b(?:public|internal)\s+const\s+[\w.]+\??\s+(?![A-Z])\w+\s*=
+N5   \binterface\s+(?!I[A-Z])\w+
+N6   \b(?:public|private|protected|internal)\s+(?:(?:static|override|virtual|abstract|new|sealed)\s+)*[\w.]+(?:<[^;=()]*>)?(?:\[[,\s]*\])*\??\s+[a-z_]\w*\s*(?:\{|=>)
+N7   ^\s*(?:\[[^\]]*\]\s*)*(?:(?:static|readonly|async|override|virtual|unsafe)\s+)*(?:void|IEnumerator|Awaitable)\s+\w+\s*\([^;]*$
+N8   \bprivate\s+(?:static\s+)?bool\s+[ms]_(?!(?:is|has|can)[A-Z])\w+\s*(?:;|=(?!>))
+N9   \benum\s+(?:E_\w+|\w+(?:Enum|Type))\b
+N10  \bclass\s+(?!\w*DataSO\b)\w+\s*:\s*ScriptableObject\b
+N11  \basync\s+(?:\w+\s+)*?(?:Awaitable|Task|ValueTask|UniTask)(?:<[^()]*>)?\s+(?!\w*Async\s*\()\w+\s*\(|\bIEnumerator\s+(?!GetEnumerator\b)(?!\w*Co\s*\()\w+\s*\(
+N12  \bevent\s+[\w.]+(?:<[^;]*>)?\s+On[A-Z]\w*\s*;
+N13  ^\s*namespace\s+(?:[\w.]*_|(?:\w+\.)*[a-z])
+N14  git ls-files -- '*.cs' | grep -E '(^|/)[a-z][^/]*\.cs$|[ ]'
+F1   (?:\)|\b(?:else|try|finally|do|get|set|init|add|remove)|=>|\b(?:class|struct|interface|enum|namespace|record)\s+[^{;]*?)\s*\{\s*$
+F2   ^.{141,}$
+F3   \b(?:if|for|foreach|while|switch|catch|using|lock|fixed)\(
+F4   ^(?!\s*//).*?\b(?!(?:if|for|foreach|while|switch|catch|using|lock|fixed|return|nameof|typeof|sizeof|default|new|await|when|in|is|and|or|not|throw|yield|case|else|where|out|ref|params|checked|unchecked|stackalloc|async|var|operator|from|select|into|let|on|by)\b)[A-Za-z_]\w*\x20+\(
+F5   ^(?!\s*//).*(?:\(\x20+(?=[^\s)])|(?<=[^\s(])\x20+\)|\[\x20+(?=[^\s\]])|(?<=[^\s\[])\x20+\])
+F6   ^(?!\s*//).*(?:(?<=[\w)\]])(?:==|!=|<=|>=)|(?:==|!=|<=|>=)(?=[\w(!-]))
+O2   ^\s*(?:(?:private|protected|public|internal|async|override|virtual)\s+)*(?:void|IEnumerator|Awaitable)\s+(?:Awake|OnEnable|Start|OnDisable|OnDestroy|FixedUpdate|Update|LateUpdate)\s*\(
+O3   \bclass\s+\w+\s*:\s*MonoBehaviour\b
+O4   ^\s*#region\b
+O5   \b(?:public|internal|private|protected)\s+(?!(?:sealed|abstract|static)\b)(?:(?:unsafe|new)\s+)*(?:partial\s+)?class\s+\w+
+O6   \bthrow\s+new\s+NotImplementedException\b
+O7   ^\s*(?:\[[^\]]*\]\s*)*public\s+(?:static\s+)?(?!(?:const|readonly|event|class|struct|enum|interface|delegate|record|abstract|virtual|override|sealed|partial|async|extern|implicit|explicit|unsafe|new|static)\b)[\w.]+(?:<[^;=()]*>)?(?:\[[,\s]*\])*\??\s+\w+\s*(?:;|=(?!>))
+O8   \+=\s*(?:async\s+)?(?:\([^)]*\)|\w+)\s*=>|\+=\s*delegate\b
+O9   (?:\+|-)=\s*[A-Z]\w*\s*;
+O10  \bGetComponents?(?:InChildren|InParent)?\s*[<(]|\bFind(?:WithTag|GameObjectsWithTag|GameObjectWithTag|ObjectOfType|ObjectsOfType|FirstObjectByType|AnyObjectByType|ObjectsByType)\s*[<(]|\bGameObject\.Find\s*\(|\bnew\s+(?:List|Dictionary|HashSet|Queue|Stack|LinkedList)\s*<
+O11  \.(?:SetBool|SetFloat|SetInteger|SetTrigger|ResetTrigger|GetBool|GetFloat|GetInteger)\s*\(\s*"|\bCompareTag\s*\(\s*"|\.tag\s*==\s*"|\bLayerMask\.(?:NameToLayer|GetMask)\s*\(\s*"
+O12  (?i)//.*\b(?:created|written|authored)\s+by\b|//\s*@?author\b
+O13  \bstatic\s+(?!(?:readonly|class|partial|void|extern|async|implicit|explicit|operator|unsafe|const)\b)(?:event\s+)?[\w.]+(?:<[^;=()]*>)?(?:\[[,\s]*\])*\??\s+\w+\s*(?:;|=(?!>)|\{\s*get\b[^}]*\bset\b)
+O14  ^\s*(?:\[[^\]]*\]\s*)*(?:(?:private|protected|public|internal|static|readonly)\s+)+[\w.]+(?:<[^;=()]*>)?(?:\[[,\s]*\])*\??\s+\w+\s*=\s*(?:0[fFdDmMuUlL]?|0\.0+[fFdDmM]?|false|null|default)\s*;
+```
 
 # General Guidelines
 
@@ -473,7 +568,11 @@ private void FixedUpdate()
 - ✅ Read input, update timers, run non-physics per-frame logic and state machines.
 - ✅ Avoid allocations, use early returns and delegate to well-named helper methods.
 - ❌ Never create new collections in `Update()`. Reuse existing ones and call `.Clear()`.
-- ❌ Never call `GetComponent`, `Find*`, or `Camera.main` here. Cache them in `Awake()`.
+- ❌ Never call `GetComponent` or `Find*` here. Cache them in `Awake()`.
+- ℹ️ `Camera.main` reads from Unity's internal cache of `MainCamera`-tagged objects; each access costs
+  about as much as `GetComponent` ([Camera.main](https://docs.unity3d.com/ScriptReference/Camera-main.html),
+  verified November 2026). Caching it is optional: do it where profiling shows the cost matters, and
+  note that a cached reference goes stale when a different camera becomes main.
 - ✅ Instead of having logic directly in the Update loop, move it to methods with descriptive names to improve cleanliness and self-documentation.
 
 ```csharp
