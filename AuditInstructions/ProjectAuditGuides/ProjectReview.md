@@ -130,6 +130,7 @@ spaces; use `find -print0` or `grep -r`). If `unity-cli` is unavailable or the u
 inventory components from saved scenes and prefabs by YAML class ID (enough for detection; use script
 GUIDs only to identify a specific component type) instead, and record the live checks Not verified. Record for each lens the evidence you found, or "nothing
 detected".
+When this folder's `Tools~/detect_lenses.py` is available, run it first (`python3 detect_lenses.py <project>`, read-only, Unity CLI first with file fallback) and start from its table; verify its evidence and apply documented project decisions before showing the menu.
 
 **Done:** scope, versions, and the source documents are recorded, and every lens has detection
 evidence or "nothing detected", and detected systems without a matching lens are listed Outside coverage.

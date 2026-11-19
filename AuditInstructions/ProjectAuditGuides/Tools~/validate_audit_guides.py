@@ -4,6 +4,9 @@ import re
 import sys
 import unittest
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import detect_lenses  # noqa: E402  (sibling tool; its self-test runs with this validator)
+
 FOLDER = Path(__file__).resolve().parents[1]
 
 
@@ -52,7 +55,9 @@ class TableRegressionTests(unittest.TestCase):
 
 
 def main():
-    result = unittest.TextTestRunner(stream=sys.stdout).run(unittest.defaultTestLoader.loadTestsFromTestCase(TableRegressionTests))
+    suite = unittest.TestSuite([unittest.defaultTestLoader.loadTestsFromTestCase(TableRegressionTests),
+                                unittest.defaultTestLoader.loadTestsFromTestCase(detect_lenses.DetectorSelfTests)])
+    result = unittest.TextTestRunner(stream=sys.stdout).run(suite)
     errors = []
     pages = sorted(FOLDER.rglob('*.md'))
     for page in pages:
@@ -60,7 +65,7 @@ def main():
     if not result.wasSuccessful() or errors:
         print('\n'.join(errors), file=sys.stderr)
         return 1
-    print(f'PASS audit guides: {len(pages)} Markdown files, checklist table structure; {result.testsRun} parser regressions')
+    print(f'PASS audit guides: {len(pages)} Markdown files, checklist table structure; {result.testsRun} parser and lens-detection regressions')
     return 0
 
 

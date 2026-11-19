@@ -1,5 +1,11 @@
 # Change log
 
+## 2026-11-18 — Deterministic lens detection
+
+- New `AuditInstructions/ProjectAuditGuides/Tools~/detect_lenses.py` drafts the project-review lens menu read-only: raw and first-party counts, a Recommended/Optional/Not detected label with its reason, evidence per signal, and representative paths, as Markdown and JSON. Evidence comes from the Unity CLI first (`unity projects info`, `unity projects verify`, and `unity command find_assets` when the project's Editor is connected), then file listing, YAML class IDs, and C# text search for the signals no command exposes.
+- Vendor, sample, and generated folders are excluded by a configurable list. A missing asmdef is never a signal; a documented predefined-assemblies policy makes Assemblies Optional, and `--optional LENS=REASON` records other documented decisions. Physics treats pointer-picking raycasts and undriven bodies as weak.
+- `ProjectReview.md` step 1 says to run the script when it is available. The folder validator runs its self-test on a synthetic project.
+
 ## 2026-11-18 — UI, input, audio and camera lens wording from a real project
 
 - UI Toolkit: a PanelRenderer reload row (callback registered and unregistered with its owner, cached elements and views rebuilt when the reload version or root changes); the controller/`ClickEvent` case now applies only where controller or keyboard navigation is a supported input.
