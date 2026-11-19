@@ -61,12 +61,14 @@ Closing the Editor is the default. When the user keeps it open and an existing c
 run Editor code (for example `unity command eval`), this guarded route keeps Unity from importing a
 partial pair:
 
-1. Preflight each selected GUID with `AssetDatabase.GUIDToAssetPath`: it must return an empty string.
+1. Preflight each selected GUID with `AssetDatabase.GUIDToAssetPath`: it must return an empty string,
+   or a path for which `AssetDatabase.AssetPathExists` is false. A running Editor can keep returning a
+   deleted asset's path.
 2. Call `AssetDatabase.DisallowAutoRefresh()`.
 3. Copy each pair, the `.meta` file before its asset, creating only required missing directories.
 4. Call `AssetDatabase.AllowAutoRefresh()` once per `DisallowAutoRefresh()`, then `AssetDatabase.Refresh()`.
-5. Read back `GUIDToAssetPath` for every GUID (it must name the intended path) and compare each
-   installed file's bytes with the staged copy.
+5. Read back `AssetDatabase.GUIDToAssetPath` for every GUID (it must name the intended path, and
+   `AssetDatabase.AssetPathExists` must be true for it) and compare each installed file's bytes with the staged copy.
 
 With neither route, ask the user to close that Editor when ready. Preserve dirty work; install no
 bridge or package to make this workflow run.
