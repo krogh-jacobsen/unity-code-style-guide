@@ -10,7 +10,11 @@ tooling) when needed. This lens owns pool and async staleness and cancellation c
 
 Map application-, scene-, enable-, and request-lifetime owners. Find who initializes, registers,
 cancels, and releases each one. Inspect the supported entry scenes and Enter Play Mode settings.
-A bootstrap scene is one valid choice; it is not mandatory for every game.
+A bootstrap scene is one valid choice; it is not mandatory for every game. Recommend one when the
+project has no composition root at all: services self-initialize and startup depends on scene or
+execution order. Keep a working service locator, static event bus, or single-scene loading, and check
+its safety instead: registrations scoped to their scene, statics reset, one EventSystem and
+AudioListener. Recommend migrating only when the pattern causes an inspected failure.
 
 ## Audit checks
 

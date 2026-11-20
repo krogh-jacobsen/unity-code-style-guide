@@ -41,6 +41,7 @@ non-interactive session the agent stops after the recommendations and changes no
 | Set up CI (works without a paid Unity licence) | [SetupCI.md](ContinuousIntegration/SetupCI.md) | [ContinuousIntegration](ContinuousIntegration/README.md) |
 | Review my packages and install the missing ones I need | [InstallPackages.md](PackageInstaller/InstallPackages.md) | [PackageInstaller](PackageInstaller/README.md) |
 | Set up tests | [TestingInstructions.md](Testing/TestingInstructions.md) | [Testing](Testing/README.md) |
+| Enforce assembly boundaries and banned APIs with tests, or add analyzers | [SetupEnforcement.md](CodeEnforcement/SetupEnforcement.md) | [CodeEnforcement](CodeEnforcement/README.md) |
 | Review a project, picking the reviews you want (animation, physics, UI, audio and more) | [ProjectReview.md](ProjectAuditGuides/ProjectReview.md) | [ProjectAuditGuides](ProjectAuditGuides/README.md) |
 | See a custom CLI command with tests | [CliScriptAndTests](UnityCLI/CliScriptAndTests/README.md) | same |
 | Prepare for a CoreCLR migration (experimental) | [CoreCLRUpgrade.md](CoreCLRmigration/CoreCLRUpgrade.md) | [CoreCLRmigration](CoreCLRmigration/README.md) |

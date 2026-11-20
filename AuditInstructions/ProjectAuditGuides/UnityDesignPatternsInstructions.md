@@ -42,6 +42,10 @@ a generic transaction framework.
   with [Scenes](UnityScenesAndLifecycleInstructions.md), rather than prescribing a global event bus.
 - ℹ️ An enum/switch can be the clearest state machine. Recommend classes only when they reduce
   transition or per-state complexity. A singleton's risk is hidden scope/lifetime, not its name.
+- ℹ️ Rank architecture recommendations by harm, not by pattern name. A missing composition root
+  justifies recommending a bootstrap scene; an existing locator, static bus, or event-channel setup
+  is kept and checked for resolution at the composition boundary, scene-scoped registration, and
+  resets. See [Scenes](UnityScenesAndLifecycleInstructions.md#establish-lifetime-ownership).
 - ℹ️ ScriptableObject configuration and runtime state need explicit ownership; see
   [Assets](UnityAssetsAndMemoryInstructions.md). Shared event-channel assets need a session reset contract.
 - ℹ️ Consolidation and deletion may improve a design more than splitting another manager. Preserve

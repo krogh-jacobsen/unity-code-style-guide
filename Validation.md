@@ -4,6 +4,18 @@ The intended profile is [Unity 6.7](AgentsInstructions/UnityTechStack/UnityTechS
 that choice from the exact prerelease Editor tested. It is not a guarantee for every 6000.7 patch,
 package upgrade, target platform, or copied project. Date: 2026-10-12.
 
+## Code enforcement tests — 2026-11-20
+
+| Check | Result | Evidence / limit |
+|---|---|---|
+| Both C# tests, copied verbatim from SetupEnforcement.md | Passed | Throwaway project on Unity 6000.7.0b9 via `unity test --mode EditMode` (Unity CLI 1.0.1), assemblies named as in the doc. Clean run: 4 of 4 pass |
+| Seeded failures | Passed | Gameplay → Presentation reference, `noEngineReferences` off on Core, one new lambda subscription, one stale baseline entry: 4 of 4 fail with the expected message; a baselined violation stays suppressed |
+| "Rule matches no assembly" guard | Not verified | Not exercised in the seeded run |
+| Analyzer step | Not verified | Documented from Unity's analyzer pages; no analyzer DLL installed. Warnings-as-errors through response files not confirmed for Unity 6 |
+| Project Auditor built-in version | Not verified | Built in and Window > Analysis confirmed; the first Editor version that includes it is not |
+| Crash reporting, Addressables content state | Documentation only | Checked against Unity's Diagnostics and Addressables pages on 2026-11-20; no build or crash was run |
+| Windows | Not verified | macOS only |
+
 ## Starter AGENTS.md and agent tooling — 2026-11-19
 
 | Check | Result | Evidence / limit |

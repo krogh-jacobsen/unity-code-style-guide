@@ -195,7 +195,8 @@ Offer these as recommendations; apply one only if it is picked and confirmed:
 | Disable scene reload | The project deliberately restores object state | Repeated Plays and enable/disable tests pass |
 | asmdefs | A concrete compile, dependency, or test boundary exists | Editor and player compile; tests are discovered in isolated assemblies |
 | Quality tiers and volumes | Target hardware needs distinct budgets | Each tier runs on a representative device |
-| Project Auditor | A broader review is wanted | Install `com.unity.project-auditor` through Package Manager; what it checks is not verified here |
+| Project Auditor | A broader review is wanted | Built in to current Unity 6 Editors: Window > Analysis > Project Auditor, which offers to install its `com.unity.project-auditor-rules` dependency on first launch. Older Editors use the `com.unity.project-auditor` package. Verified November 2026; confirm the menu in the target Editor |
+| Stack trace logging | Release logs are noisy, or Info stack traces cost too much | `PlayerSettings.SetStackTraceLogType` per log type: keep full traces for errors and exceptions, reduce Log and Warning in release |
 
 ## 5. Verify
 

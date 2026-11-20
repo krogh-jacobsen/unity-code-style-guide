@@ -84,6 +84,9 @@ output paths, evidence files, and acceptance checks before execution.
 | Data compatibility | Existing saves/settings survive the agreed upgrade | Copy supported old fixtures, upgrade, reopen, verify behavior, test invalid/missing data and recovery | Persistence used |
 | Performance/visuals | Meets agreed budgets and presentation expectations | Measure representative workload on named target hardware; record conditions and captures | Required support tiers |
 | Diagnostics | Failures can be traced to this build | Preserve matching symbols and build logs; verify diagnostic output avoids credentials/player secrets | Platform/toolchain applicable |
+| Crash reporting | Crashes and exceptions from players reach the team | Unity 6.2+: built-in Diagnostics replaces the deprecated Cloud Diagnostics, and data collection must be enabled in the Editor (verified November 2026). Upload this build's symbols (Dashboard or CI), trigger a test crash on a development build, and confirm it arrives. A third-party reporter is the user's choice | Players outside the team |
+| Addressables content state | A later content-only update stays possible | Archive `addressables_content_state.bin` from this full build with the release; update builds reuse it until the next full build | Addressables with remote content |
+| Development-only code absent | Cheats, debug consoles, lab scenes and test assemblies are not in the release | Inspect the build report or player assemblies for development-only assemblies and scenes | Always |
 | Distribution materials | Selected notices, content inventory, and platform requirements are accounted for | Inventory third-party dependencies/notices; record platform requirement source/date and responsible review owner | Distribution route selected |
 | Recovery | Previous artifact and compatible data recovery path are known | Retain prior artifact/fixtures; rehearse selected recovery without touching live player data | Update release |
 

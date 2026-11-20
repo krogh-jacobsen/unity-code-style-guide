@@ -1,5 +1,13 @@
 # Change log
 
+## 2026-11-20 — Code enforcement, assembly layering, and release corrections from real projects
+
+- New `AuditInstructions/CodeEnforcement/`: `SetupEnforcement.md` (audit-first) declares assembly layers (engine-free core, contracts, features, presentation, composition, plus adapters for vendor code and a development-only assembly) and adds two copyable EditMode tests. The assembly boundary test reads Unity's compiled assembly graph against declared rules and fails when a rule matches no assembly. The banned-API ratchet keeps a baseline of today's violations: new ones fail, and so do entries whose violation is fixed, so the baseline only shrinks. An optional step adds Roslyn analyzers through the `RoslynAnalyzer` label with per-assembly severity. Routed from the root AGENTS.md, the topic index and the root README.
+- UnityRules.md: the Bootstrap Scene rule now accepts a service locator inside the composition root when registrations are scene-scoped and reset; Kill Singletons accepts a static event bus that resets; Assembly Definitions adds engine-free core and vendor-via-adapter; new unmarked rules Development Code Stays Out of Players and Logging; Zero Warnings links to analyzer severity.
+- Audits rank architecture findings by harm: the scenes and design-patterns lenses recommend a bootstrap scene when a project has no composition root, and keep a working locator, static bus or single-scene loading while checking its safety. The assembly lens gains Development-only code and Vendor reach rows and a `noEngineReferences` note.
+- Release readiness gains Crash reporting (Unity 6.2+ built-in Diagnostics), Addressables content state, and Development-only code absent rows. Project Auditor guidance now says it is built in to current Unity 6 Editors; project settings gain a stack-trace logging option.
+- Basis: patterns found in the author's Unity projects (standards and boundary tests, layered assemblies, colocated test asmrefs; lab code and direct vendor references as anti-patterns) and official Unity pages checked on 2026-11-20.
+
 ## 2026-11-19 — Starter AGENTS.md, agent tooling, and rules from real projects
 
 - `AgentsInstructions/AGENTS.md` was an empty file. It is now a 67-line standalone starter: a "This project decides" table (version, pipeline, input, UI, async, domain reload, protected folders, test command), Unity safety, verification, working rules, a routing table and a precedence order. It links only inside `AgentsInstructions/`, so it works without the audit kit; the root `AGENTS.md` stays the full-kit version. The folder README now lists what is in the folder and how to adopt the starter, including a `CLAUDE.md` that imports it.

@@ -64,6 +64,9 @@
         "BuildSettings/MobileBuilds.md": {
           "prerequisite": "Android and iOS are selected; host is Windows with Android tools installed, but no Mac or Xcode is available. Saved settings are readable."
         },
+        "CodeEnforcement/SetupEnforcement.md": {
+          "prerequisite": "Test Framework is absent. Assembly definitions and first-party source are readable, so boundary and banned-API recommendations can proceed; the tests cannot run."
+        },
         "ContinuousIntegration/SetupCI.md": {
           "prerequisite": "The .NET SDK is absent. Python and Git are available for independent static checks; Unity Editor tests remain separate."
         },

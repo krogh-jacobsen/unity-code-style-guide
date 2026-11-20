@@ -24,7 +24,7 @@ each source and either confirm, correct, or remove the claim.
 | API Compatibility Level default | Options listed, no default stated | 6.7 Player settings |
 | `UNITY_64`, `DEVELOPMENT_BUILD` deprecated; removal in 6.8 | From the 6.6 upgrade guide; the removal plan can move | [Upgrade to 6.6](https://docs.unity.com/en-us/engine/6000.7/manual/upgrade-guides/upgrade-guide-unity66), then the 6.7 guide |
 | CoreCLR (Experimental) backend, not a baseline | Listed on the Windows page; macOS page not read | 6.7 Windows and macOS Player settings pages |
-| Project Auditor | Package exists (3.1.x); what it checks is not documented where read | The package manual |
+| Project Auditor | Built in to the Editor (Window > Analysis); rules ship as the `com.unity.project-auditor-rules` dependency, listed for 6000.6. The first Editor version with it built in is not confirmed | [Project Auditor rules manual](https://docs.unity3d.com/Packages/com.unity.project-auditor-rules@3.2/manual/index.html) |
 
 ## Claims to re-confirm on every release
 

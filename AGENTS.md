@@ -84,6 +84,7 @@ Use Editor APIs for ProjectSettings while the Editor is open. Commit `Assets` wi
 | Install selected script templates | [Template workflow](AuditInstructions/ScriptTemplates/SetupScriptTemplates.md) |
 | Capture/implement GitHub issues, review PRs, or complete merge/cleanup | [GitHub workflow](AuditInstructions/Github/GithubInstructions.md) |
 | Set up or repair test assemblies and discoverable tests | [Test setup](AuditInstructions/Testing/TestingInstructions.md) |
+| Enforce assembly boundaries and banned APIs, or add Roslyn analyzers | [Code enforcement](AuditInstructions/CodeEnforcement/SetupEnforcement.md) |
 | Set up GitHub CI or a test gate (no paid licence needed) | [CI workflow](AuditInstructions/ContinuousIntegration/SetupCI.md) |
 | Set up `.gitignore`, `.gitattributes`, LFS, or scene merging | [Version control workflow](AuditInstructions/VersionControl/SetupVersionControl.md) |
 | Install/apply selected presets or register defaults | [Preset workflow](AuditInstructions/Presets/SetupPresets.md) |

@@ -86,5 +86,5 @@ An existing project keeps whatever it saved before, so the agent reads the real 
 - **Preferences are personal.** Auto Refresh, worker count, and what happens when you edit scripts
   during Play are Editor preferences on your machine, not project settings. The agent recommends
   them but doesn't change them.
-- **Other tools.** The Project Auditor package can check a project more broadly. It is optional, and
-  this guide has not verified what it checks.
+- **Other tools.** Project Auditor checks a project more broadly. Current Unity 6 Editors include it
+  (Window > Analysis > Project Auditor); this guide has not verified every check it runs.

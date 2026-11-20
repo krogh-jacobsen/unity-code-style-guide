@@ -26,6 +26,8 @@ references and defines. Folder names alone do not establish compilation boundari
 | Reference direction | The reference graph built from `references`, plus actual source dependencies | A cycle exists in the graph, or a binding project dependency rule is violated |
 | Test inclusion | With asmdefs: test asmdefs, every non-test asmdef's `references`, the output of a normal player build or its build report | A normal player build or build report contains a test assembly, or a non-test asmdef lists a test asmdef, NUnit, or `UnityEngine.TestRunner` in `references`; the build-side half needs a build. A no-asmdef project is judged by folder placement and define guards in [Testing](UnityTestingInstructions.md) |
 | Optional packages | `manifest.json` / `packages-lock.json`, asmdef `references`, `versionDefines`, `defineConstraints` | An asmdef references a package assembly that the project treats as optional, with no `versionDefines` plus `defineConstraints` guard, so it cannot compile when the package is absent |
+| Development-only code | Assemblies holding cheats, debug consoles, lab or preview scenes, benchmarks; their `defineConstraints`, platform filters, and which production assemblies reference them | A normal player compiles such an assembly (no `UNITY_EDITOR` / `DEVELOPMENT_BUILD` constraint or Editor-only filter), or a production assembly references it |
+| Vendor reach | `references` of first-party assemblies against vendor and Asset Store assemblies | Core, gameplay, or UI assemblies reference a vendor assembly directly when the project intends an adapter boundary, so a vendor update or removal spreads through the game |
 | Granularity | Editor compile log or `unity:unity-cli` compile timing after a one-file edit | A recorded recompile of one assembly follows an edit that none of its dependents use, and the timing is large enough to matter to the project's iteration goal; report the measurement, never a script count (needs a live compile) |
 
 ℹ️ AOT and stripping findings belong to [Assets and memory](UnityAssetsAndMemoryInstructions.md).
@@ -34,6 +36,9 @@ references and defines. Folder names alone do not establish compilation boundari
 
 - ℹ️ Absence of asmdefs is not itself a correctness defect. Recommend a boundary for a concrete
   dependency or build problem, with migration cost; avoid script-count thresholds.
+- ℹ️ `noEngineReferences: true` on pure rules assemblies lets the compiler prove they need no Unity
+  types, which keeps them fast to test. To keep a declared boundary from regressing, recommend the
+  boundary test in [Code enforcement](../CodeEnforcement/SetupEnforcement.md).
 - ℹ️ `autoReferenced` defaults to true and controls references from predefined assemblies. It does not
   mean every asmdef references the library. Judge the intended visibility rather than requiring one
   global value.
