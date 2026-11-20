@@ -1,5 +1,14 @@
 # Change log
 
+## 2026-11-19 — Starter AGENTS.md, agent tooling, and rules from real projects
+
+- `AgentsInstructions/AGENTS.md` was an empty file. It is now a 67-line standalone starter: a "This project decides" table (version, pipeline, input, UI, async, domain reload, protected folders, test command), Unity safety, verification, working rules, a routing table and a precedence order. It links only inside `AgentsInstructions/`, so it works without the audit kit; the root `AGENTS.md` stays the full-kit version. The folder README now lists what is in the folder and how to adopt the starter, including a `CLAUDE.md` that imports it.
+- UnityRules.md gains four one-line rules, each linking to detail: Reload-Safe Static State, Vendor and Protected Code, Fix at the Owning Source, Verification Honesty. They are unmarked because they prevent known bugs rather than express taste.
+- UnityTechStack.md says the baseline column is a starting point and the project's recorded choice overrides generic UI Toolkit, Awaitable and reload examples. The reload row is an explicit per-project choice.
+- New `AgentsInstructions/Tooling/README.md`: a `PreToolUse` hook that blocks hand edits to Unity YAML and `.meta` files, a test-runner subagent with an authorization table and a literal `Deferred:` reply, and nested or path-scoped instructions. All are copy-paste examples; nothing is installed.
+- Two `AGENTS.md` files, on purpose. The root file is retitled "this repository and the full kit" and opens with a note saying it is the full-kit version (instructions for this repo, and the file the install workflow merges), that a project uses one of the two, and that the note and the maintenance section are left out when merging. The root README gains a "Which AGENTS.md to use" comparison, a new install row and a new "Where to start" row; the AgentsInstructions README explains the same split. The root file's rules are unchanged: the validators, installer and five docs depend on its anchors and contract section.
+- Basis: 2026 guidance from Anthropic, agents.md, Codex, Copilot and Cursor (short files, no discoverable content, hooks for rules without exceptions, progressive disclosure) and a read of the instruction files across the author's own Unity projects.
+
 ## 2026-11-18 — Updating an adapted copy with no installation record
 
 - UpdateKit.md has a new read-only step 2 for kit material copied without a recorded source revision: match files by name across upstream history, bound the search by the date the copy arrived, score each upstream commit by line similarity, and take the best as a reconstructed baseline. Each file is classified near-pristine, adapted, or local fork (thresholds 0.95 and 0.60, reported with the scores).

@@ -29,6 +29,10 @@ Awaitable operations require owned cancellation/error observation; a destruction
 cover disable or request replacement. Pool capacity reserves storage rather than prewarming objects.
 Use matching skills for implementations instead of loading audit references during setup.
 
+The baseline column is a starting point, not a mandate. Record the project's actual choice for each
+row in its `AGENTS.md` ([This project decides](../AGENTS.md#this-project-decides)); that record
+overrides generic UI Toolkit, Awaitable or reload examples in any linked document.
+
 ## Resolved packages
 
 Read `Packages/manifest.json`, `Packages/packages-lock.json`, and Package Manager's completed resolved
@@ -52,7 +56,7 @@ lockfile as the authoritative dependency graph. Install only selected packages.
 | Additional architectures/platforms | Intel macOS only when selected; others outside the desktop baseline |
 | Desktop support and profiles | Fill in minimum OS/GPU/hardware and selected API order; follow [desktop setup](../../AuditInstructions/BuildSettings/DesktopBuilds.md) or [mobile setup](../../AuditInstructions/BuildSettings/MobileBuilds.md) |
 | Frame/memory budget | Record when established for a representative workload |
-| Enter Play Mode reload | Scene reload enabled; domain reload off (the 6.6+ new-project default) with static state reset; see [project settings](../../AuditInstructions/ProjectSettings/ProjectSettings.md#reload-policy) |
+| Enter Play Mode reload | Scene reload enabled; domain reload off (the 6.6+ new-project default) with static state reset. A per-project choice: record the actual setting, and write static resets that work with reload on or off ([Reload-Safe Static State](../UnityProjectRules/UnityRules.md)); see [project settings](../../AuditInstructions/ProjectSettings/ProjectSettings.md#reload-policy) |
 | Assembly policy | Default assemblies; add boundaries for concrete needs; isolate tests/Editor code |
 | Optional presets/templates/examples | List selected groups |
 | Optional scene templates | Strategy Sandbox, UI Preview, Asset LookDev; select installed groups and record target validation |

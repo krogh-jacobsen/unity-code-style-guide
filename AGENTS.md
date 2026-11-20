@@ -1,6 +1,13 @@
-# AGENTS.md — Unity starter conventions
+# AGENTS.md — this repository and the full kit
 
-Use this as the target project's canonical instruction file. Adapt the selected stack in
+> **Which AGENTS.md is this?** The full-kit version. It holds the instructions for working on this
+> repository, and it is the file an installer merges into a project that adopts the whole kit: it
+> routes into `AuditInstructions/`. Starting a project and only want the agent instructions? Copy the
+> [AgentsInstructions](AgentsInstructions/README.md) folder and use its shorter
+> [starter AGENTS.md](AgentsInstructions/AGENTS.md) instead. Use one of the two in a project, not both.
+> When merging this file into a project, leave out this note and the maintenance section.
+
+Use this as the target project's canonical instruction file once adapted. Adapt the selected stack in
 [UnityTechStack.md](AgentsInstructions/UnityTechStack/UnityTechStack.md) during setup. This starter repository itself
 contains reusable documentation and assets; it is not a Unity project. To change this repository,
 follow [Maintaining this repository](#maintaining-this-repository); a target project can drop that section.

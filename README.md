@@ -19,7 +19,7 @@ Besides the code style instructions, this repo also includes a selection of tool
 | Area | What you'll find | Start here |
 |---|---|---|
 | **Code style guide** | Naming, formatting and class-layout rules for Unity 6.7+, a ready-made `.editorconfig`, a naming checker script with good/bad fixtures | [Style guide](AgentsInstructions/CodeStyleGuide/UnityStyleGuide.md) · [README](AgentsInstructions/CodeStyleGuide/README.md) |
-| **Agent instructions** | An example `AGENTS.md` to copy and adapt, plus the Unity 6.7 tech stack profile your LLM should assume | [AgentsInstructions](AgentsInstructions/README.md) · [Tech stack](AgentsInstructions/UnityTechStack/UnityTechStack.md) |
+| **Agent instructions** | A short starter `AGENTS.md` to copy and adapt, coding rules, the Unity 6.7 tech stack profile your LLM should assume, and copy-paste hooks and a test-runner subagent | [AgentsInstructions](AgentsInstructions/README.md) · [Rules](AgentsInstructions/UnityProjectRules/UnityRules.md) · [Tooling](AgentsInstructions/Tooling/README.md) |
 | **Project setup** | End-to-end setup workflow, folder structure, version control (`.gitignore`, `.gitattributes`, LFS), package installer, project and build settings (desktop and mobile) | [Setup workflow](AuditInstructions/SetupInstructions/README.md) |
 | **Reusable Unity resources** | Script templates (core and optional), 13 texture/audio/model/animation import presets, 3 scene templates (asset look-dev, strategy sandbox, UI preview) | [Script templates](AuditInstructions/ScriptTemplates/README.md) · [Presets](AuditInstructions/Presets/README.md) · [Scene templates](AuditInstructions/SceneTemplates/README.md) |
 | **Project audits** | A review router plus 20+ discipline lenses: performance, physics, rendering, UI Toolkit/uGUI, networking, audio, persistence, testing and more | [Review router](AuditInstructions/ProjectAuditGuides/ProjectReview.md) |
@@ -33,7 +33,8 @@ Every audit and setup guide follows the same four stages: **audit → recommend 
 
 | I want to… | Go to |
 |---|---|
-| Understand the conventions | [Agent instructions](AGENTS.md) and [style guide](AgentsInstructions/CodeStyleGuide/UnityStyleGuide.md) |
+| Start a project with a ready-made `AGENTS.md` | [Starter AGENTS.md](AgentsInstructions/AGENTS.md) and [how to use it](AgentsInstructions/README.md#using-the-starter-agentsmd) |
+| Understand the conventions | [Full-kit agent instructions](AGENTS.md) and [style guide](AgentsInstructions/CodeStyleGuide/UnityStyleGuide.md) |
 | Set up a new project | [Setup workflow](AuditInstructions/SetupInstructions/README.md) |
 | Audit an existing project | [Review router](AuditInstructions/ProjectAuditGuides/ProjectReview.md) |
 | Find one specific topic | [Topic index](AuditInstructions/README.md) |
@@ -48,8 +49,22 @@ size of adoption that fits:
 | I want to… | Do this |
 |---|---|
 | **Try one thing** (a style guide, a preset, one audit) | Copy the URL of that topic's agent document from the [topic index](AuditInstructions/README.md) and tell your LLM "implement this in my Unity project". |
+| **Just the agent instructions** (a new project, a light start) | Copy the [AgentsInstructions](AgentsInstructions/README.md) folder into your project and use its short starter `AGENTS.md`. No audit kit needed. See [which AGENTS.md to use](#which-agentsmd-to-use). |
 | **Adopt the whole kit** | Hand the [setup workflow](AuditInstructions/SetupInstructions/README.md) to your LLM. It audits your project, recommends changes, and applies only the ones you pick and confirm. Use one source commit for the whole selection. |
 | **Keep the kit for reference and updates** | Keep a **reference snapshot** at `Documentation/UnityStarterKit/`, outside `Assets`, with the source hierarchy intact. See [Where files end up](#where-files-end-up). |
+
+### Which AGENTS.md to use
+
+The repository has two `AGENTS.md` files on purpose. Use **one** of them in your project, not both.
+
+| | [Root AGENTS.md](AGENTS.md) | [AgentsInstructions/AGENTS.md](AgentsInstructions/AGENTS.md) |
+|---|---|---|
+| **Use it when** | You adopt the whole kit, or you work on this repository | You start a project and want a solid, short file now |
+| **What it is** | The full version: audit-first rules, asset safety, and routing into `AuditInstructions/`. Its maintenance section is for this repo only | A short starter: a fill-in table of your stack choices, Unity safety, verification rules, and links that stay inside `AgentsInstructions/` |
+| **How you use it** | The install workflow merges it into your project's `AGENTS.md` | You copy it to your project root and fill in "This project decides" |
+
+If you start with the lean starter and adopt the whole kit later, carry your "This project decides"
+answers over when the install workflow merges the root file.
 
 ### Where files end up
 
@@ -61,7 +76,7 @@ copied into `Assets` separately, and only when selected. The table below shows w
 | Source here | Destination relative to the Unity project root | Action |
 |---|---|---|
 | Manifest `snapshot_sources`, with their existing paths, minus `snapshot_exclude` | `Documentation/UnityStarterKit/` | Retain complete reference hierarchy; merge or choose another location if occupied. Excluded replay archives (about 5 MB) stay upstream; snapshot links to them resolve only there |
-| AGENTS.md | AGENTS.md | Merge conventions and routing; prefix file links with `Documentation/UnityStarterKit/`; retain local anchors; remove the repository-maintenance section |
+| AGENTS.md | AGENTS.md | Merge conventions and routing; prefix file links with `Documentation/UnityStarterKit/`; retain local anchors; remove the opening "Which AGENTS.md" note and the repository-maintenance section |
 | CLAUDE.md | CLAUDE.md | Optional pointer to the target's root AGENTS.md; preserve existing instructions |
 | AgentsInstructions/CodeStyleGuide/EditorConfig/.editorconfig | .editorconfig | Merge selected rules; the reference copy is not the active configuration |
 | AuditInstructions/VersionControl/Unity.gitignore | .gitignore | Install the selected managed block |

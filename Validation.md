@@ -4,6 +4,17 @@ The intended profile is [Unity 6.7](AgentsInstructions/UnityTechStack/UnityTechS
 that choice from the exact prerelease Editor tested. It is not a guarantee for every 6000.7 patch,
 package upgrade, target platform, or copied project. Date: 2026-10-12.
 
+## Starter AGENTS.md and agent tooling — 2026-11-19
+
+| Check | Result | Evidence / limit |
+|---|---|---|
+| `validate_all.py` | Passed | 85 Markdown files, 633 local links and anchors, 7 folder validators; installation staging passes with the new files |
+| `check_naming.py` | Passed | Good 0, Bad 6; .NET SDK 10.0.302 |
+| Starter length | Passed | 67 lines against a 100-line target |
+| Hook, subagent and scoped-rule snippets | Not verified | Written to the documented Claude Code contract (exit code 2 blocks; `paths:` frontmatter). Not run in a live session |
+| Unity CLI test command syntax | Not verified | The Tooling doc tells readers to discover it with `unity commands --grep test` |
+| Effect on agent behavior | Not verified | No before/after measurement; published research reports context files can lower task success when they add discoverable content |
+
 ## Baseline reconstruction for adapted copies — 2026-11-18
 
 | Check | Result | Evidence / limit |
