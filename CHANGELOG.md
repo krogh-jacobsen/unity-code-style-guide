@@ -1,5 +1,16 @@
 # Change log
 
+## 2026-11-23 — Silent-bug rules in both AGENTS.md files, review and context tooling
+
+- Both `AGENTS.md` files gain the same section. The root file's section replaces its general cleanup and async bullet, and its On-demand table now routes C# authoring to UnityRules.md as well as the style policy. It also says not to search generated folders.
+- The starter `AGENTS.md` gains "Unity bugs the compiler won't catch": destroyed-object null checks, subscription cleanup, static resets, ScriptableObject runtime state, Editor-only code, development code out of players, async lifetime, and asset handle release. These compile, often pass in the Editor, and fail later, so they are always loaded rather than one link away. It also gains four feedback rows in "This project decides" (compile check, player compile check, console, visual check), a rule to wait for compilation before testing, and a rule to skip `Library/`, `Temp/`, `Logs/`, `obj/` and `UserSettings/`. It is now 93 lines.
+- UnityRules.md has one owner per rule: the 12 rules now in the starter `AGENTS.md` are replaced by an index of their detail links. Ten general clean-code rules move to a closing "If your model needs it" section, kept as a learning reference. All 16 `[opinion]` markers stay. The opening describes the kit's stance rather than "my" philosophy.
+- Every `AgentsInstructions` document works when only that folder is copied. In UnityRules.md, links to the root `AGENTS.md` point at the starter. All 44 links that left the folder (UnityRules.md, the style guide, the tech stack, the EditorConfig and folder readmes) are now GitHub URLs, matching how the `AuditInstructions` documents are handed to an agent.
+- The Tooling doc gains three copy-paste examples:
+  - A path-scoped rule that points the agent at UnityRules.md whenever it reads or edits C#, for Claude Code and GitHub Copilot.
+  - A review subagent that applies the rules after a change and groups findings as silent bugs, design rules, then labelled preferences.
+  - `Read` deny rules that keep `Library/`, `Temp/`, `Logs/`, `obj/` and `UserSettings/` out of file tools, with their documented limits.
+
 ## 2026-11-23 — Code enforcement tests that work on any project
 
 A read-only run of `SetupEnforcement.md` against a real layered project showed the copyable tests assumed the example's names. Fixes:

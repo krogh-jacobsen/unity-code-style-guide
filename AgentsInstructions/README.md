@@ -1,7 +1,7 @@
 # Agent instructions
 
 Material you copy into a Unity project so your LLM follows the same conventions every session. For
-audits and setup workflows that you hand to an LLM by URL, see [AuditInstructions](../AuditInstructions/README.md).
+audits and setup workflows that you hand to an LLM by URL, see [AuditInstructions](https://github.com/krogh-jacobsen/unity-code-style-guide/blob/main/AuditInstructions/README.md).
 
 | Folder or file | What it is |
 |---|---|
@@ -25,6 +25,6 @@ This repository has two `AGENTS.md` files on purpose, and a project uses **one**
 
 - **This folder's [AGENTS.md](AGENTS.md)** is the lean starter above. Use it when you only want the
   agent instructions. Its links stay inside this folder, so it works without the rest of the kit.
-- **The root [AGENTS.md](../AGENTS.md)** is the full-kit version. It also holds the instructions for
+- **The root [AGENTS.md](https://github.com/krogh-jacobsen/unity-code-style-guide/blob/main/AGENTS.md)** is the full-kit version. It also holds the instructions for
   maintaining this repository, and the install workflow merges it into a project that adopts the audit
-  and setup documents. See [which AGENTS.md to use](../README.md#which-agentsmd-to-use).
+  and setup documents. See [which AGENTS.md to use](https://github.com/krogh-jacobsen/unity-code-style-guide/blob/main/README.md#which-agentsmd-to-use).

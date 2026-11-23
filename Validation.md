@@ -4,6 +4,18 @@ The intended profile is [Unity 6.7](AgentsInstructions/UnityTechStack/UnityTechS
 that choice from the exact prerelease Editor tested. It is not a guarantee for every 6000.7 patch,
 package upgrade, target platform, or copied project. Date: 2026-10-12.
 
+## Silent-bug rules in the starter AGENTS.md — 2026-11-23
+
+| Check | Result | Evidence / limit |
+|---|---|---|
+| No rule lost from UnityRules.md | Passed | Script diff against the previous version: 40 rules kept, 12 moved, each present in the starter `AGENTS.md`; `[opinion]` markers 16 → 16 |
+| GitHub URLs in `AgentsInstructions` | Passed | 44 URLs mapped to local files; every file and anchor exists (repository anchor rules). No relative link leaves the folder. `validate_all.py` does not check `http` links |
+| `validate_all.py`, `check_installation.py` | Passed | 87 Markdown files, 609 local links and anchors; the installed root `AGENTS.md` carries the new section |
+| Claude Code and Copilot path-scoped formats | Passed | Checked against code.claude.com memory docs and GitHub's custom-instructions page, 2026-11-23 |
+| Permission rules and subagent frontmatter | Passed | `Read(...)` deny syntax and path anchoring, the Bash allow form, and `tools` field limits checked against code.claude.com permissions and sub-agents docs, 2026-11-23. The examples were not run in a live session |
+| Cursor rule format, `@path` imports inside rule files | Not verified | Cursor's rules page did not load; imports are documented for `CLAUDE.md` only |
+| Effect on agent behavior | Not verified | No before/after task measurement |
+
 ## Code enforcement tests, generalized — 2026-11-23
 
 | Check | Result | Evidence / limit |

@@ -455,7 +455,7 @@ private void OnDisable()
   `[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]`.
 - ✅ Still unsubscribe instance handlers in `OnDisable`; cleanup of the static field does not remove
   subscriptions you made from objects that are still alive.
-- ℹ️ See the [reload policy](../../AuditInstructions/ProjectSettings/ProjectSettings.md#reload-policy) for how
+- ℹ️ See the [reload policy](https://github.com/krogh-jacobsen/unity-code-style-guide/blob/main/AuditInstructions/ProjectSettings/ProjectSettings.md#reload-policy) for how
   the Editor setting and this attribute work together.
 
 ```csharp
@@ -904,7 +904,7 @@ ExecuteAction();
 - ⚠️ In hot paths — `Update`, `FixedUpdate`, tight loops — every string you build is garbage. Cache the
   result and only rebuild when the underlying value actually changes.
 - ✅ Use `StringBuilder` when assembling a string from many parts.
-- ℹ️ See [Performance audit](../../AuditInstructions/ProjectAuditGuides/UnityPerformanceOptimizationInstructions.md#high-value-interpretation-checks)
+- ℹ️ See [Performance audit](https://github.com/krogh-jacobsen/unity-code-style-guide/blob/main/AuditInstructions/ProjectAuditGuides/UnityPerformanceOptimizationInstructions.md#high-value-interpretation-checks)
   for the zero-allocation techniques.
 
 ```csharp
@@ -973,7 +973,7 @@ public class EnemyRegistry : MonoBehaviour
   destroyed: `if (this == null || !isActiveAndEnabled) return;`
 - ⚠️ Avoid `async void` except where a callback requires it. Observe exceptions at the operation owner;
   an ignored `Awaitable` can retain an exception without reporting it. See the
-  [lifecycle audit](../../AuditInstructions/ProjectAuditGuides/UnityScenesAndLifecycleInstructions.md#async-cases-that-basic-null-checks-miss).
+  [lifecycle audit](https://github.com/krogh-jacobsen/unity-code-style-guide/blob/main/AuditInstructions/ProjectAuditGuides/UnityScenesAndLifecycleInstructions.md#async-cases-that-basic-null-checks-miss).
 - ⚠️ Cache suitable coroutine waits to avoid repeated allocation; allocation churn is not itself a leak.
 
 ```csharp
@@ -1129,7 +1129,7 @@ private void UpdateMovementBadly(bool isMoving, float currentSpeed)
 - ℹ️ Prefer `[RequireComponent]` over defensive null checks — it makes the dependency an edit-time
   guarantee instead of a runtime question.
 - ℹ️ For the full diagnostic workflow — triage order, stack trace interpretation, Input System and
-  physics debugging — see [UnityDebuggingInstructions.md](../../AuditInstructions/ProjectAuditGuides/UnityDebuggingInstructions.md).
+  physics debugging — see [UnityDebuggingInstructions.md](https://github.com/krogh-jacobsen/unity-code-style-guide/blob/main/AuditInstructions/ProjectAuditGuides/UnityDebuggingInstructions.md).
 
 ```csharp
 // Include context so clicking the log selects the object
@@ -1201,16 +1201,16 @@ This guide covers style and naming. The general best-practice guides go into dep
 
 | Topic | Guide |
 |---|---|
-| SOLID, patterns, object pooling, state machines | [UnityDesignPatternsInstructions.md](../../AuditInstructions/ProjectAuditGuides/UnityDesignPatternsInstructions.md) |
-| Hot paths, allocations, profiling, rendering cost | [UnityPerformanceOptimizationInstructions.md](../../AuditInstructions/ProjectAuditGuides/UnityPerformanceOptimizationInstructions.md) |
-| UXML, USS, BEM, flexbox, runtime binding | [UnityUIToolkitInstructions.md](../../AuditInstructions/ProjectAuditGuides/UnityUIToolkitInstructions.md) |
-| Canvas structure, layout rebuilds, uGUI pitfalls | [UnityUGUIInstructions.md](../../AuditInstructions/ProjectAuditGuides/UnityUGUIInstructions.md) |
-| Addressables, import settings, memory budgets | [UnityAssetsAndMemoryInstructions.md](../../AuditInstructions/ProjectAuditGuides/UnityAssetsAndMemoryInstructions.md) |
-| Bootstrapping, additive scenes, domain reload | [UnityScenesAndLifecycleInstructions.md](../../AuditInstructions/ProjectAuditGuides/UnityScenesAndLifecycleInstructions.md) |
-| Edit Mode vs Play Mode tests, test assemblies | [UnityTestingInstructions.md](../../AuditInstructions/ProjectAuditGuides/UnityTestingInstructions.md) |
-| Custom inspectors, property drawers, Gizmos | [UnityEditorToolingInstructions.md](../../AuditInstructions/ProjectAuditGuides/UnityEditorToolingInstructions.md) |
-| Input System actions, phases, rebinding | [UnityInputSystemInstructions.md](../../AuditInstructions/ProjectAuditGuides/UnityInputSystemInstructions.md) |
-| Animator parameters, blend trees, events | [UnityAnimationInstructions.md](../../AuditInstructions/ProjectAuditGuides/UnityAnimationInstructions.md) |
-| Mixers, AudioSource pooling, spatial audio | [UnityAudioInstructions.md](../../AuditInstructions/ProjectAuditGuides/UnityAudioInstructions.md) |
-| Assembly definitions and dependency boundaries | [UnityAssemblyDefinitionsInstructions.md](../../AuditInstructions/ProjectAuditGuides/UnityAssemblyDefinitionsInstructions.md) |
-| Triage, stack traces, Input System & physics debugging | [UnityDebuggingInstructions.md](../../AuditInstructions/ProjectAuditGuides/UnityDebuggingInstructions.md) |
+| SOLID, patterns, object pooling, state machines | [UnityDesignPatternsInstructions.md](https://github.com/krogh-jacobsen/unity-code-style-guide/blob/main/AuditInstructions/ProjectAuditGuides/UnityDesignPatternsInstructions.md) |
+| Hot paths, allocations, profiling, rendering cost | [UnityPerformanceOptimizationInstructions.md](https://github.com/krogh-jacobsen/unity-code-style-guide/blob/main/AuditInstructions/ProjectAuditGuides/UnityPerformanceOptimizationInstructions.md) |
+| UXML, USS, BEM, flexbox, runtime binding | [UnityUIToolkitInstructions.md](https://github.com/krogh-jacobsen/unity-code-style-guide/blob/main/AuditInstructions/ProjectAuditGuides/UnityUIToolkitInstructions.md) |
+| Canvas structure, layout rebuilds, uGUI pitfalls | [UnityUGUIInstructions.md](https://github.com/krogh-jacobsen/unity-code-style-guide/blob/main/AuditInstructions/ProjectAuditGuides/UnityUGUIInstructions.md) |
+| Addressables, import settings, memory budgets | [UnityAssetsAndMemoryInstructions.md](https://github.com/krogh-jacobsen/unity-code-style-guide/blob/main/AuditInstructions/ProjectAuditGuides/UnityAssetsAndMemoryInstructions.md) |
+| Bootstrapping, additive scenes, domain reload | [UnityScenesAndLifecycleInstructions.md](https://github.com/krogh-jacobsen/unity-code-style-guide/blob/main/AuditInstructions/ProjectAuditGuides/UnityScenesAndLifecycleInstructions.md) |
+| Edit Mode vs Play Mode tests, test assemblies | [UnityTestingInstructions.md](https://github.com/krogh-jacobsen/unity-code-style-guide/blob/main/AuditInstructions/ProjectAuditGuides/UnityTestingInstructions.md) |
+| Custom inspectors, property drawers, Gizmos | [UnityEditorToolingInstructions.md](https://github.com/krogh-jacobsen/unity-code-style-guide/blob/main/AuditInstructions/ProjectAuditGuides/UnityEditorToolingInstructions.md) |
+| Input System actions, phases, rebinding | [UnityInputSystemInstructions.md](https://github.com/krogh-jacobsen/unity-code-style-guide/blob/main/AuditInstructions/ProjectAuditGuides/UnityInputSystemInstructions.md) |
+| Animator parameters, blend trees, events | [UnityAnimationInstructions.md](https://github.com/krogh-jacobsen/unity-code-style-guide/blob/main/AuditInstructions/ProjectAuditGuides/UnityAnimationInstructions.md) |
+| Mixers, AudioSource pooling, spatial audio | [UnityAudioInstructions.md](https://github.com/krogh-jacobsen/unity-code-style-guide/blob/main/AuditInstructions/ProjectAuditGuides/UnityAudioInstructions.md) |
+| Assembly definitions and dependency boundaries | [UnityAssemblyDefinitionsInstructions.md](https://github.com/krogh-jacobsen/unity-code-style-guide/blob/main/AuditInstructions/ProjectAuditGuides/UnityAssemblyDefinitionsInstructions.md) |
+| Triage, stack traces, Input System & physics debugging | [UnityDebuggingInstructions.md](https://github.com/krogh-jacobsen/unity-code-style-guide/blob/main/AuditInstructions/ProjectAuditGuides/UnityDebuggingInstructions.md) |

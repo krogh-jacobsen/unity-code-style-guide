@@ -41,8 +41,6 @@ Installers replace these placeholders with the target's facts; this starter repo
 - Prefer available Unity CLI skills for Editor control, project creation, testing, and builds.
   Discover installed CLI help and the connected Editor's command catalog; target the project
   explicitly. Use the Package Manager Client API for package changes through the Editor.
-- Pair subscriptions, requests, resources, and registrations with cleanup at their owning lifetime.
-  Observe async errors; source configuration assets must not accumulate unintended session state.
 - Keep frequent paths free of avoidable allocations/lookups. Cache with an explicit invalidation
   contract; measure before introducing an optimization framework.
 - Preserve concurrent edits and unsaved scenes. Make the smallest useful change and validate its
@@ -73,7 +71,26 @@ correct assets/scenes; direct tool mutations need appropriate Undo support.
 
 Use Editor APIs for ProjectSettings while the Editor is open. Commit `Assets` with metadata,
 `Packages/manifest.json`, `Packages/packages-lock.json`, and project settings; generated `Library`,
-`Temp`, `obj`, `Logs`, and `UserSettings` stay out of source control.
+`Temp`, `obj`, `Logs`, and `UserSettings` stay out of source control. Do not search or read them either:
+Unity regenerates them, and they flood search results.
+
+## Unity bugs the compiler won't catch
+
+These compile, often pass in the Editor, and fail later.
+
+- **Destroyed objects look alive to `?.`, `??` and `is null`.** Compare `UnityEngine.Object` references
+  with `==` or `!=`.
+- **Unsubscribe what you subscribe.** Subscribe in `OnEnable`, unsubscribe in `OnDisable`, and subscribe
+  named methods, not lambdas that cannot be removed.
+- **Reset mutable statics** in a `[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]`
+  method, so code works with domain reload on or off.
+- **ScriptableObjects hold config, not runtime state.** Play Mode writes to an asset persist in the Editor.
+- **Editor-only code** goes in an Editor assembly or behind `#if UNITY_EDITOR`, or the player build breaks.
+- **Development code stays out of players.** Cheats, debug consoles and lab scenes go in an assembly
+  with `defineConstraints` such as `UNITY_EDITOR || DEVELOPMENT_BUILD`.
+- **Async work ends with its owner.** Pass `destroyCancellationToken` and never drop an exception.
+- **Whoever acquires it releases it.** Loaded assets, Addressables handles, requests and service
+  registrations are released at their owner's lifetime.
 
 ## On-demand references
 
@@ -96,7 +113,7 @@ Use Editor APIs for ProjectSettings while the Editor is open. Commit `Assets` wi
 | Review or set core project settings (reload policy, input, serialization) | [Project settings](AuditInstructions/ProjectSettings/ProjectSettings.md) |
 | Configure Windows/macOS player and build settings | [Desktop build setup](AuditInstructions/BuildSettings/DesktopBuilds.md) |
 | Configure Android/iOS player and build settings | [Mobile build setup](AuditInstructions/BuildSettings/MobileBuilds.md) |
-| Owned C# authoring or style review | [Style policy](AgentsInstructions/CodeStyleGuide/UnityStyleGuide.md); root `.editorconfig` |
+| Owned C# authoring or style review | [Unity rules](AgentsInstructions/UnityProjectRules/UnityRules.md) for design, then the [style policy](AgentsInstructions/CodeStyleGuide/UnityStyleGuide.md); root `.editorconfig` |
 | Stack/API compatibility | [Project configuration](AgentsInstructions/UnityTechStack/UnityTechStack.md); installed source/version-matched docs |
 | Audit, guide-conformance, or change/subsystem review | [Project review workflow](AuditInstructions/ProjectAuditGuides/ProjectReview.md) detects, offers, and loads only the lenses the user picks; human overview in its [readme](AuditInstructions/ProjectAuditGuides/README.md) |
 | Review rendering correctness (renderer features, Render Graph, cameras, shaders) | [Rendering lens](AuditInstructions/ProjectAuditGuides/UnityRenderingInstructions.md), selected through the project-review workflow |

@@ -12,7 +12,7 @@ evidence; this document records the intended choices and reasons, not a second p
 - Intended starter line: **Unity 6.7 (6000.7.x)**. An intended line is not a tested release claim.
 - Exact target Editor: **fill in from `ProjectSettings/ProjectVersion.txt`**.
 - Language/API baseline: **C# 9 / .NET Standard 2.1**, verified against the selected release.
-- Starter validation results and prerelease limits: [Validation.md](../../Validation.md).
+- Starter validation results and prerelease limits: [Validation.md](https://github.com/krogh-jacobsen/unity-code-style-guide/blob/main/Validation.md).
 
 ## Selected systems
 
@@ -54,9 +54,9 @@ lockfile as the authoritative dependency graph. Install only selected packages.
 | Project namespace | Fill in |
 | Desktop platforms / backends | Windows x64 and macOS Apple Silicon; record primary platform and backend per target |
 | Additional architectures/platforms | Intel macOS only when selected; others outside the desktop baseline |
-| Desktop support and profiles | Fill in minimum OS/GPU/hardware and selected API order; follow [desktop setup](../../AuditInstructions/BuildSettings/DesktopBuilds.md) or [mobile setup](../../AuditInstructions/BuildSettings/MobileBuilds.md) |
+| Desktop support and profiles | Fill in minimum OS/GPU/hardware and selected API order; follow [desktop setup](https://github.com/krogh-jacobsen/unity-code-style-guide/blob/main/AuditInstructions/BuildSettings/DesktopBuilds.md) or [mobile setup](https://github.com/krogh-jacobsen/unity-code-style-guide/blob/main/AuditInstructions/BuildSettings/MobileBuilds.md) |
 | Frame/memory budget | Record when established for a representative workload |
-| Enter Play Mode reload | Scene reload enabled; domain reload off (the 6.6+ new-project default) with static state reset. A per-project choice: record the actual setting, and write static resets that work with reload on or off ([Reload-Safe Static State](../UnityProjectRules/UnityRules.md)); see [project settings](../../AuditInstructions/ProjectSettings/ProjectSettings.md#reload-policy) |
+| Enter Play Mode reload | Scene reload enabled; domain reload off (the 6.6+ new-project default) with static state reset. A per-project choice: record the actual setting, and write static resets that work with reload on or off ([Reload-Safe Static State](../UnityProjectRules/UnityRules.md)); see [project settings](https://github.com/krogh-jacobsen/unity-code-style-guide/blob/main/AuditInstructions/ProjectSettings/ProjectSettings.md#reload-policy) |
 | Assembly policy | Default assemblies; add boundaries for concrete needs; isolate tests/Editor code |
 | Optional presets/templates/examples | List selected groups |
 | Optional scene templates | Strategy Sandbox, UI Preview, Asset LookDev; select installed groups and record target validation |
@@ -78,7 +78,7 @@ permission for a search-and-replace migration:
 From 6000.6, verify the parameterless FindObjectsByType API and obsolete sorted overloads; older
 6000.0–6000.5 projects require their supported signatures. ParticleSystem module writes use a local
 module variable (`var emission = particles.emission; emission.enabled = true;`). Do not introduce
-future CoreCLR/.NET APIs into this baseline; see the optional [migration reference](../../AuditInstructions/CoreCLRmigration/CoreCLRUpgrade.md).
+future CoreCLR/.NET APIs into this baseline; see the optional [migration reference](https://github.com/krogh-jacobsen/unity-code-style-guide/blob/main/AuditInstructions/CoreCLRmigration/CoreCLRUpgrade.md).
 
 ## CLI/manual completion
 

@@ -16,7 +16,7 @@ Roslyn IDE naming diagnostics, and setting a naming severity alone does not make
 it. If CI enforcement is selected, install a compatible analyzer/formatter runner, explicitly select
 IDE1006, and verify representative intersections. Use
 `python3 CodeStyleGuide/Tools~/check_naming.py` in this kit checkout for good/bad fixtures against the installed
-.NET SDK's Roslyn through `dotnet format`; record its version in [Validation](../../../Validation.md).
+.NET SDK's Roslyn through `dotnet format`; record its version in [Validation](https://github.com/krogh-jacobsen/unity-code-style-guide/blob/main/Validation.md).
 This is separate from Unity CLI compilation/testing, which verifies Unity code and dependencies.
 Add `--target <project>` to count violations in a project's owned C# without changing it.
 
@@ -27,5 +27,5 @@ to owned source and inspect the diff. Do not run a general text formatter over U
 ## Git attributes
 
 The starter `.gitignore` and `.gitattributes` now live with their installer in the
-[version control guide](../../../AuditInstructions/VersionControl/README.md), including LFS routing and
+[version control guide](https://github.com/krogh-jacobsen/unity-code-style-guide/blob/main/AuditInstructions/VersionControl/README.md), including LFS routing and
 scene-merge setup.
