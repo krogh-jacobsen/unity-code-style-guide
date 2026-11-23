@@ -1,5 +1,18 @@
 # Change log
 
+## 2026-11-23 — Player compile check, Unity analyzers, and a ratchet starter set
+
+- SetupEnforcement.md has a new step 5: a copyable EditMode test that compiles the player scripts for the active build target with `PlayerBuildInterface.CompilePlayerScripts` and fails with the file and line of each error. It catches runtime code that uses `UnityEditor` and compiles only in the Editor, in about 2 seconds.
+- The analyzer step, now step 6, is rewritten from a run in Unity:
+  - Get the DLL from the NuGet package.
+  - Put it in the Core assembly's folder, so it covers Core and every assembly that references it while vendor code stays out.
+  - Mark it through the Plugin Inspector and the `RoslynAnalyzer` label.
+  - Raise UNT0007, UNT0008 and UNT0029 (`??`, `?.` and `is null` on Unity objects) to errors in `Assets/Default.ruleset`. They default below warning, so nothing shows without a ruleset.
+  - `.editorconfig` severity had no effect, because Unity did not pass the file to the compiler. The previous text recommended it.
+- The banned-API ratchet gains three runtime-only starter rules: `gameobject-find`, `legacy-input`, and `string-message` (string-based `SendMessage`, skipping static calls on a type name). `Camera.main` is deliberately excluded, because Unity has cached it since 2020.2.
+- The Tooling doc's "Keep it honest" list adds a lightweight check on new rules: record the prompt that failed, re-run it once after the change, and reword, enforce or delete rules that do not help.
+- The starter `AGENTS.md` "Player compile check" row names the new test, and a short "How to work with me" section gives example communication preferences to adapt or delete. UnityRules.md links the null-check and Editor-only rules to their checks.
+
 ## 2026-11-23 — Silent-bug rules in both AGENTS.md files, review and context tooling
 
 - Both `AGENTS.md` files gain the same section. The root file's section replaces its general cleanup and async bullet, and its On-demand table now routes C# authoring to UnityRules.md as well as the style policy. It also says not to search generated folders.

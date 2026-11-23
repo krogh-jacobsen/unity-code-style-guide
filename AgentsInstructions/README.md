@@ -13,7 +13,8 @@ audits and setup workflows that you hand to an LLM by URL, see [AuditInstruction
 
 ## Using the starter AGENTS.md
 
-1. Copy [AGENTS.md](AGENTS.md) to your project root and fill in **This project decides**.
+1. Copy [AGENTS.md](AGENTS.md) to your project root, fill in **This project decides**, and adapt or
+   delete **How to work with me**.
 2. Copy this `AgentsInstructions` folder into your project too (for example next to it), and prefix the
    links in your `AGENTS.md` with the folder's location, such as `AgentsInstructions/`.
 3. If your tool reads `CLAUDE.md`, add one containing `@AGENTS.md` so both share a single source of truth.

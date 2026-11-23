@@ -15,6 +15,12 @@ with your EditMode tests, so a broken rule shows up the moment it is broken rath
 baseline of today's violations: new ones fail, and an entry fails once its violation is fixed, so the
 baseline can only shrink. You get enforcement on day one and pay the cleanup down gradually.
 
+**Checks an agent can't talk its way past.** Two silent Unity bugs get their own checks. A player
+compile test catches runtime code that uses `UnityEditor` and compiles only in the Editor. The optional
+Microsoft.Unity.Analyzers setup turns `?.` and `??` on destroyed Unity objects into compile errors in your
+own assemblies, leaving vendor code alone. An agent fixes a failing check far more reliably than it
+remembers a written rule.
+
 **Assembly layers.** The layering in the agent document (engine-free core, contracts, features,
 presentation, composition, plus adapters for vendor code and a development-only assembly for cheats and lab
 scenes) comes from real projects where it held up. The agent proposes layers from your actual code and

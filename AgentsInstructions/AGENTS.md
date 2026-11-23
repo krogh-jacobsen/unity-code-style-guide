@@ -22,7 +22,7 @@ These choices beat the generic examples in the linked documents. Fill in every r
 | Protected folders | _Vendor code, `Packages/`, generated output. Wrap, do not edit_ |
 | Test command | _The exact command that runs EditMode tests_ |
 | Compile check | _How to confirm scripts finished compiling after an edit_ |
-| Player compile check | _A scripts-only player build, or "none yet"_ |
+| Player compile check | _The [player compile test](https://github.com/krogh-jacobsen/unity-code-style-guide/blob/main/AuditInstructions/CodeEnforcement/SetupEnforcement.md#5-add-the-player-compile-check), or "none yet"_ |
 | Console | _How to read Editor console errors and warnings_ |
 | Visual check | _How to capture a Play Mode screenshot, or "ask a human"_ |
 
@@ -87,6 +87,19 @@ These compile, often pass in the Editor, and fail later.
 | Enforcing a rule with a hook, delegating tests, or loading rules only for C# files | [Tooling](Tooling/README.md) |
 
 Add a document here only for a distinct, recurring task, and give it one loading condition.
+
+## How to work with me
+
+_Communication preferences. Adapt them to yours or delete this section._
+
+- **Clarify before non-trivial work.** Ask questions until goal, scope and edge cases are shared,
+  and point out gaps or weak assumptions. Skip this for trivial or unambiguous requests. In a
+  non-interactive run, state your assumptions instead of waiting.
+- **Be succinct.** Lead with the answer. No preamble, no restating the request.
+- **In a multi-phase plan, end each phase with a status:** what is done, where you are, what is next.
+- **Finish with a TL;DR** of what changed and how it was verified.
+- **Close with a recommended next step.** When there are real alternatives, offer them as options to
+  pick from, with your recommendation first and the reason for it.
 
 ## Precedence
 

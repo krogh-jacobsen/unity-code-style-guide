@@ -207,6 +207,9 @@ Checked against Claude Code's permissions documentation, November 2026.
 ## Keep it honest
 
 - Add a rule after the agent repeats a mistake, not in advance.
+- Record the prompt that failed next to the new rule, and re-run it once after the change. If the agent
+  still fails, reword the rule or turn it into a check; a rule that never fires and has no check is a
+  candidate for deletion.
 - Leave naming and formatting to `.editorconfig` and the compiler.
 - Do not describe the folder layout. The agent reads the repo.
 - A fact lives in one file. Link to it from everywhere else.

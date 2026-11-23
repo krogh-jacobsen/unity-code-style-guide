@@ -4,6 +4,21 @@ The intended profile is [Unity 6.7](AgentsInstructions/UnityTechStack/UnityTechS
 that choice from the exact prerelease Editor tested. It is not a guarantee for every 6000.7 patch,
 package upgrade, target platform, or copied project. Date: 2026-10-12.
 
+## Player compile check, analyzers and ratchet starter set — 2026-11-23
+
+All runs on Unity 6000.7.0b9, Test Framework 1.5.1, macOS, in a throwaway project with Core, Gameplay, Presentation, Adapters and a fake vendor assembly.
+
+| Check | Result | Evidence / limit |
+|---|---|---|
+| Player compile test, clean | Passed | 1.9 s for the StandaloneOSX target |
+| Player compile test, seeded | Passed | A runtime Gameplay file using `UnityEditor.EditorApplication` without `#if`: the Editor compile and the other tests pass, and this test fails with `EditorLeak.cs(1,100): error CS0234` |
+| Analyzer placement scope | Passed | DLL in the Core asmdef folder: the compiler response files pass it to Core, Gameplay and Presentation, and not to Adapters, Vendor or the test assembly |
+| Analyzer severity | Passed | No diagnostics at default severity. With `Assets/Default.ruleset`, compilation fails with UNT0007, UNT0008 and UNT0029 in Gameplay and UNT0008 in Presentation; identical code in the vendor assembly compiles. A ruleset next to the Gameplay asmdef applied to Gameplay only |
+| `.editorconfig` severity | Failed | `dotnet_diagnostic.UNT0008.severity = error` at the project root changed nothing; no `-analyzerconfig` in the response file. The doc now says to use a ruleset |
+| Ratchet starter rules | Passed | Flagged `GameObject.FindWithTag`, `Input.GetKeyDown` and `SendMessage("…")` in runtime code. Not flagged: `Camera.main`, `SendMessage(nameof(…))`, a static `Network.SendMessage("…")` after one pattern fix, and `GameObject.Find` under `Tests/` |
+| All three tests verbatim from the doc, with the analyzer active | Passed | Boundary, both ratchet tests and player compile pass; engine-free Skipped |
+| Several build targets, Windows host, warnings-as-errors via response files | Not verified | Only the active macOS target was compiled |
+
 ## Silent-bug rules in the starter AGENTS.md — 2026-11-23
 
 | Check | Result | Evidence / limit |
@@ -35,7 +50,7 @@ package upgrade, target platform, or copied project. Date: 2026-10-12.
 | Both C# tests, copied verbatim from SetupEnforcement.md | Passed | Throwaway project on Unity 6000.7.0b9 via `unity test --mode EditMode` (Unity CLI 1.0.1), assemblies named as in the doc. Clean run: 4 of 4 pass |
 | Seeded failures | Passed | Gameplay → Presentation reference, `noEngineReferences` off on Core, one new lambda subscription, one stale baseline entry: 4 of 4 fail with the expected message; a baselined violation stays suppressed |
 | "Rule matches no assembly" guard | Not verified | Not exercised in the seeded run; the `Forbidden` side was exercised on 2026-11-23 |
-| Analyzer step | Not verified | Documented from Unity's analyzer pages; no analyzer DLL installed. Warnings-as-errors through response files not confirmed for Unity 6 |
+| Analyzer step | Not verified | Documented from Unity's analyzer pages; no analyzer DLL installed. Verified on 2026-11-23, except warnings-as-errors through response files |
 | Project Auditor built-in version | Not verified | Built in and Window > Analysis confirmed; the first Editor version that includes it is not |
 | Crash reporting, Addressables content state | Documentation only | Checked against Unity's Diagnostics and Addressables pages on 2026-11-20; no build or crash was run |
 | Windows | Not verified | macOS only |

@@ -6,7 +6,8 @@
 
 Turn the project's architecture and API rules into checks that fail on new violations, so an existing
 project can adopt them without fixing everything first. This document is self-contained.
-**Last verified: November 2026**, with both tests run on Unity 6000.7.0b9 and Test Framework 1.5.1.
+**Last verified: November 2026**, with the three tests and the analyzer setup run on Unity 6000.7.0b9,
+Test Framework 1.5.1 and Microsoft.Unity.Analyzers 1.28.0.
 Confirm Unity Editor, Test Framework and analyzer details against the installed versions before
 writing configuration.
 
@@ -235,6 +236,9 @@ namespace Game.Tests.EditMode
             ("draw-mesh", @"\bGraphics\.DrawMesh(Instanced)?\s*\(", k_anyCode, "Use the RenderMesh family"),
             ("uxml-factory", @"\bUxml(Factory|Traits)\b", k_anyCode, "Use [UxmlElement] and [UxmlAttribute]"),
             ("lambda-subscription", @"\+=\s*(\([^)]*\)|\w+)\s*=>", k_runtimeCode, "Subscribe a named method so it can be unsubscribed"),
+            ("gameobject-find", @"\bGameObject\.(Find|FindWithTag|FindGameObjectsWithTag)\s*\(", k_runtimeCode, "Use a serialized reference; name lookups break on rename"),
+            ("legacy-input", @"\bInput\.(GetKey|GetButton|GetAxis|GetMouseButton)\w*\s*\(", k_runtimeCode, "Use Input System actions"),
+            ("string-message", @"(?<!\b[A-Z]\w*\.)\b(SendMessage|SendMessageUpwards|BroadcastMessage)\s*\(\s*""", k_runtimeCode, "Call a method or raise an event; string messages break on rename"),
         };
 
         // Known violations as "path|rule-id". Delete a line when its violation is fixed; never add one.
@@ -289,7 +293,11 @@ namespace Game.Tests.EditMode
 
 Set `s_firstPartyRoots` to the project's own folders first; a root that does not exist fails the test.
 Seed the rules from the deprecated-API table in the project's tech stack document and from rules the
-project has already been bitten by; the rules above are examples. Give runtime-only rules
+project has already been bitten by; the rules above are a starter set. Drop `legacy-input` when the
+project still uses the legacy Input Manager. `Camera.main` is left out on purpose: Unity has cached it
+since 2020.2, so a rule against it is noise. `string-message` skips calls on a type name, such as a
+static `Network.SendMessage("…")`, but still matches a project's own instance method with that name;
+baseline those or rename the method. Give runtime-only rules
 `k_runtimeCode` so test and Editor code do not fill the baseline, and give a rule within one assembly
 a folder filter such as `@"^Assets/_Project/Gameplay/Buildings/"`.
 Keep each pattern narrow: a rule with false positives gets ignored.
@@ -300,23 +308,113 @@ Generate the first baseline from the test's own failure output, then review it w
 **Done:** the test passes with the reviewed baseline, fails when one new violation is added temporarily,
 and fails when one baseline line is left after its violation is fixed.
 
-## 5. Optional: Roslyn analyzers
+## 5. Add the player compile check
 
-Analyzers catch at compile time what the ratchet catches by text. Unity runs an analyzer DLL that carries
-the asset label `RoslynAnalyzer` (exact, case sensitive). A DLL inside an asmdef folder applies only to
-that assembly and the assemblies that reference it, which keeps vendor code out of scope.
+The Editor compiles every assembly with `UnityEditor` available, so runtime code that uses it without
+`#if UNITY_EDITOR` passes in the Editor and breaks the player build. This EditMode test compiles the
+player scripts for the active build target, without building the player, and fails on any error.
 
-- **Microsoft.Unity.Analyzers** adds Unity-specific diagnostics and suppresses false "unused" warnings on
-  Unity messages. Visual Studio and the VS Code Unity extension already apply it in the IDE; adding the DLL
-  with the label makes Unity's own compiler report it too.
-- **Severity:** set per diagnostic in `.editorconfig` (`dotnet_diagnostic.<ID>.severity = error`), or in a
-  `.ruleset`: `Default.ruleset` in `Assets` for all assemblies, a ruleset next to an `.asmdef` for that
-  assembly. Raise severity for first-party assemblies only.
-- Project-wide warnings-as-errors through compiler response files is **Not verified** in Unity 6; prefer
+```csharp
+using System.Collections.Generic;
+using System.IO;
+using NUnit.Framework;
+using UnityEditor;
+using UnityEditor.Build.Player;
+using UnityEngine;
+using UnityEngine.TestTools;
+
+namespace Game.Tests.EditMode
+{
+    public class PlayerCompileTests
+    {
+        private readonly List<string> m_errors = new List<string>();
+
+        [Test]
+        public void PlayerScriptsCompileForActiveTarget()
+        {
+            BuildTarget target = EditorUserBuildSettings.activeBuildTarget;
+            var settings = new ScriptCompilationSettings
+            {
+                target = target,
+                group = BuildPipeline.GetBuildTargetGroup(target),
+            };
+            string outputFolder = Path.Combine(Path.GetTempPath(), "PlayerCompileCheck");
+
+            // Compile errors arrive as error logs; collect them instead of failing on the first one.
+            LogAssert.ignoreFailingMessages = true;
+            m_errors.Clear();
+            Application.logMessageReceived += OnLogMessage;
+            ScriptCompilationResult result;
+            try
+            {
+                result = PlayerBuildInterface.CompilePlayerScripts(settings, outputFolder);
+            }
+            finally
+            {
+                Application.logMessageReceived -= OnLogMessage;
+            }
+
+            Assert.That(m_errors, Is.Empty, $"Player scripts for {target} do not compile:\n" + string.Join("\n", m_errors));
+            Assert.That(result.assemblies, Is.Not.Empty, $"Player scripts for {target} produced no assemblies");
+        }
+
+        private void OnLogMessage(string message, string stackTrace, LogType type)
+        {
+            if (type == LogType.Error || type == LogType.Exception)
+            {
+                m_errors.Add(message);
+            }
+        }
+    }
+}
+```
+
+It checks the active build target only. For a project that ships to several platforms, run it once per
+target in CI, or add a test case per target that has its build support module installed. Record the
+test in the project's `AGENTS.md` as the player compile check.
+
+**Done:** the test passes, and fails with the file and line when a runtime script uses `UnityEditor`
+without `#if UNITY_EDITOR` (then removed).
+
+## 6. Optional: Roslyn analyzers
+
+Analyzers catch at compile time what the ratchet catches by text, including the case a text search
+cannot: `?.`, `??` and `is null` on a `UnityEngine.Object`, which treat a destroyed object as alive.
+
+1. **Get the DLL.** Download the `Microsoft.Unity.Analyzers` package from NuGet (MIT licence) and take
+   `analyzers/dotnet/cs/Microsoft.Unity.Analyzers.dll` from it. Visual Studio and the VS Code Unity
+   extension already run it in the IDE; this step makes Unity's own compiler run it too.
+2. **Scope it by placement.** A DLL inside an asmdef folder applies to that assembly and every assembly
+   that references it. Put it in the Core assembly's folder (for example `Core/Analyzers/`) and it covers
+   Core and the layers built on it, while vendor code, which does not reference Core, stays out. An
+   assembly that does not reference Core, such as an adapter, is not covered.
+3. **Mark it as an analyzer** through the Editor: in the Plugin Inspector turn off Any Platform, Editor and
+   every standalone platform, and give the asset the label `RoslynAnalyzer` (exact, case sensitive).
+4. **Raise the severity.** The diagnostics default to below warning, so Unity's console shows nothing
+   until a ruleset raises them. `Assets/Default.ruleset` applies to every assembly, but only assemblies
+   the analyzer reaches produce diagnostics. A ruleset next to an `.asmdef` applies to that assembly only.
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<RuleSet Name="First-party" ToolsVersion="16.0">
+  <Rules AnalyzerId="Microsoft.Unity.Analyzers" RuleNamespace="Microsoft.Unity.Analyzers">
+    <Rule Id="UNT0007" Action="Error" />
+    <Rule Id="UNT0008" Action="Error" />
+    <Rule Id="UNT0029" Action="Error" />
+  </Rules>
+</RuleSet>
+```
+
+UNT0007, UNT0008 and UNT0029 are null coalescing, null propagation and `is null` on Unity objects. Add
+other diagnostic IDs from the analyzer's documentation once the team agrees on them.
+
+- `.editorconfig` severity (`dotnet_diagnostic.<ID>.severity`) had no effect: Unity did not pass the file
+  to the compiler. Use a ruleset.
+- Project-wide warnings-as-errors through compiler response files is **Not verified**; prefer
   per-diagnostic severity.
 
-**Done:** a seeded diagnostic appears in Unity's console at the configured severity, and vendor assemblies
-report none.
+**Done:** a seeded `?.` on a Unity object fails compilation in a first-party assembly, the same line in a
+vendor assembly compiles, and the seed is removed.
 
 ## Report
 
