@@ -1,5 +1,14 @@
 # Change log
 
+## 2026-11-23 — Code enforcement tests that work on any project
+
+A read-only run of `SetupEnforcement.md` against a real layered project showed the copyable tests assumed the example's names. Fixes:
+
+- The ratchet resolves `s_firstPartyRoots` from the project root and fails with "set s_firstPartyRoots" when a root does not exist, instead of throwing. Baseline paths stay project-relative.
+- Each ratchet rule has an `AppliesTo` path filter. Runtime-only rules (the lambda subscription example) skip `Tests/` and `Editor/` code, and a folder filter enforces a rule inside one assembly, such as "Buildings never references Npcs".
+- The boundary test also fails when a `Forbidden` pattern matches no assembly, and reports all rule problems together. The engine-free list starts empty and the test reports Ignored until one is declared, because many real Core assemblies hold engine infrastructure.
+- The audit looks for vendor code beyond folder names (no asmdef, so it lands in `Assembly-CSharp`; misspelled folders; vendor tools with their own asmdefs) and lists build scenes that use development code, with a migration note before gating it. Project-stated rules take precedence over the examples. The doc names `AssembliesType.Editor` for Editor-assembly rules, and "Last verified" names the Unity and Test Framework versions.
+
 ## 2026-11-20 — Code enforcement, assembly layering, and release corrections from real projects
 
 - New `AuditInstructions/CodeEnforcement/`: `SetupEnforcement.md` (audit-first) declares assembly layers (engine-free core, contracts, features, presentation, composition, plus adapters for vendor code and a development-only assembly) and adds two copyable EditMode tests. The assembly boundary test reads Unity's compiled assembly graph against declared rules and fails when a rule matches no assembly. The banned-API ratchet keeps a baseline of today's violations: new ones fail, and so do entries whose violation is fixed, so the baseline only shrinks. An optional step adds Roslyn analyzers through the `RoslynAnalyzer` label with per-assembly severity. Routed from the root AGENTS.md, the topic index and the root README.

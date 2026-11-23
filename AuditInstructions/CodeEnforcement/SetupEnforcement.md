@@ -6,8 +6,9 @@
 
 Turn the project's architecture and API rules into checks that fail on new violations, so an existing
 project can adopt them without fixing everything first. This document is self-contained.
-**Last verified: November 2026.** Confirm Unity Editor, Test Framework and analyzer details against the
-installed versions before writing configuration.
+**Last verified: November 2026**, with both tests run on Unity 6000.7.0b9 and Test Framework 1.5.1.
+Confirm Unity Editor, Test Framework and analyzer details against the installed versions before
+writing configuration.
 
 ## Operating rules
 
@@ -57,12 +58,21 @@ report is not confirmation.
 ## 1. Audit the current boundaries
 
 Map every first-party assembly, its `references`, `defineConstraints`, `includePlatforms` and
-`noEngineReferences`, plus `.asmref` files. Identify vendor assemblies (Asset Store packs, `3rdParty`,
-`Plugins`) and keep them out of judgement. Record existing standards tests, analyzers and rulesets.
+`noEngineReferences`, plus `.asmref` files. Identify vendor code and keep it out of judgement. Look
+beyond folder names:
+
+- Asset Store and third-party folders under any spelling (`3rdParty`, `ThirdParty`, `Plugins`, a
+  publisher name).
+- Vendor code with no asmdef: it compiles into `Assembly-CSharp` or `Assembly-CSharp-firstpass`, so an
+  assembly rule cannot isolate it until it gets its own asmdef.
+- Vendor tools that ship their own asmdefs, which look first-party by name.
+
+Record existing standards tests, analyzers and rulesets.
 
 Report at least: assemblies that reference presentation or vendor code from core logic; development,
-lab, cheat or preview code that a normal player build compiles; test code outside test assemblies; and
-the dependency rules the project already states in its documents.
+lab, cheat or preview code that a normal player build compiles, and which build scenes reference it;
+test code outside test assemblies; and the dependency rules the project already states in its
+documents. Rules the project already states take precedence over the examples in this document.
 
 **Done:** every first-party assembly has a row with its references and a stated layer, or "no asmdefs".
 
@@ -73,7 +83,7 @@ projects, from the inside out:
 
 | Layer | Holds | May reference |
 |---|---|---|
-| Core / Rules | Pure C# rules and data, `noEngineReferences: true` | Nothing first-party |
+| Core / Rules | Shared rules and data; `noEngineReferences: true` when it holds pure C# only | Nothing first-party |
 | Contracts | Interfaces, events, shared data types | Core |
 | Features | Gameplay systems | Core, Contracts |
 | Presentation | UI, VFX, audio, cameras | Core, Contracts, Features |
@@ -81,8 +91,15 @@ projects, from the inside out:
 | Adapters | Wrappers around vendor packages | Vendor assemblies, Contracts |
 | Development | Cheats, debug consoles, lab scenes, benchmarks | Anything; `defineConstraints` such as `UNITY_EDITOR || DEVELOPMENT_BUILD` |
 
+A Core that holds engine infrastructure (a service locator MonoBehaviour, shared components) needs the
+engine. Keep it, and add a separate engine-free rules assembly only if the project wants one.
+
 Tests can sit next to their module: an `.asmref` in each module's `Tests/EditMode` folder points at one
 shared EditMode test assembly. Record the agreed rules in the project's `AGENTS.md` so they have one owner.
+
+Moving development code behind `defineConstraints` removes it from players. Before that, list the build
+scenes that reference its components: those scenes would load with missing scripts. Either remove the
+scene from the build, move the component to a development-only scene, or keep it with a stated reason.
 
 **Done:** the user has confirmed a rule list, each rule stated as "assembly A never references B, because …".
 
@@ -103,7 +120,8 @@ namespace Game.Tests.EditMode
 {
     public class AssemblyBoundaryTests
     {
-        // From: assemblies the rule applies to. Forbidden: references they must not have.
+        // Replace with the confirmed rules. From: assemblies the rule applies to.
+        // Forbidden: references they must not have. Each pattern must match at least one assembly.
         private static readonly (string From, string Forbidden, string Reason)[] s_rules =
         {
             (@"^Game\.Core$", @"^Game\.", "Core references nothing first-party"),
@@ -111,35 +129,50 @@ namespace Game.Tests.EditMode
             (@"^Game\.(?!Adapters$)", @"^Vendor\.", "Only the adapter assembly references vendor code"),
         };
 
-        private static readonly string[] s_engineFreeAssemblies = { "Game.Core" };
+        // Assemblies with noEngineReferences: true. Leave empty when none is engine-free.
+        private static readonly string[] s_engineFreeAssemblies = { };
 
         [Test]
         public void AssemblyReferencesFollowDeclaredRules()
         {
             Assembly[] assemblies = CompilationPipeline.GetAssemblies(AssembliesType.PlayerWithoutTestAssemblies);
-            var violations = new List<string>();
+            var problems = new List<string>();
             foreach ((string from, string forbidden, string reason) in s_rules)
             {
                 Assembly[] matches = assemblies.Where(assembly => Regex.IsMatch(assembly.name, from)).ToArray();
-                Assert.That(matches, Is.Not.Empty, $"Rule '{from}' matches no assembly; fix the rule");
+                if (matches.Length == 0)
+                {
+                    problems.Add($"From '{from}' matches no assembly; fix the rule");
+                }
+
+                if (!assemblies.Any(assembly => Regex.IsMatch(assembly.name, forbidden)))
+                {
+                    problems.Add($"Forbidden '{forbidden}' matches no assembly; fix the rule");
+                }
+
                 foreach (Assembly assembly in matches)
                 {
                     foreach (Assembly reference in assembly.assemblyReferences)
                     {
                         if (Regex.IsMatch(reference.name, forbidden))
                         {
-                            violations.Add($"{assembly.name} -> {reference.name}: {reason}");
+                            problems.Add($"{assembly.name} -> {reference.name}: {reason}");
                         }
                     }
                 }
             }
 
-            Assert.That(violations, Is.Empty, string.Join("\n", violations));
+            Assert.That(problems, Is.Empty, string.Join("\n", problems));
         }
 
         [Test]
         public void EngineFreeAssembliesDoNotReferenceUnityEngine()
         {
+            if (s_engineFreeAssemblies.Length == 0)
+            {
+                Assert.Ignore("No engine-free assembly declared");
+            }
+
             Assembly[] assemblies = CompilationPipeline.GetAssemblies(AssembliesType.PlayerWithoutTestAssemblies);
             foreach (string name in s_engineFreeAssemblies)
             {
@@ -155,9 +188,17 @@ namespace Game.Tests.EditMode
 }
 ```
 
-A rule that matches no assembly fails on purpose, so a renamed assembly cannot silently disable it.
-Without asmdefs, write the same rules as a source search instead: files under the core folder must not
-contain the game's namespaces or type names.
+A rule whose `From` or `Forbidden` pattern matches no assembly fails on purpose, so a renamed assembly
+cannot silently disable it. An empty engine-free list reports the test as ignored, not passed.
+
+- **Editor assemblies:** `PlayerWithoutTestAssemblies` does not list them. For rules about Editor code,
+  run the same loop over `AssembliesType.Editor`, which also lists test assemblies; keep test
+  assemblies out of the `From` patterns.
+- **Rules inside one assembly** ("Buildings never references Npcs" when both live in `Game.Gameplay`)
+  cannot be seen in the assembly graph. Add them to the ratchet in step 4 as a source rule limited to
+  that folder, such as a pattern for `using Game.Npcs` or the forbidden type names.
+- **Without asmdefs,** write every rule that way: files under the core folder must not contain the
+  game's namespaces or type names.
 
 **Done:** the test passes on the current project, and fails when one forbidden reference is added
 temporarily (then removed).
@@ -174,19 +215,26 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
+using UnityEngine;
 
 namespace Game.Tests.EditMode
 {
     public class StandardsRatchetTests
     {
+        // Replace with the project's first-party source folders, relative to the project root.
         private static readonly string[] s_firstPartyRoots = { "Assets/_Project" };
 
-        private static readonly (string Id, string Pattern, string Fix)[] s_rules =
+        // Path filters, matched against the project-relative path.
+        private const string k_anyCode = "";
+        private const string k_runtimeCode = @"^(?!.*/(Tests?|Editor)/)";
+
+        // AppliesTo limits a rule to matching paths, such as runtime code only or one feature folder.
+        private static readonly (string Id, string Pattern, string AppliesTo, string Fix)[] s_rules =
         {
-            ("find-object-of-type", @"\bFindObjects?OfType\s*[<(]", "Use a serialized reference, or FindAnyObjectByType / FindObjectsByType"),
-            ("draw-mesh", @"\bGraphics\.DrawMesh(Instanced)?\s*\(", "Use the RenderMesh family"),
-            ("uxml-factory", @"\bUxml(Factory|Traits)\b", "Use [UxmlElement] and [UxmlAttribute]"),
-            ("lambda-subscription", @"\+=\s*(\([^)]*\)|\w+)\s*=>", "Subscribe a named method so it can be unsubscribed"),
+            ("find-object-of-type", @"\bFindObjects?OfType\s*[<(]", k_anyCode, "Use a serialized reference, or FindAnyObjectByType / FindObjectsByType"),
+            ("draw-mesh", @"\bGraphics\.DrawMesh(Instanced)?\s*\(", k_anyCode, "Use the RenderMesh family"),
+            ("uxml-factory", @"\bUxml(Factory|Traits)\b", k_anyCode, "Use [UxmlElement] and [UxmlAttribute]"),
+            ("lambda-subscription", @"\+=\s*(\([^)]*\)|\w+)\s*=>", k_runtimeCode, "Subscribe a named method so it can be unsubscribed"),
         };
 
         // Known violations as "path|rule-id". Delete a line when its violation is fixed; never add one.
@@ -211,19 +259,23 @@ namespace Game.Tests.EditMode
 
         private static HashSet<string> FindViolations()
         {
+            string projectRoot = Path.GetDirectoryName(Application.dataPath);
             var violations = new HashSet<string>();
             foreach (string root in s_firstPartyRoots)
             {
-                foreach (string file in Directory.EnumerateFiles(root, "*.cs", SearchOption.AllDirectories))
+                string fullRoot = Path.Combine(projectRoot, root);
+                Assert.That(Directory.Exists(fullRoot), Is.True, $"Root '{root}' not found; set s_firstPartyRoots");
+                foreach (string file in Directory.EnumerateFiles(fullRoot, "*.cs", SearchOption.AllDirectories))
                 {
+                    string path = Path.GetRelativePath(projectRoot, file).Replace('\\', '/');
                     string[] codeLines = File.ReadAllLines(file)
                         .Where(line => !line.TrimStart().StartsWith("//"))
                         .ToArray();
-                    foreach ((string id, string pattern, string _) in s_rules)
+                    foreach ((string id, string pattern, string appliesTo, string _) in s_rules)
                     {
-                        if (codeLines.Any(line => Regex.IsMatch(line, pattern)))
+                        if (Regex.IsMatch(path, appliesTo) && codeLines.Any(line => Regex.IsMatch(line, pattern)))
                         {
-                            violations.Add(file.Replace('\\', '/') + "|" + id);
+                            violations.Add(path + "|" + id);
                         }
                     }
                 }
@@ -235,8 +287,12 @@ namespace Game.Tests.EditMode
 }
 ```
 
+Set `s_firstPartyRoots` to the project's own folders first; a root that does not exist fails the test.
 Seed the rules from the deprecated-API table in the project's tech stack document and from rules the
-project has already been bitten by. Keep each pattern narrow: a rule with false positives gets ignored.
+project has already been bitten by; the rules above are examples. Give runtime-only rules
+`k_runtimeCode` so test and Editor code do not fill the baseline, and give a rule within one assembly
+a folder filter such as `@"^Assets/_Project/Gameplay/Buildings/"`.
+Keep each pattern narrow: a rule with false positives gets ignored.
 The search reads text and skips only whole comment lines, so a match inside a string literal or a
 trailing comment also counts; baseline those or tighten the pattern.
 Generate the first baseline from the test's own failure output, then review it with the user.

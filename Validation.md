@@ -4,13 +4,25 @@ The intended profile is [Unity 6.7](AgentsInstructions/UnityTechStack/UnityTechS
 that choice from the exact prerelease Editor tested. It is not a guarantee for every 6000.7 patch,
 package upgrade, target platform, or copied project. Date: 2026-10-12.
 
+## Code enforcement tests, generalized — 2026-11-23
+
+| Check | Result | Evidence / limit |
+|---|---|---|
+| Handoff on a real project, read-only | Passed with findings | A fresh agent given only `SetupEnforcement.md` audited a layered Unity 6 project and produced rules and a baseline; it surfaced the six flaws fixed in this round. No project file was changed |
+| Both C# tests, copied verbatim from the doc | Passed | Unity 6000.7.0b9, Test Framework 1.5.1, `unity test --mode EditMode`. Clean run: boundary and both ratchet tests pass, engine-free test reports Skipped with an empty list; a lambda subscription in `Tests/` is not flagged |
+| Seeded failures | Passed | All 4 fail with the expected message: Gameplay → Presentation plus a `Forbidden` pattern matching nothing (reported together), Core with engine references, a new runtime lambda plus a folder rule hit in `Buildings/` (the same text outside the folder is not flagged), a stale baseline entry; a baselined violation stays suppressed |
+| Missing root | Passed | Both ratchet tests fail with "Root 'Assets/Missing' not found; set s_firstPartyRoots" |
+| `AssembliesType.Editor` lists test assemblies | Passed | Probe test listed `Game.Tests.EditMode` alongside the player assemblies |
+| `validate_all.py`, `check_installation.py`, `check_naming.py` | Passed | 87 Markdown files, 647 local links and anchors; naming Good 0, Bad 6 |
+| Analyzer step, Windows | Not verified | Unchanged from 2026-11-20 |
+
 ## Code enforcement tests — 2026-11-20
 
 | Check | Result | Evidence / limit |
 |---|---|---|
 | Both C# tests, copied verbatim from SetupEnforcement.md | Passed | Throwaway project on Unity 6000.7.0b9 via `unity test --mode EditMode` (Unity CLI 1.0.1), assemblies named as in the doc. Clean run: 4 of 4 pass |
 | Seeded failures | Passed | Gameplay → Presentation reference, `noEngineReferences` off on Core, one new lambda subscription, one stale baseline entry: 4 of 4 fail with the expected message; a baselined violation stays suppressed |
-| "Rule matches no assembly" guard | Not verified | Not exercised in the seeded run |
+| "Rule matches no assembly" guard | Not verified | Not exercised in the seeded run; the `Forbidden` side was exercised on 2026-11-23 |
 | Analyzer step | Not verified | Documented from Unity's analyzer pages; no analyzer DLL installed. Warnings-as-errors through response files not confirmed for Unity 6 |
 | Project Auditor built-in version | Not verified | Built in and Window > Analysis confirmed; the first Editor version that includes it is not |
 | Crash reporting, Addressables content state | Documentation only | Checked against Unity's Diagnostics and Addressables pages on 2026-11-20; no build or crash was run |
